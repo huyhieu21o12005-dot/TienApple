@@ -1,0 +1,61 @@
+I attached a document with TWO parts. Use them as REFERENCE only:
+PART 1 "Halora" hero = LAYOUT TEMPLATE (composition only).
+PART 2 Apple Vietnam DESIGN.md = typography, spacing, accessibility rules.
+IGNORE from Part 1: sage/olive/rose-gold colours, frosted glass, blur, glass circle, leaf shadows, wellness copy.
+
+GOAL
+Design a complete website for a real phone shop "Tien Mobile" (placeholder) that SELLS phones and REPAIRS phones. Vietnamese copy. Apple.com-level restraint: clean, minimal, premium, hand-built editorial feel. NOT a generic AI-generated website.
+
+SCREENS TO CREATE (desktop 1440x900 and mobile 375x812 for each)
+1. Home hero
+2. Product listing + product detail
+3. Consultation page
+4. Custom order page
+5. Support chat widget (bottom-right corner, on every page)
+
+GLOBAL DESIGN SYSTEM (strict)
+- Colours: page #FFFFFF, surface #F5F5F7, border #D2D2D7, text #1D1D1F, secondary text #6E6E73. Mostly WHITE with BLACK accents. Only accent #0071E3 for text links and focus rings. Primary button solid #1D1D1F with white text; secondary button 1px outline, no fill. Error text #C62828.
+- Type: SF Pro look (fallback Helvetica Neue / Inter), one family. Headline 56-64px weight 600, line-height 1.05, letter-spacing -0.02em, left-aligned. Body 17px/1.5, max 52 characters per line. Labels 12px uppercase tracked. Big numerals weight 300.
+- Shape: cards 16px radius, 1px border, flat; buttons fully rounded pills.
+- Grid: 12 columns, 8px spacing scale, margins 80px desktop / 16px mobile, strong left alignment, whitespace is the main design element.
+- Shared header: logo left; links Điện thoại, Sửa chữa, Phụ kiện, Thu cũ đổi mới, Liên hệ; right: "Giỏ hàng" link with icon and solid black button "Đặt lịch sửa". Mobile: burger menu.
+- States for all buttons/links/inputs: default, hover (subtle fill or opacity change, no movement, no glow), focus-visible (2px #0071E3 ring), pressed, disabled. WCAG 2.2 AA, 44px touch targets.
+
+STRICTLY FORBIDDEN (common AI-website tells)
+NO gradients anywhere. NO blur, glassmorphism or backdrop-filter. NO glow or neon. NO drop shadows (except one soft contact shadow under the hand in the hero). NO purple/blue/pink schemes. NO floating blobs or decorative orbs. NO emoji, NO stars as text characters. NO centred-everything layouts. NO identical 3-column feature-card filler grids. NO badge clutter. NO words like "revolutionary", "seamless", "unleash", "next-level", "cutting-edge". NO lorem ipsum: every number and label must read like real shop information.
+
+SCREEN 1: HOME HERO
+- Composition from Part 1: header on top; left column vertically centred; centre: a real open human HAND rising from the bottom edge, palm up, fingers spread, holding a next-generation iPhone 18 (thin titanium frame, edge-to-edge screen, refined camera island, generic, no logo); right column: three flat info cards stacked vertically.
+- Background pure white studio; only a soft natural contact shadow under the hand and phone.
+- Left copy: eyebrow "Chính hãng, bảo hành 12 tháng"; headline "Điện thoại mới." / "Sửa xong trong ngày."; paragraph "Bán iPhone và điện thoại chính hãng. Sửa màn hình, pin, mainboard, báo giá trước khi làm."; buttons: solid "Xem điện thoại", outlined "Đặt lịch sửa chữa".
+- Cards (flat, #F5F5F7 or white, 1px border, 24px padding, label with simple 1.5px line icon, big numeral, small sub-label): "SỬA CHỮA / 30 phút / Thay màn hình"; "BẢO HÀNH / 12 tháng / Máy chính hãng"; "ĐÁNH GIÁ / 4,9 trên 5 / Khách hàng".
+- NOTE: the hand and background will later be replaced by a Three.js 3D animated scene. Design the hand area as a clear rectangular zone in the centre so the 3D canvas can fit exactly there. Add a small annotation near it: "3D scene: hand + phone, slow float, pointer parallax, scroll lifts the phone".
+
+SCREEN 2: PRODUCT LISTING + DETAIL
+- Title "Điện thoại chính hãng", line "Máy mới, máy cũ đã kiểm tra, bảo hành tại cửa hàng."
+- Left filter column (280px), plain checkbox lists with counts: Hãng (Apple, Samsung, Xiaomi, OPPO); Tình trạng (Mới 100%, Like new, Đã qua sử dụng); Khoảng giá (range slider with two numeric inputs); Dung lượng (128GB, 256GB, 512GB, 1TB); text link "Xóa bộ lọc".
+- Results bar: "48 sản phẩm" and sort select (Mới nhất, Giá thấp đến cao, Giá cao đến thấp).
+- Grid 3 columns, 12 products. Card: flat #F5F5F7 image area with phone photo, name (e.g. "iPhone 16 Pro 256GB"), condition as plain text, price "28.990.000đ" with struck-through old price, text "Trả góp 0%", outlined button "Thêm vào giỏ". Include a few sold-out cards ("Hết hàng", disabled). Number pagination at bottom.
+- Detail variant: large image left; right: name, price, storage chips, flat colour swatches, warranty line, solid black "Mua ngay", outlined "Tư vấn cho tôi", spec table (Màn hình, Chip, Camera, Pin, Bảo hành).
+
+SCREEN 3: CONSULTATION "Tư vấn chọn máy"
+- Left: heading "Bạn cần máy như thế nào?"; questionnaire one question per step with a thin progress line (Bước 1/4): Ngân sách (radio price ranges); Nhu cầu chính (Chụp ảnh, Chơi game, Làm việc, Học tập, Gọi nghe cơ bản); Hãng ưa thích (Apple, Samsung, Không quan trọng); Mới hay cũ. Buttons: outlined "Quay lại", solid "Tiếp tục". Selected option = 2px black border, no colour fill.
+- Right: panel "Gợi ý cho bạn" with 3 recommended phones stacked: name, price, two short reasons ("Camera tốt trong tầm giá", "Pin dùng được 2 ngày"), link "Xem máy".
+- Below: contact row with Hotline, Zalo, giờ làm việc 8:00 đến 21:00, address.
+
+SCREEN 4: CUSTOM ORDER "Đặt máy theo yêu cầu"
+- Intro: "Không thấy máy bạn cần? Cho chúng tôi biết, shop sẽ tìm và báo giá trong 24 giờ."
+- Single-column form, max width 640px, labels above inputs: Họ và tên; Số điện thoại; Hãng và dòng máy; Dung lượng (select); Màu sắc; Tình trạng (radio: Mới 100% / Like new / Đã qua sử dụng); Ngân sách tối đa; Ghi chú thêm (textarea); Ảnh tham khảo (dashed 1px upload box). Checkbox "Tôi muốn nhận báo giá qua Zalo". Full-width solid black button "Gửi yêu cầu".
+- Sticky right column "Quy trình", numbered 1-4 plain text: Gửi yêu cầu, Shop báo giá, Đặt cọc 30%, Nhận máy.
+- Also design: field error state ("Vui lòng nhập số điện thoại hợp lệ" in #C62828) and success state ("Đã nhận yêu cầu #TM-0231. Chúng tôi sẽ gọi lại trong 24 giờ.").
+
+SCREEN 5: SUPPORT CHAT WIDGET (bottom-right, fixed, every page)
+- Closed: solid black circle 56px with a simple chat line icon and optional small white count badge. No shadow, no pulse, no glow.
+- Open: 360x520 panel, 24px from bottom-right, white, 1px #D2D2D7 border, 16px radius, no shadow. Header "Hỗ trợ Tien Mobile", "Thường trả lời trong 5 phút", close icon. Shop messages left in #F5F5F7 bubbles; customer messages right in solid black bubbles with white text; 12px grey timestamps. Outlined quick-reply chips: "Hỏi giá sửa màn hình", "Tư vấn mua máy", "Kiểm tra bảo hành". Footer: input "Nhập tin nhắn...", attach icon, black circular send button.
+- Show three states: closed; open with a short conversation about screen repair price; open empty state. On mobile the open panel becomes a full-screen sheet with a back arrow.
+
+3D MOTION BRIEF (design annotation only; will be built later with Three.js, not by Stitch)
+Hero canvas: GLB hand + phone, flat white #FFFFFF background (no gradient, no fog, no bloom), one key light from above-left, soft contact shadow only. Motion: entrance rise 1.2s ease-out; idle float (~6s period) with the phone slowly rotating; gentle pointer parallax within +-6 degrees; on scroll the phone lifts and rotates toward the camera and its screen swaps to a product image. Respect prefers-reduced-motion (static frame); on mobile use a lighter or static version.
+
+OUTPUT
+Keep all screens consistent with the same header, colours and type. Prioritise clarity, hierarchy and whitespace over decoration.

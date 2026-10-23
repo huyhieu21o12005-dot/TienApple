@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Halora — Smart Ring Hero, Sage Studio</title>
+  
+  <!-- Fonts: Neo-grotesk (Inter) & Light Geometric Display (Plus Jakarta Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ==========================================================================
+       Artboard Scale & Design Tokens (2048 x 1152 reference)
+       --s = min(100vw / 2048, 100vh / 1152) with 0.55px floor on desktop
+       ========================================================================== */
+    :root {
+      --vw-scale: calc(100vw / 2048);
+      --vh-scale: calc(100vh / 1152);
+      --s: max(0.55px, min(var(--vw-scale), var(--vh-scale)));
+
+      /* Palette */
+      --page-bg: #CBCFB8;
+      --ink-deep-forest: #1E3227;
+      --ink-olive-forest: #3F5447;
+      --accent-olive-gold: #9B8A3E;
+      --btn-solid: #1E3227;
+      --cart-pill-bg: rgba(62, 86, 70, 0.52);
+      --glass-card-bg: rgba(224, 227, 212, 0.38);
+      --glass-card-border: rgba(30, 50, 39, 0.22);
+      
+      /* Typography Stacks */
+      --font-neo: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-display: 'Plus Jakarta Sans', var(--font-neo);
+    }
+
+    /* Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--page-bg);
+      color: var(--ink-deep-forest);
+      font-family: var(--font-neo);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ==========================================================================
+       Hero Stage Container (Viewport Locked, No Letterbox)
+       ========================================================================== */
+    .hero-stage {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--page-bg);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* ==========================================================================
+       Background Photo & Seamless Video Layer
+       ========================================================================== */
+    .stage-media-wrap {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    /* Background Video: Fitted to viewport height, anchored to bottom */
+    .stage-video {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 100%;
+      width: auto;
+      min-width: 100%;
+      object-fit: cover;
+      object-position: bottom center;
+      opacity: 0;
+      transition: opacity 0.8s ease-out;
+    }
+
+    .stage-video.ready {
+      opacity: 1;
+    }
+
+    /* Ultra-wide soft edge blend mask */
+    .stage-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 65%, transparent 45%, rgba(203, 207, 184, 0.4) 75%, var(--page-bg) 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Glass Arc accent behind hand */
+    .glass-arc-circle {
+      position: absolute;
+      bottom: calc(-120 * var(--s));
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(880 * var(--s));
+      height: calc(880 * var(--s));
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      box-shadow: 0 0 calc(60 * var(--s)) rgba(255, 255, 255, 0.2) inset, 0 0 calc(40 * var(--s)) rgba(255, 255, 255, 0.15);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ==========================================================================
+       Header
+       ========================================================================== */
+    .stage-header {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      padding: calc(48 * var(--s)) calc(64 * var(--s)) 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Left: Logo */
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: calc(14 * var(--s));
+      text-decoration: none;
+      color: var(--ink-deep-forest);
+    }
+
+    .logo-icon {
+      width: calc(34 * var(--s));
+      height: calc(34 * var(--s));
+    }
+
+    .logo-text {
+      font-size: calc(35 * var(--s));
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    /* Centre: Links at 22s */
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: calc(44 * var(--s));
+    }
+
+    .nav-link {
+      font-size: calc(22 * var(--s));
+      font-weight: 500;
+      color: var(--ink-deep-forest);
+      text-decoration: none;
+      transition: color 0.2s ease, opacity 0.2s ease;
+      opacity: 0.88;
+    }
+
+    .nav-link:hover {
+      opacity: 1;
+      color: #000;
+    }
+
+    /* Right: Cart Pill & Shop the Ring Pill */
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: calc(16 * var(--s));
+    }
+
+    .cart-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: calc(10 * var(--s));
+      padding: calc(14 * var(--s)) calc(26 * var(--s));
+      border-radius: 9999px;
+      background-color: var(--cart-pill-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color: #FFFFFF;
+      font-size: calc(20 * var(--s));
+      font-weight: 500;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .cart-pill:hover {
+      transform: scale(1.03);
+      background-color: rgba(45, 65, 52, 0.7);
+    }
+
+    .cart-icon-svg {
+      width: calc(20 * var(--s));
+      height: calc(20 * var(--s));
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .shop-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: calc(14 * var(--s)) calc(30 * var(--s));
+      border-radius: 9999px;
+      background-color: var(--btn-solid);
+      color: #FFFFFF;
+      font-size: calc(20 * var(--s));
+      font-weight: 500;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .shop-pill:hover {
+      transform: scale(1.03);
+      background-color: #000000;
+    }
+
+    /* ==========================================================================
+       Stage Body: 3-Zone Layout (Copy | Hand / Ring | Metrics)
+       ========================================================================== */
+    .stage-content {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      padding: 0 calc(64 * var(--s));
+      display: grid;
+      grid-template-columns: calc(640 * var(--s)) 1fr calc(260 * var(--s));
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .stage-content > * {
+      pointer-events: auto;
+    }
+
+    /* Left Copy (Vertically Centred) */
+    .copy-zone {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      max-width: calc(620 * var(--s));
+    }
+
+    /* Eyebrow: Dot + "Tracking 24/7" */
+    .eyebrow-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: calc(10 * var(--s));
+      font-size: calc(20 * var(--s));
+      font-weight: 500;
+      color: var(--ink-olive-forest);
+      margin-bottom: calc(24 * var(--s));
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .tracking-dot {
+      width: calc(9 * var(--s));
+      height: calc(9 * var(--s));
+      border-radius: 50%;
+      background-color: var(--ink-deep-forest);
+      position: relative;
+    }
+
+    .tracking-dot::after {
+      content: '';
+      position: absolute;
+      inset: calc(-4 * var(--s));
+      border-radius: 50%;
+      border: 1px solid var(--ink-deep-forest);
+      opacity: 0.5;
+      animation: pulsePing 2.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes pulsePing {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      80%, 100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* Headline at 69s with mask reveal */
+    .headline-mask {
+      overflow: hidden;
+      margin-bottom: calc(6 * var(--s));
+    }
+
+    .headline-line {
+      display: block;
+      font-size: calc(69 * var(--s));
+      font-weight: 600;
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+      color: var(--ink-deep-forest);
+    }
+
+    /* Paragraph */
+    .copy-paragraph {
+      font-size: calc(24 * var(--s));
+      font-weight: 400;
+      line-height: 1.45;
+      color: var(--ink-olive-forest);
+      margin-top: calc(28 * var(--s));
+      margin-bottom: calc(44 * var(--s));
+      max-width: calc(560 * var(--s));
+    }
+
+    /* CTA Dark Pill */
+    .cta-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: calc(64 * var(--s));
+      padding: 0 calc(42 * var(--s));
+      border-radius: 9999px;
+      background-color: var(--btn-solid);
+      color: #FFFFFF;
+      font-size: calc(20 * var(--s));
+      font-weight: 500;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .cta-pill:hover {
+      transform: scale(1.03);
+      background-color: #000000;
+    }
+
+    /* Middle Zone: Spacer for Hand in 3-zone grid */
+    .hand-spacer-zone {
+      /* Hand visual rests in background under this zone */
+      height: 100%;
+    }
+
+    /* Right Metrics: Three 222×160s Glass Cards */
+    .metrics-zone {
+      display: flex;
+      flex-direction: column;
+      gap: calc(20 * var(--s));
+      align-items: flex-end;
+    }
+
+    .metric-glass-card {
+      width: calc(222 * var(--s));
+      height: calc(160 * var(--s));
+      border-radius: calc(20 * var(--s));
+      background-color: var(--glass-card-bg);
+      border: 1px solid var(--glass-card-border);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding: calc(20 * var(--s)) calc(22 * var(--s));
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+      /* No drop shadow per prompt */
+    }
+
+    .metric-glass-card:hover {
+      transform: translateY(calc(-3 * var(--s)));
+      border-color: rgba(30, 50, 39, 0.45);
+      background-color: rgba(224, 227, 212, 0.55);
+    }
+
+    .metric-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .metric-label {
+      font-size: calc(14 * var(--s));
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-deep-forest);
+    }
+
+    .metric-icon-svg {
+      width: calc(18 * var(--s));
+      height: calc(18 * var(--s));
+      stroke: var(--ink-deep-forest);
+      fill: none;
+      stroke-width: 1.8;
+    }
+
+    .metric-numeral {
+      font-family: var(--font-display);
+      font-size: calc(44 * var(--s));
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      color: var(--ink-deep-forest);
+      margin-top: calc(4 * var(--s));
+    }
+
+    .metric-sublabel {
+      font-size: calc(13 * var(--s));
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-olive-gold);
+    }
+
+    /* Mobile Hamburger Menu */
+    .mobile-burger-btn {
+      display: none;
+      width: calc(44 * var(--s));
+      height: calc(44 * var(--s));
+      border-radius: 50%;
+      background-color: var(--cart-pill-bg);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(12px);
+      color: var(--ink-deep-forest);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Mobile Drawer */
+    .mobile-menu-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 280px;
+      height: 100vh;
+      background: rgba(203, 207, 184, 0.95);
+      backdrop-filter: blur(20px);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      padding: 30px;
+      gap: 20px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      border-left: 1px solid var(--glass-card-border);
+    }
+
+    .mobile-menu-drawer.open {
+      transform: translateX(0);
+    }
+
+    /* ==========================================================================
+       Responsive Breakpoints
+       ========================================================================== */
+    @media (max-width: 1200px) {
+      .stage-content {
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+      }
+      .hand-spacer-zone {
+        display: none;
+      }
+    }
+
+    @media (max-width: 820px) {
+      :root {
+        --s: max(0.45px, 100vw / 600);
+      }
+      .header-nav, .header-right {
+        display: none;
+      }
+      .mobile-burger-btn {
+        display: flex;
+      }
+      .stage-content {
+        grid-template-columns: 1fr;
+        height: auto;
+        padding-top: calc(30 * var(--s));
+        padding-bottom: calc(40 * var(--s));
+        gap: 24px;
+        overflow-y: auto;
+      }
+      .metrics-zone {
+        flex-direction: row;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        width: 100%;
+      }
+      .metric-glass-card {
+        width: calc(48% - 8px);
+        height: auto;
+        min-height: calc(130 * var(--s));
+      }
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+      .stage-video {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero-stage" id="heroStage">
+
+    <!-- Background Hand & Ring Video with Seamless Crossfade -->
+    <div class="stage-media-wrap">
+      <div class="glass-arc-circle"></div>
+      
+      <!-- Video Layer: Loop crossfade seamlessly -->
+      <video 
+        id="bgVideo"
+        class="stage-video"
+        autoplay
+        loop
+        muted
+        playsinline
+        preload="auto"
+        poster="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1920&auto=format&fit=crop&q=80"
+      >
+        <source src="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/e6d15706-f42b-400d-beda-75840834e8bc.mp4" type="video/mp4" />
+      </video>
+
+      <div class="stage-vignette"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="stage-header" id="stageHeader">
+      <!-- Left: Logo -->
+      <a href="#" class="header-left anim-item">
+        <!-- Six-petal dashed circle logo -->
+        <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
+          <circle cx="18" cy="18" r="15" stroke="#1E3227" stroke-width="2" stroke-dasharray="4 4" />
+          <path d="M18 6 C18 12 14 16 9 18 C14 18 18 22 18 30 C18 22 22 18 27 18 C22 16 18 12 18 6 Z" fill="#1E3227" opacity="0.8" />
+        </svg>
+        <span class="logo-text">Halora</span>
+      </a>
+
+      <!-- Centre: Nav Links at 22s -->
+      <nav class="header-nav">
+        <a href="#technology" class="nav-link anim-item">Technology</a>
+        <a href="#health" class="nav-link anim-item">Health</a>
+        <a href="#activity" class="nav-link anim-item">Activity</a>
+        <a href="#insights" class="nav-link anim-item">Insights</a>
+      </nav>
+
+      <!-- Right: Cart & Shop pills -->
+      <div class="header-right">
+        <button class="cart-pill anim-item" id="cartPillBtn">
+          <svg class="cart-icon-svg" viewBox="0 0 24 24">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span>Cart</span>
+        </button>
+
+        <a href="#shop" class="shop-pill anim-item">
+          Shop the Ring
+        </a>
+      </div>
+
+      <!-- Mobile Hamburger Button -->
+      <button class="mobile-burger-btn" id="mobileBurgerBtn" aria-label="Open navigation">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-menu-drawer" id="mobileDrawer">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="logo-text" style="font-size: 24px;">Halora</span>
+        <button id="closeDrawerBtn" style="background: none; border: none; font-size: 24px; cursor: pointer;">✕</button>
+      </div>
+      <a href="#technology" style="font-size: 18px; color: var(--ink-deep-forest); text-decoration: none;">Technology</a>
+      <a href="#health" style="font-size: 18px; color: var(--ink-deep-forest); text-decoration: none;">Health</a>
+      <a href="#activity" style="font-size: 18px; color: var(--ink-deep-forest); text-decoration: none;">Activity</a>
+      <a href="#insights" style="font-size: 18px; color: var(--ink-deep-forest); text-decoration: none;">Insights</a>
+      <a href="#shop" class="shop-pill" style="text-align: center; margin-top: 20px;">Shop the Ring</a>
+    </div>
+
+    <!-- 3-Zone Stage Body -->
+    <main class="stage-content">
+      
+      <!-- Left Copy (Vertically Centred) -->
+      <div class="copy-zone">
+        <div class="eyebrow-wrap" id="eyebrowWrap">
+          <span class="tracking-dot" id="trackingDot"></span>
+          <span id="eyebrowText">Tracking 24/7</span>
+        </div>
+
+        <div class="headline-mask">
+          <h1 class="headline-line" id="headlineLine1">Know Your Body.</h1>
+        </div>
+        <div class="headline-mask">
+          <div class="headline-line" id="headlineLine2">Move With It.</div>
+        </div>
+
+        <p class="copy-paragraph" id="copyParagraph">
+          Sleep, recovery, stress, heart rate and activity — tracked continuously and turned into insights you can actually use.
+        </p>
+
+        <a href="#shop" class="cta-pill" id="ctaPill">
+          Explore the Ring
+        </a>
+      </div>
+
+      <!-- Middle Hand Spacer -->
+      <div class="hand-spacer-zone"></div>
+
+      <!-- Right Metrics: Three 222×160s Glass Cards -->
+      <div class="metrics-zone">
+        
+        <!-- Metric Card 1: Sleep -->
+        <article class="metric-glass-card" id="cardSleep">
+          <div class="metric-header">
+            <span class="metric-label">SLEEP</span>
+            <svg class="metric-icon-svg" viewBox="0 0 24 24">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </div>
+          <div class="metric-numeral">7h 42m</div>
+          <div class="metric-sublabel">GOOD</div>
+        </article>
+
+        <!-- Metric Card 2: Calories -->
+        <article class="metric-glass-card" id="cardCalories">
+          <div class="metric-header">
+            <span class="metric-label">CALORIES</span>
+            <svg class="metric-icon-svg" viewBox="0 0 24 24">
+              <path d="M12 2c1 3 4 5 4 9a6 6 0 0 1-12 0c0-4 3-6 4-9 1 2 2 3 4 0z"></path>
+            </svg>
+          </div>
+          <div class="metric-numeral">1642</div>
+          <div class="metric-sublabel">KCAL</div>
+        </article>
+
+        <!-- Metric Card 3: HRV -->
+        <article class="metric-glass-card" id="cardHrv">
+          <div class="metric-header">
+            <span class="metric-label">HRV</span>
+            <svg class="metric-icon-svg" viewBox="0 0 24 24">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+            </svg>
+          </div>
+          <div class="metric-numeral">68</div>
+          <div class="metric-sublabel">MS</div>
+        </article>
+
+      </div>
+
+    </main>
+
+    <!-- Bottom edge anchor filler -->
+    <div style="height: 1px;"></div>
+
+  </div>
+
+  <!-- ==========================================================================
+       Motion Controller: Web Animations API Entrance & Seamless Video Loop
+       ========================================================================== -->
+  <script>
+    (function() {
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const video = document.getElementById('bgVideo');
+
+      // Video First Frame Ready Fade-in (0.8s)
+      if (video) {
+        if (!prefersReduced) {
+          video.addEventListener('canplay', () => {
+            video.classList.add('ready');
+          }, { once: true });
+        } else {
+          video.pause();
+        }
+
+        // Loop crossfade last second into first
+        video.addEventListener('timeupdate', () => {
+          if (video.duration) {
+            // When within 0.8s of end, fade smoothly
+            const timeLeft = video.duration - video.currentTime;
+            if (timeLeft < 0.8) {
+              video.style.opacity = (timeLeft / 0.8).toFixed(2);
+            } else if (video.currentTime < 0.8) {
+              video.style.opacity = (video.currentTime / 0.8).toFixed(2);
+            } else {
+              video.style.opacity = '1';
+            }
+          }
+        });
+      }
+
+      // Mobile Drawer
+      const burger = document.getElementById('mobileBurgerBtn');
+      const drawer = document.getElementById('mobileDrawer');
+      const closeBtn = document.getElementById('closeDrawerBtn');
+
+      if (burger && drawer) {
+        burger.addEventListener('click', () => drawer.classList.add('open'));
+        closeBtn?.addEventListener('click', () => drawer.classList.remove('open'));
+      }
+
+      // Web Animations API Entrance
+      if (!prefersReduced) {
+        // Wait for fonts & page load
+        document.fonts.ready.then(() => {
+          playEntranceAnimation();
+        });
+      }
+
+      function playEntranceAnimation() {
+        // 1. Header items drop down from -30px
+        const headerItems = document.querySelectorAll('.anim-item');
+        headerItems.forEach((el, index) => {
+          el.animate([
+            { opacity: 0, transform: 'translateY(-24px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], {
+            duration: 800,
+            delay: 100 + index * 60,
+            easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+            fill: 'backwards'
+          });
+        });
+
+        // 2. Tracking dot clip reveal & label
+        const dot = document.getElementById('trackingDot');
+        const eyebrowText = document.getElementById('eyebrowText');
+        if (dot && eyebrowText) {
+          dot.animate([
+            { transform: 'scale(0)', opacity: 0 },
+            { transform: 'scale(1)', opacity: 1 }
+          ], {
+            duration: 600,
+            delay: 350,
+            easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+            fill: 'backwards'
+          });
+
+          eyebrowText.animate([
+            { opacity: 0, transform: 'translateX(-12px)' },
+            { opacity: 1, transform: 'translateX(0)' }
+          ], {
+            duration: 600,
+            delay: 450,
+            easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+            fill: 'backwards'
+          });
+        }
+
+        // 3. Headline lines rise inside their own masks
+        const line1 = document.getElementById('headlineLine1');
+        const line2 = document.getElementById('headlineLine2');
+
+        if (line1) {
+          line1.animate([
+            { transform: 'translateY(110%)', opacity: 0 },
+            { transform: 'translateY(0)', opacity: 1 }
+          ], {
+            duration: 900,
+            delay: 450,
+            easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+            fill: 'backwards'
+          });
+        }
+
+        if (line2) {
+          line2.animate([
+            { transform: 'translateY(110%)', opacity: 0 },
+            { transform: 'translateY(0)', opacity: 1 }
+          ], {
+            duration: 900,
+            delay: 580,
+            easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+            fill: 'backwards'
+          });
+        }
+
+        // 4. Paragraph & CTA settle in
+        const paragraph = document.getElementById('copyParagraph');
+        const cta = document.getElementById('ctaPill');
+
+        if (paragraph) {
+          paragraph.animate([
+            { opacity: 0, transform: 'translateY(20px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], {
+            duration: 800,
+            delay: 720,
+            easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+            fill: 'backwards'
+          });
+        }
+
+        if (cta) {
+          cta.animate([
+            { opacity: 0, transform: 'translateY(18px) scale(0.96)' },
+            { opacity: 1, transform: 'translateY(0) scale(1)' }
+          ], {
+            duration: 750,
+            delay: 840,
+            easing: 'cubic-bezier(0.34, 1.3, 0.64, 1)',
+            fill: 'backwards'
+          });
+        }
+
+        // 5. Glass cards rise one after another
+        const cards = [
+          document.getElementById('cardSleep'),
+          document.getElementById('cardCalories'),
+          document.getElementById('cardHrv')
+        ];
+
+        cards.forEach((card, index) => {
+          if (card) {
+            card.animate([
+              { opacity: 0, transform: 'translateY(40px) scale(0.92)' },
+              { opacity: 1, transform: 'translateY(0) scale(1)' }
+            ], {
+              duration: 900,
+              delay: 600 + index * 140,
+              easing: 'cubic-bezier(0.2, 0.9, 0.3, 1)',
+              fill: 'backwards'
+            });
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

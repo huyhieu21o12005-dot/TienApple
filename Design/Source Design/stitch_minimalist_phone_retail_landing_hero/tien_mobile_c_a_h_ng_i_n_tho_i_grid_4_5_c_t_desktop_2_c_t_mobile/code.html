@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tien Mobile — Điện thoại chính hãng &amp; Sửa chữa</title>
+<!-- Tailwind CSS CDN with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-primary": "#ffffff",
+            "on-error": "#ffffff",
+            "error": "#ba1a1a",
+            "border-hairline": "#d2d2d7",
+            "primary-container": "#1d1d1f",
+            "surface-secondary": "#f5f5f7",
+            "surface-base": "#ffffff",
+            "secondary": "#0071e3",
+            "primary": "#1d1d1f",
+            "outline": "#6e6e73",
+            "surface-container": "#efedf3",
+            "surface-container-high": "#e9e7ed"
+          },
+          fontFamily: {
+            sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "SF Pro Text", "Helvetica Neue", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: #ffffff;
+      color: #1d1d1f;
+    }
+    
+    /* Touch target helpers */
+    .touch-target {
+      min-height: 44px;
+    }
+
+    /* Scrollbar hide */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-white text-[#1d1d1f]">
+<!-- Top Navigation (Apple style clean bar) -->
+<header class="sticky top-0 z-40 w-full h-14 sm:h-16 bg-white/90 backdrop-blur-md border-b border-border-hairline transition-all">
+<div class="max-w-[1600px] h-full mx-auto px-4 sm:px-8 flex items-center justify-between">
+<div class="flex items-center gap-8">
+<a aria-label="Tien Mobile Trang chủ" class="flex items-center gap-2.5 font-semibold text-lg text-primary tracking-tight" href="#">
+<svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<rect height="20" rx="3" ry="3" width="14" x="5" y="2"></rect>
+<line x1="12" x2="12.01" y1="18" y2="18"></line>
+</svg>
+<span class="font-bold tracking-tight">Tien Mobile</span>
+</a>
+<nav aria-label="Điều hướng chính" class="hidden md:flex items-center gap-7 text-xs font-normal text-outline">
+<a class="text-primary font-medium transition-colors hover:text-secondary" href="#dienthoai">Điện thoại</a>
+<a class="hover:text-primary transition-colors" href="#suachua">Sửa chữa</a>
+<a class="hover:text-primary transition-colors" href="#phukien">Phụ kiện</a>
+<a class="hover:text-primary transition-colors" href="#thucu">Thu cũ đổi mới</a>
+<a class="hover:text-primary transition-colors" href="#lienhe">Liên hệ</a>
+</nav>
+</div>
+<div class="flex items-center gap-3 sm:gap-5">
+<a aria-label="Giỏ hàng" class="flex items-center gap-1.5 text-xs text-primary font-medium hover:text-secondary transition-colors" href="#giohang">
+<svg class="w-4 h-4 stroke-current fill-none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<circle cx="9" cy="21" r="1"></circle>
+<circle cx="20" cy="21" r="1"></circle>
+<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+</svg>
+<span class="hidden sm:inline">Giỏ hàng</span>
+<span class="bg-surface-secondary text-[11px] px-1.5 py-0.5 rounded-full border border-border-hairline font-semibold">2</span>
+</a>
+<a class="hidden sm:inline-flex items-center justify-center h-8 px-4 bg-primary text-white text-xs font-medium rounded-full hover:opacity-90 active:opacity-80 transition-opacity" href="#datlich">
+          Đặt lịch sửa
+        </a>
+<button aria-label="Menu" class="md:hidden p-1.5 text-primary hover:bg-surface-secondary rounded-lg">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<line x1="3" x2="21" y1="12" y2="12"></line>
+<line x1="3" x2="21" y1="6" y2="6"></line>
+<line x1="3" x2="21" y1="18" y2="18"></line>
+</svg>
+</button>
+</div>
+</div>
+</header>
+<main class="w-full flex-1">
+<!-- Category Banner Header -->
+<section class="w-full bg-white border-b border-border-hairline py-8 sm:py-10">
+<div class="max-w-[1600px] mx-auto px-4 sm:px-8">
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+<div>
+<div class="flex items-center gap-2 text-[11px] font-semibold text-outline uppercase tracking-wider mb-2">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+              Danh mục thiết bị di động
+            </div>
+<h1 class="text-2xl sm:text-4xl font-semibold text-primary tracking-tight">
+              Điện thoại chính hãng
+            </h1>
+<p class="text-xs sm:text-sm text-outline mt-1.5 max-w-2xl leading-relaxed">
+              Máy mới 100%, máy Like New đã qua kiểm tra 32 bước nghiêm ngặt. Cam kết linh kiện zin 100%, bảo hành lỗi 1 đổi 1 chu đáo.
+            </p>
+</div>
+<!-- Quick Category Filters Pills -->
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+<button class="px-4 py-2 rounded-full bg-primary text-white text-xs font-medium whitespace-nowrap transition-colors">
+              Tất cả (48)
+            </button>
+<button class="px-4 py-2 rounded-full bg-surface-secondary text-primary hover:bg-surface-container text-xs font-medium whitespace-nowrap transition-colors">
+              Apple (24)
+            </button>
+<button class="px-4 py-2 rounded-full bg-surface-secondary text-primary hover:bg-surface-container text-xs font-medium whitespace-nowrap transition-colors">
+              Samsung (14)
+            </button>
+<button class="px-4 py-2 rounded-full bg-surface-secondary text-primary hover:bg-surface-container text-xs font-medium whitespace-nowrap transition-colors">
+              Like New (20)
+            </button>
+<button class="px-4 py-2 rounded-full bg-surface-secondary text-primary hover:bg-surface-container text-xs font-medium whitespace-nowrap transition-colors">
+              Cũ 95-98% (8)
+            </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Content: Sidebar Filter + Wide Products Grid (4 to 5 cols desktop, 2 cols mobile) -->
+<section class="w-full max-w-[1600px] mx-auto px-4 sm:px-8 py-8 sm:py-10">
+<div class="flex flex-col lg:flex-row items-start gap-8 xl:gap-10">
+<!-- Sidebar Filter (260px Fixed Desktop, sleek minimalism) -->
+<aside class="w-full lg:w-[260px] lg:flex-shrink-0 space-y-6 lg:sticky lg:top-24 bg-white">
+<div class="flex items-center justify-between pb-3 border-b border-border-hairline">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-primary">tune</span>
+<span class="font-semibold text-sm text-primary">Bộ lọc tìm kiếm</span>
+</div>
+<button class="text-xs text-secondary hover:underline cursor-pointer font-medium" id="reset-filters">
+              Thiết lập lại
+            </button>
+</div>
+<!-- Brand Filter -->
+<div class="space-y-3 pb-5 border-b border-border-hairline">
+<h3 class="text-xs font-semibold text-outline uppercase tracking-wider">Hãng sản xuất</h3>
+<div class="space-y-2">
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="flex items-center gap-2.5">
+<input checked="" class="w-4 h-4 rounded border-border-hairline text-primary focus:ring-0 accent-primary cursor-pointer" type="checkbox"/>
+<span class="text-xs text-primary group-hover:text-secondary transition-colors">Apple</span>
+</span>
+<span class="text-[11px] text-outline">(24)</span>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="flex items-center gap-2.5">
+<input class="w-4 h-4 rounded border-border-hairline text-primary focus:ring-0 accent-primary cursor-pointer" type="checkbox"/>
+<span class="text-xs text-primary group-hover:text-secondary transition-colors">Samsung</span>
+</span>
+<span class="text-[11px] text-outline">(14)</span>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="flex items-center gap-2.5">
+<input class="w-4 h-4 rounded border-border-hairline text-primary focus:ring-0 accent-primary cursor-pointer" type="checkbox"/>
+<span class="text-xs text-primary group-hover:text-secondary transition-colors">Xiaomi</span>
+</span>
+<span class="text-[11px] text-outline">(6)</span>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="flex items-center gap-2.5">
+<input class="w-4 h-4 rounded border-border-hairline text-primary focus:ring-0 accent-primary cursor-pointer" type="checkbox"/>
+<span class="text-xs text-primary group-hover:text-secondary transition-colors">OPPO</span>
+</span>
+<span class="text-[11px] text-outline">(4)</span>
+</label>
+</div>
+</div>
+<!-- Condition Filter -->
+<div class="space-y-3 pb-5 border-b border-border-hairline">
+<h3 class="text-xs font-semibold text-outline uppercase tracking-wider">Tình trạng máy</h3>
+<div class="space-y-2">
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="flex items-center gap-2.5">
+<input checked="" class="w-4 h-4 rounded border-border-hairline text-primary focus:ring-0 accent-primary cursor-pointer" type="checkbox"/>
+<span class="text-xs text-primary group-hover:text-secondary transition-colors">Mới 100% nguyên seal</span>
+</span>
+<span class="text-[11px] text-outline">(28)</span>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="flex items-center gap-2.5">
+<input class="w-4 h-4 rounded border-border-hairline text-primary focus:ring-0 accent-primary cursor-pointer" type="checkbox"/>
+<span class="text-xs text-primary group-hover:text-secondary transition-colors">Like New 99%</span>
+</span>
+<span class="text-[11px] text-outline">(12)</span>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="flex items-center gap-2.5">
+<input class="w-4 h-4 rounded border-border-hairline text-primary focus:ring-0 accent-primary cursor-pointer" type="checkbox"/>
+<span class="text-xs text-primary group-hover:text-secondary transition-colors">Cũ zin (95-98%)</span>
+</span>
+<span class="text-[11px] text-outline">(8)</span>
+</label>
+</div>
+</div>
+<!-- Price Range Slider -->
+<div class="space-y-3 pb-5 border-b border-border-hairline">
+<h3 class="text-xs font-semibold text-outline uppercase tracking-wider">Khoảng giá (VNĐ)</h3>
+<div class="grid grid-cols-2 gap-2 text-xs">
+<div>
+<span class="text-[10px] text-outline">Từ:</span>
+<div class="mt-0.5 px-2.5 py-1.5 bg-surface-secondary border border-border-hairline rounded-lg text-primary font-medium">10 tr</div>
+</div>
+<div>
+<span class="text-[10px] text-outline">Đến:</span>
+<div class="mt-0.5 px-2.5 py-1.5 bg-surface-secondary border border-border-hairline rounded-lg text-primary font-medium">40 tr</div>
+</div>
+</div>
+<input class="w-full accent-primary h-1 bg-surface-secondary rounded-lg cursor-pointer" max="50" min="5" type="range" value="40"/>
+</div>
+<!-- Capacity Filter -->
+<div class="space-y-3 pb-5 border-b border-border-hairline">
+<h3 class="text-xs font-semibold text-outline uppercase tracking-wider">Dung lượng</h3>
+<div class="grid grid-cols-2 gap-2">
+<label class="flex items-center gap-2 p-2 rounded-lg border border-border-hairline hover:bg-surface-secondary cursor-pointer text-xs">
+<input class="rounded border-border-hairline text-primary focus:ring-0 accent-primary" type="checkbox"/>
+<span>128GB</span>
+</label>
+<label class="flex items-center gap-2 p-2 rounded-lg border-2 border-primary bg-surface-secondary cursor-pointer text-xs font-medium">
+<input checked="" class="rounded border-border-hairline text-primary focus:ring-0 accent-primary" type="checkbox"/>
+<span>256GB</span>
+</label>
+<label class="flex items-center gap-2 p-2 rounded-lg border border-border-hairline hover:bg-surface-secondary cursor-pointer text-xs">
+<input class="rounded border-border-hairline text-primary focus:ring-0 accent-primary" type="checkbox"/>
+<span>512GB</span>
+</label>
+<label class="flex items-center gap-2 p-2 rounded-lg border border-border-hairline hover:bg-surface-secondary cursor-pointer text-xs">
+<input class="rounded border-border-hairline text-primary focus:ring-0 accent-primary" type="checkbox"/>
+<span>1TB</span>
+</label>
+</div>
+</div>
+<!-- Quality Guarantee Note -->
+<div class="p-3.5 bg-surface-secondary rounded-xl border border-border-hairline">
+<div class="flex items-center gap-1.5 text-xs font-semibold text-primary">
+<span class="material-symbols-outlined text-secondary text-base">verified</span>
+              Cam kết Tien Mobile
+            </div>
+<p class="text-[11px] text-outline mt-1.5 leading-relaxed">
+              100% nguyên bản, phát hiện máy dựng đền gấp đôi. Bao test 30 ngày 1 đổi 1 ngay tại quầy.
+            </p>
+</div>
+</aside>
+<!-- Right Content: Results Toolbar & 4-5 Column Product Grid -->
+<div class="flex-1 w-full space-y-6">
+<!-- Toolbar Header -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border-hairline">
+<div class="flex items-center gap-2.5">
+<span class="text-sm font-semibold text-primary">48 sản phẩm</span>
+<span class="text-xs px-2.5 py-0.5 rounded-full bg-surface-secondary text-outline">Apple, Mới 100%, 256GB</span>
+</div>
+<div class="flex items-center gap-2 self-end sm:self-auto">
+<label class="text-xs text-outline whitespace-nowrap" for="sort-select">Sắp xếp:</label>
+<div class="relative">
+<select class="appearance-none bg-surface-secondary border border-border-hairline text-primary text-xs rounded-lg pl-3 pr-8 py-1.5 focus:outline-none focus:border-secondary cursor-pointer" id="sort-select">
+<option selected="">Mới nhất</option>
+<option>Giá thấp đến cao</option>
+<option>Giá cao đến thấp</option>
+<option>Bán chạy nhất</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-outline text-base">
+                  expand_more
+                </span>
+</div>
+</div>
+</div>
+<!-- Product Grid: 2 columns on Mobile, 4 columns on Desktop, 5 columns on XL screen -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
+<!-- Card 1: iPhone 16 Pro 256GB -->
+<article class="group bg-white border border-border-hairline rounded-2xl p-3 sm:p-4 flex flex-col justify-between hover:border-outline transition-all duration-150">
+<div>
+<div class="relative w-full aspect-square bg-surface-secondary rounded-xl flex items-center justify-center p-3 sm:p-4 overflow-hidden mb-3">
+<span class="absolute top-2 left-2 text-[10px] font-semibold text-outline uppercase bg-white px-2 py-0.5 rounded-full border border-border-hairline">
+                    Mới 100%
+                  </span>
+<span class="absolute top-2 right-2 text-secondary text-[10px] font-semibold">
+                    0% LS
+                  </span>
+<img class="object-contain w-full h-full group-hover:scale-105 transition-transform duration-200" data-alt="Minimalist studio photograph of the titanium frame iPhone 16 Pro resting upright against a neutral soft gray background with crisp clean studio lighting and sharp industrial reflection" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxksiYeIg76BCtVBPAV2f85yd0fNJR8I8GGjO14EScIOquvy9v-HCfHaZfwCGHj7p87D0onr3W84Z4ASmM3hYjDcZBzgg7hVT4VbMX3RVnEh-IDzT5hFLMuANboxNREdnDZqVurN_cFjL0J4Gm0CaxzCFIBGFbc9lZp8h7LMPE0OawZJceDJL8C_D-qbWXDC3M9JlbjC7Twd0ZYYSu5LeuQSj62jcGgYeIompkYCJaNMx4k26_y0PM"/>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-1 text-[11px] text-secondary">
+<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-medium text-primary">5.0</span>
+<span class="text-outline text-[10px]">(64)</span>
+</div>
+<h2 class="text-xs sm:text-sm font-semibold text-primary group-hover:text-secondary transition-colors line-clamp-1 leading-snug">
+                    iPhone 16 Pro 256GB
+                  </h2>
+<p class="text-[11px] text-outline line-clamp-1">Titan Tự Nhiên • A18 Pro</p>
+</div>
+</div>
+<div class="pt-3 mt-3 border-t border-border-hairline">
+<div class="flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-1.5 mb-2.5">
+<span class="text-xs sm:text-sm font-bold text-primary tracking-tight">28.990.000₫</span>
+<span class="text-[10px] sm:text-[11px] text-outline line-through">31.990.000₫</span>
+</div>
+<div class="grid grid-cols-2 gap-1.5">
+<button class="touch-target py-1.5 px-2 rounded-full border border-primary text-primary text-[11px] sm:text-xs font-medium hover:bg-surface-secondary transition-colors text-center">
+                    Giỏ hàng
+                  </button>
+<a class="touch-target py-1.5 px-2 rounded-full bg-primary text-white text-[11px] sm:text-xs font-medium hover:opacity-90 transition-opacity text-center flex items-center justify-center" href="#quickview-section">
+                    Chi tiết
+                  </a>
+</div>
+</div>
+</article>
+<!-- Card 2: iPhone 15 Pro Max 256GB -->
+<article class="group bg-white border border-border-hairline rounded-2xl p-3 sm:p-4 flex flex-col justify-between hover:border-outline transition-all duration-150">
+<div>
+<div class="relative w-full aspect-square bg-surface-secondary rounded-xl flex items-center justify-center p-3 sm:p-4 overflow-hidden mb-3">
+<span class="absolute top-2 left-2 text-[10px] font-semibold text-outline uppercase bg-white px-2 py-0.5 rounded-full border border-border-hairline">
+                    Like new 99%
+                  </span>
+<span class="absolute top-2 right-2 text-secondary text-[10px] font-semibold">
+                    0% LS
+                  </span>
+<img class="object-contain w-full h-full group-hover:scale-105 transition-transform duration-200" data-alt="Apple iPhone 15 Pro Max in Blue Titanium shot flat in clean studio perspective isolated on modern light grey stage with crisp shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe2DxPVNv-6xz7QrguhNbsxXXcbbbCxRM5rQZg9_zymlgzPrcvZRx3Yt-P5U1q8aGaeZNAkcsM1gLCd5buZvrIvpTOTTixS5-Omnv5s7kSgsbZPt5OEcsWARCJ8UTJ2RNtuHOG1U3zcFzrStse_zyEOxWRwLJch_vnI9pmUC7IUEBnd7MQnKb0BtX0o4tlyxFUK35xxMfuHncJGYBCMs5qALJBMTInvNCd44N2bJC1FDZ1pj3EO-Q_"/>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-1 text-[11px] text-secondary">
+<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-medium text-primary">4.9</span>
+<span class="text-outline text-[10px]">(112)</span>
+</div>
+<h2 class="text-xs sm:text-sm font-semibold text-primary group-hover:text-secondary transition-colors line-clamp-1 leading-snug">
+                    iPhone 15 Pro Max 256GB
+                  </h2>
+<p class="text-[11px] text-outline line-clamp-1">Titan Xanh • Pin 100%</p>
+</div>
+</div>
+<div class="pt-3 mt-3 border-t border-border-hairline">
+<div class="flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-1.5 mb-2.5">
+<span class="text-xs sm:text-sm font-bold text-primary tracking-tight">24.490.000₫</span>
+<span class="text-[10px] sm:text-[11px] text-outline line-through">27.500.000₫</span>
+</div>
+<div class="grid grid-cols-2 gap-1.5">
+<button class="touch-target py-1.5 px-2 rounded-full border border-primary text-primary text-[11px] sm:text-xs font-medium hover:bg-surface-secondary transition-colors text-center">
+                    Giỏ hàng
+                  </button>
+<button class="touch-target py-1.5 px-2 rounded-full bg-surface-secondary text-primary text-[11px] sm:text-xs font-medium hover:bg-surface-container transition-colors text-center">
+                    Mua ngay
+                  </button>
+</div>
+</div>
+</article>
+<!-- Card 3: Galaxy S24 Ultra 256GB -->
+<article class="group bg-white border border-border-hairline rounded-2xl p-3 sm:p-4 flex flex-col justify-between hover:border-outline transition-all duration-150">
+<div>
+<div class="relative w-full aspect-square bg-surface-secondary rounded-xl flex items-center justify-center p-3 sm:p-4 overflow-hidden mb-3">
+<span class="absolute top-2 left-2 text-[10px] font-semibold text-outline uppercase bg-white px-2 py-0.5 rounded-full border border-border-hairline">
+                    Mới 100%
+                  </span>
+<span class="absolute top-2 right-2 text-secondary text-[10px] font-semibold">
+                    Tặng sạc 45W
+                  </span>
+<img class="object-contain w-full h-full group-hover:scale-105 transition-transform duration-200" data-alt="Samsung Galaxy S24 Ultra Titanium Gray smartphone elegant display front and rear angles with integrated stylus pen resting beside on ultra-clean matte studio surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkmzErF9CmhTRpIV5k2lOQH3rY7od_NAXG_zzR8x1XmEt66K53kdQ2lextvYEf7nJcQ2t0TYxuN4tJCCRWTP2IC4w4JyyXdo7mmykKf8oqJc6zXseauimow-2Pip2Z07CxO4g5s0Ikr7R_Xvl1FeceKTFr_CVgjL9yLqJ2OY3ED6r3pYCUM-0cUhg6_NEfp1G-ohDsrLHLysX0vGrfwrdKrol4x_Hp1PaqAJpRgfqv__7Kj00DtxnV"/>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-1 text-[11px] text-secondary">
+<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-medium text-primary">4.8</span>
+<span class="text-outline text-[10px]">(38)</span>
+</div>
+<h2 class="text-xs sm:text-sm font-semibold text-primary group-hover:text-secondary transition-colors line-clamp-1 leading-snug">
+                    Galaxy S24 Ultra 256GB
+                  </h2>
+<p class="text-[11px] text-outline line-clamp-1">Titan Gray • S-Pen zin</p>
+</div>
+</div>
+<div class="pt-3 mt-3 border-t border-border-hairline">
+<div class="flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-1.5 mb-2.5">
+<span class="text-xs sm:text-sm font-bold text-primary tracking-tight">25.890.000₫</span>
+<span class="text-[10px] sm:text-[11px] text-outline line-through">29.990.000₫</span>
+</div>
+<div class="grid grid-cols-2 gap-1.5">
+<button class="touch-target py-1.5 px-2 rounded-full border border-primary text-primary text-[11px] sm:text-xs font-medium hover:bg-surface-secondary transition-colors text-center">
+                    Giỏ hàng
+                  </button>
+<button class="touch-target py-1.5 px-2 rounded-full bg-surface-secondary text-primary text-[11px] sm:text-xs font-medium hover:bg-surface-container transition-colors text-center">
+                    Mua ngay
+                  </button>
+</div>
+</div>
+</article>
+<!-- Card 4: iPhone 14 128GB -->
+<article class="group bg-white border border-border-hairline rounded-2xl p-3 sm:p-4 flex flex-col justify-between hover:border-outline transition-all duration-150">
+<div>
+<div class="relative w-full aspect-square bg-surface-secondary rounded-xl flex items-center justify-center p-3 sm:p-4 overflow-hidden mb-3">
+<span class="absolute top-2 left-2 text-[10px] font-semibold text-outline uppercase bg-white px-2 py-0.5 rounded-full border border-border-hairline">
+                    Like new 99%
+                  </span>
+<span class="absolute top-2 right-2 text-secondary text-[10px] font-semibold">
+                    0% LS
+                  </span>
+<img class="object-contain w-full h-full group-hover:scale-105 transition-transform duration-200" data-alt="Apple iPhone 14 Midnight black aluminum frame device presented vertically in minimalist tech showcase setting against high-key architectural white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUtFbvMy43tn7pq-_I53I7G1AYO5UNVvhqGWZefC_ooBkgp9NeCYaXEx4qrPLjjjK7xYjL6AeKn5yyNKRHdTyukYVDp9iVuwZODz28qQmn-KwZAEGGn4o8qp95GvQTRnxXGXkV3_0Fr-qIkczgjVMA7ZqvZgk4bk_IXeuxQ2qjZWE1QJmkDHlrBDKhiIZqE43kOQoWHdDbQqkTgk7e75ehqqc88LyZonyrhIdULgxNx7-E717bVGU2"/>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-1 text-[11px] text-secondary">
+<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-medium text-primary">4.7</span>
+<span class="text-outline text-[10px]">(89)</span>
+</div>
+<h2 class="text-xs sm:text-sm font-semibold text-primary group-hover:text-secondary transition-colors line-clamp-1 leading-snug">
+                    iPhone 14 128GB
+                  </h2>
+<p class="text-[11px] text-outline line-clamp-1">Midnight • Pin 98% zin</p>
+</div>
+</div>
+<div class="pt-3 mt-3 border-t border-border-hairline">
+<div class="flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-1.5 mb-2.5">
+<span class="text-xs sm:text-sm font-bold text-primary tracking-tight">12.990.000₫</span>
+<span class="text-[10px] sm:text-[11px] text-outline line-through">15.500.000₫</span>
+</div>
+<div class="grid grid-cols-2 gap-1.5">
+<button class="touch-target py-1.5 px-2 rounded-full border border-primary text-primary text-[11px] sm:text-xs font-medium hover:bg-surface-secondary transition-colors text-center">
+                    Giỏ hàng
+                  </button>
+<button class="touch-target py-1.5 px-2 rounded-full bg-surface-secondary text-primary text-[11px] sm:text-xs font-medium hover:bg-surface-container transition-colors text-center">
+                    Mua ngay
+                  </button>
+</div>
+</div>
+</article>
+<!-- Card 5: iPhone 16 Plus 128GB -->
+<article class="group bg-white border border-border-hairline rounded-2xl p-3 sm:p-4 flex flex-col justify-between hover:border-outline transition-all duration-150">
+<div>
+<div class="relative w-full aspect-square bg-surface-secondary rounded-xl flex items-center justify-center p-3 sm:p-4 overflow-hidden mb-3">
+<span class="absolute top-2 left-2 text-[10px] font-semibold text-outline uppercase bg-white px-2 py-0.5 rounded-full border border-border-hairline">
+                    Mới 100%
+                  </span>
+<span class="absolute top-2 right-2 text-secondary text-[10px] font-semibold">
+                    0% LS
+                  </span>
+<img class="object-contain w-full h-full group-hover:scale-105 transition-transform duration-200" data-alt="Apple iPhone 16 Plus in Teal green colorway floating symmetrically on modern flat daylight studio platform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6MCM-2Nr16laNY7qHHfoN8-2NIKWXg_3NycxBoOu9l7yM7MOlCWc6tCLU3gl8So0ZpX2dODzAy7R8pexFnhx3KE5arold7NDFH476Z-LKbjchOo1zO99tl6evjKKHpMGqNd2B4kU_ipwc3NAgCctqw--OnJ-7bLZIUSDnBXsX4hae9gP9OWMtlUGdNDSJ0LooTCWLAycuAfa4E98j8HXI-OTRDOMPXvRhoRfacX8eushtBfQGeRow"/>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-1 text-[11px] text-secondary">
+<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-medium text-primary">5.0</span>
+<span class="text-outline text-[10px]">(23)</span>
+</div>
+<h2 class="text-xs sm:text-sm font-semibold text-primary group-hover:text-secondary transition-colors line-clamp-1 leading-snug">
+                    iPhone 16 Plus 128GB
+                  </h2>
+<p class="text-[11px] text-outline line-clamp-1">Teal Mint • Màn 6.7"</p>
+</div>
+</div>
+<div class="pt-3 mt-3 border-t border-border-hairline">
+<div class="flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-1.5 mb-2.5">
+<span class="text-xs sm:text-sm font-bold text-primary tracking-tight">23.990.000₫</span>
+<span class="text-[10px] sm:text-[11px] text-outline line-through">25.990.000₫</span>
+</div>
+<div class="grid grid-cols-2 gap-1.5">
+<button class="touch-target py-1.5 px-2 rounded-full border border-primary text-primary text-[11px] sm:text-xs font-medium hover:bg-surface-secondary transition-colors text-center">
+                    Giỏ hàng
+                  </button>
+<button class="touch-target py-1.5 px-2 rounded-full bg-surface-secondary text-primary text-[11px] sm:text-xs font-medium hover:bg-surface-container transition-colors text-center">
+                    Mua ngay
+                  </button>
+</div>
+</div>
+</article>
+<!-- Card 6: iPhone 13 Pro 128GB (Hết hàng) -->
+<article class="bg-white border border-border-hairline rounded-2xl p-3 sm:p-4 flex flex-col justify-between opacity-70">
+<div>
+<div class="relative w-full aspect-square bg-surface-secondary rounded-xl flex items-center justify-center p-3 sm:p-4 overflow-hidden mb-3">
+<span class="absolute top-2 left-2 text-[10px] font-semibold text-white uppercase bg-error px-2 py-0.5 rounded-full">
+                    Hết hàng
+                  </span>
+<span class="absolute top-2 right-2 text-outline text-[10px]">
+                    Đã kiểm tra
+                  </span>
+<img class="object-contain w-full h-full grayscale opacity-60" data-alt="Apple iPhone 13 Pro Sierra Blue muted perspective product shot in studio environment with clean lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSxJ_EKmWWWafXUwjI_6hBi9ruKl5dU4GDgMMRwqFx_00SAFOt4GQ2NpMSbpDvv7Ub-XOZoxyy7sO8af62vhtUA28gBEApJ8Zi1Z0NkNg4fd8tYv5IZxd5BWRNEhSPW2N6rt4ON_OxO1LGfQllRQ-d28zhaYpPU5xwPRl1iePb0A227kObpLRyNwfNaM8yZggLc5Nl785tGKgLPQaWZqkWbFIBwYpjrvaV_7KwVPBptI5ImdcFyiRe"/>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-1 text-[11px] text-outline">
+<span class="material-symbols-outlined text-[13px]">star</span>
+<span>4.6</span>
+<span class="text-[10px]">(142)</span>
+</div>
+<h2 class="text-xs sm:text-sm font-semibold text-outline line-clamp-1 leading-snug">
+                    iPhone 13 Pro 128GB
+                  </h2>
+<p class="text-[11px] text-outline line-clamp-1">Sierra Blue • Cũ 98%</p>
+</div>
+</div>
+<div class="pt-3 mt-3 border-t border-border-hairline">
+<div class="flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-1.5 mb-2.5">
+<span class="text-xs sm:text-sm font-bold text-outline tracking-tight">13.200.000₫</span>
+<span class="text-[10px] sm:text-[11px] text-outline line-through">14.900.000₫</span>
+</div>
+<button class="touch-target w-full py-1.5 px-2 rounded-full bg-surface-secondary text-outline text-[11px] sm:text-xs font-medium cursor-not-allowed text-center" disabled="">
+                  Tạm hết hàng
+                </button>
+</div>
+</article>
+</div>
+<!-- Pagination -->
+<div class="pt-8 flex items-center justify-center gap-1.5 sm:gap-2">
+<button class="w-9 h-9 rounded-full border border-border-hairline flex items-center justify-center text-outline hover:border-primary hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-base">chevron_left</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-primary text-white text-xs font-semibold">
+              1
+            </button>
+<button class="w-9 h-9 rounded-full border border-border-hairline text-primary text-xs hover:border-primary transition-colors">
+              2
+            </button>
+<button class="w-9 h-9 rounded-full border border-border-hairline text-primary text-xs hover:border-primary transition-colors">
+              3
+            </button>
+<span class="text-outline text-xs px-1">...</span>
+<button class="w-9 h-9 rounded-full border border-border-hairline text-primary text-xs hover:border-primary transition-colors">
+              8
+            </button>
+<button class="h-9 px-3.5 rounded-full border border-border-hairline flex items-center gap-1 text-primary text-xs hover:border-primary transition-colors font-medium">
+<span>Tiếp</span>
+<span class="material-symbols-outlined text-base">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Editorial Product Detail Stage (DOCUMENT_2 Specification Showcase) -->
+<section class="w-full bg-surface-secondary py-12 sm:py-16 border-t border-border-hairline" id="quickview-section">
+<div class="max-w-[1600px] mx-auto px-4 sm:px-8 space-y-10">
+<!-- Section Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-border-hairline">
+<div>
+<span class="text-[11px] font-semibold text-outline uppercase tracking-wider">Tiêu điểm sản phẩm</span>
+<h2 class="text-xl sm:text-3xl font-semibold text-primary tracking-tight mt-1">
+              Chi tiết cấu hình chuẩn studio
+            </h2>
+</div>
+<div class="flex items-center gap-2 text-outline text-xs sm:text-sm">
+<span class="material-symbols-outlined text-secondary text-lg">verified_user</span>
+<span>Bảo hành 12 tháng chính hãng tại Tien Mobile</span>
+</div>
+</div>
+<!-- Split Detail Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+<!-- Left: Phone Gallery (5 cols) -->
+<div class="lg:col-span-5 space-y-3">
+<div class="w-full aspect-square bg-white rounded-2xl border border-border-hairline flex items-center justify-center p-8 sm:p-12 relative overflow-hidden">
+<span class="absolute top-4 left-4 px-2.5 py-1 bg-surface-secondary border border-border-hairline rounded-full text-[11px] font-medium text-primary">
+                Mới 100% Nguyên Hộp
+              </span>
+<span class="absolute top-4 right-4 text-xs font-semibold text-secondary">
+                A18 Pro Chip
+              </span>
+<img class="w-full h-full object-contain" data-alt="High precision front and profile view of Apple iPhone 16 Pro Natural Titanium sitting on crisp pure white studio background with high contrast minimal lighting" id="main-product-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5jcWqq7KFfz8u5KEvWKZFLq1GYcZFwNHlfoDSvkIgcoAV255K9k5aFaAY1EqZIHbkWBdMC9gKSqMoCeqzdWX1GNm2r8Vaq7U-n_K92hC-F29uEe-8319wUMmZWiNl2lGexVeFMpd5MYG5msphdnLdQyCu-AeQeEQsYUFCMJTbqbuVu_cTIrbyoYzJIOt6_EGtwB1MyUoAbG9g6skGGENaobx44KQDmyrXDuj3Cyd5o6gLBlK8b2Y2"/>
+</div>
+<!-- Thumbnails Row -->
+<div class="grid grid-cols-4 gap-2.5">
+<button class="aspect-square bg-white rounded-xl border-2 border-primary p-2 transition-all">
+<img class="w-full h-full object-contain" data-alt="Front view angle of iPhone 16 Pro display screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaNQGI-2zMLmkhtySAKH3GUGub7wgF3JuXUnY0bwfCJ0obOI3fBf1Dlsg6Az101glaiM-yswNJEOGs8qpsnKQgHxpC9e8BJCVCWkuZBZFW9QT1TlmSR03Rn3ZyFsde7xY-DtROkva3poPGWx01yXq8ZQ9D2nV2H3DEvDBjinGm2c5VhuzQz4tb0fG4O4ouz5wj_gMr-npkc6qUgmc2vxD9rrKZ4lNDwUIwIuukrHBmFl6EBO9lMuOC"/>
+</button>
+<button class="aspect-square bg-white rounded-xl border border-border-hairline p-2 hover:border-outline transition-all">
+<img class="w-full h-full object-contain" data-alt="Camera island close up macro detail of iPhone 16 Pro 48MP lenses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHZhbQ7dnQ_9U0Y3F3zc2QNHjd1sw2ty7mP0jQov0bv_ZuDdZIY1kHAS2_eCWQpedu-gFxZCVyxrijvxdTOBhHjH0bJQgjr6wK_rINWl-6rtqJT0oJ_oLMyla4j0xSnzaHauA-BTRkB-vZ1JbtQuNTd3JVpcBJqPo0FWpML3P-ZgYUPWthZK-W9urgeFNkoHZnQNJFBenUW_FT4Hr_J-1AxhH9Ozy6OMWb9g6Z2pNMTingnO4xysRp"/>
+</button>
+<button class="aspect-square bg-white rounded-xl border border-border-hairline p-2 hover:border-outline transition-all">
+<img class="w-full h-full object-contain" data-alt="Side profile view showing action button and camera control slider of iPhone 16 Pro" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxo4V_X-AJYdMP5XXKuQZRPh7uS8UOmWyCYige7kMMk-QqkyWrFPqa9SRQTu2YJMhPVZQTu1oz_xQ1Mg8aHe4aVmWNhtcq9CvkghiuPo76zuuyXMDlS2d2az3ZpecPedHpR-k1lQjC_toatjfZbnKDr5qyv1ZCLvbfj9Fi9tyhNkMa_L8hClBWwNSRQhL80XfSfSgRe_DATvWOCCAj9XZ83efeJ-3IjLYOfwlZ5RuQNyiQgvAFO-MD"/>
+</button>
+<button class="aspect-square bg-white rounded-xl border border-border-hairline p-2 hover:border-outline transition-all">
+<img class="w-full h-full object-contain" data-alt="Rear view of iPhone 16 Pro titanium matte glass back plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPN--w4XSA0uBGD80ZQqgodiJ5YdSKdkF7VjXxlOLmmJJEd45a_iL4CU18i-5M0L7L5RaWM5tnRciZdRXcKkDKpwb3OnJQW_QG3ri-T7uSeddVF5gj5on8tgATPellSKLM0ploVOmYGncdj-q6aoxagTJ1Lk1dnLOrYhEf_FBSbRjRwSck1d91oPYJyai05AH-DwdKRYxqmna5IR3dJCUTXDVSLv7BOmi7PVw9Hy61ECmVtgT5lmvr"/>
+</button>
+</div>
+</div>
+<!-- Right: Specs, Selectors & Checkout (7 cols) -->
+<div class="lg:col-span-7 space-y-6 bg-white p-6 sm:p-8 rounded-2xl border border-border-hairline">
+<!-- Title & Price Block -->
+<div class="space-y-2 pb-5 border-b border-border-hairline">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-surface-secondary text-[10px] font-semibold text-primary uppercase">Mã SP: IP16P-256</span>
+<span class="text-xs text-outline">• Sẵn máy tại toàn hệ thống</span>
+</div>
+<h1 class="text-2xl sm:text-3xl font-semibold text-primary">
+                iPhone 16 Pro 256GB
+              </h1>
+<div class="flex flex-wrap items-baseline gap-3 pt-1">
+<span class="text-2xl sm:text-3xl font-bold text-primary tracking-tight">28.990.000₫</span>
+<span class="text-sm text-outline line-through">31.990.000₫</span>
+<span class="text-xs text-secondary bg-surface-secondary px-2 py-0.5 rounded-md font-medium">Tiết kiệm 3.000.000₫</span>
+</div>
+</div>
+<!-- Color Swatches -->
+<div class="space-y-2.5">
+<div class="flex items-center justify-between text-xs">
+<span class="text-outline font-medium">Màu sắc:</span>
+<span class="font-semibold text-primary" id="selected-color-name">Titan Tự Nhiên (Natural Titanium)</span>
+</div>
+<div class="flex items-center gap-3">
+<button class="w-9 h-9 rounded-full border-2 border-primary p-0.5 flex items-center justify-center" title="Titan Tự Nhiên">
+<span class="w-full h-full rounded-full bg-[#B8B4AE] block"></span>
+</button>
+<button class="w-9 h-9 rounded-full border border-border-hairline p-0.5 flex items-center justify-center hover:border-outline" title="Titan Đen">
+<span class="w-full h-full rounded-full bg-[#3B3A3E] block"></span>
+</button>
+<button class="w-9 h-9 rounded-full border border-border-hairline p-0.5 flex items-center justify-center hover:border-outline" title="Titan Trắng">
+<span class="w-full h-full rounded-full bg-[#ECEBE9] block"></span>
+</button>
+<button class="w-9 h-9 rounded-full border border-border-hairline p-0.5 flex items-center justify-center hover:border-outline" title="Titan Sa Mạc">
+<span class="w-full h-full rounded-full bg-[#C5B39E] block"></span>
+</button>
+</div>
+</div>
+<!-- Storage Chips -->
+<div class="space-y-2.5">
+<div class="flex items-center justify-between text-xs">
+<span class="text-outline font-medium">Dung lượng bộ nhớ:</span>
+<span class="text-secondary font-medium">Khuyên dùng quay 4K ProRes</span>
+</div>
+<div class="grid grid-cols-4 gap-2.5">
+<button class="py-2.5 px-2 rounded-xl border border-border-hairline text-center hover:border-outline transition-colors">
+<span class="block text-xs font-semibold text-primary">128GB</span>
+<span class="block text-[10px] text-outline mt-0.5">25.990k</span>
+</button>
+<button class="py-2.5 px-2 rounded-xl border-2 border-primary bg-surface-secondary text-center">
+<span class="block text-xs font-semibold text-primary">256GB</span>
+<span class="block text-[10px] text-primary mt-0.5 font-medium">28.990k</span>
+</button>
+<button class="py-2.5 px-2 rounded-xl border border-border-hairline text-center hover:border-outline transition-colors">
+<span class="block text-xs font-semibold text-primary">512GB</span>
+<span class="block text-[10px] text-outline mt-0.5">34.990k</span>
+</button>
+<button class="py-2.5 px-2 rounded-xl border border-border-hairline text-center hover:border-outline transition-colors">
+<span class="block text-xs font-semibold text-primary">1TB</span>
+<span class="block text-[10px] text-outline mt-0.5">40.990k</span>
+</button>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="space-y-2.5 pt-2">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<button class="touch-target w-full h-11 rounded-full bg-primary text-white text-xs sm:text-sm font-medium hover:opacity-90 active:opacity-80 transition-opacity flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-lg">shopping_bag</span>
+                  Mua ngay
+                </button>
+<button class="touch-target w-full h-11 rounded-full border border-primary text-primary text-xs sm:text-sm font-medium hover:bg-surface-secondary transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-lg">call</span>
+                  Tư vấn kỹ thuật
+                </button>
+</div>
+<p class="text-[11px] text-center text-outline">
+                Đã gồm thuế VAT • Miễn phí giao hàng hỏa tốc trong 2h
+              </p>
+</div>
+<!-- Tabular Specifications Table -->
+<div class="space-y-2 pt-4 border-t border-border-hairline">
+<h3 class="text-xs font-semibold text-primary uppercase tracking-wider">Thông số kỹ thuật chi tiết</h3>
+<div class="divide-y divide-border-hairline text-xs">
+<div class="py-2 flex justify-between items-center">
+<span class="text-outline">Màn hình</span>
+<span class="text-primary font-medium text-right">6.3" Super Retina XDR OLED, 120Hz</span>
+</div>
+<div class="py-2 flex justify-between items-center">
+<span class="text-outline">Chip vi xử lý</span>
+<span class="text-primary font-medium text-right">Apple A18 Pro (3nm Gen 2)</span>
+</div>
+<div class="py-2 flex justify-between items-center">
+<span class="text-outline">Camera chính</span>
+<span class="text-primary font-medium text-right">48MP Fusion + 48MP UW + 12MP 5x Tele</span>
+</div>
+<div class="py-2 flex justify-between items-center">
+<span class="text-outline">Thời lượng pin</span>
+<span class="text-primary font-medium text-right">3.582 mAh, sạc nhanh USB-C 3.0</span>
+</div>
+<div class="py-2 flex justify-between items-center">
+<span class="text-outline">Bảo hành</span>
+<span class="text-secondary font-medium text-right">12 tháng lỗi 1 đổi 1 tại Tien Mobile</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Value Propositions Banner -->
+<section class="w-full bg-white py-10 sm:py-12 border-t border-border-hairline">
+<div class="max-w-[1600px] mx-auto px-4 sm:px-8 grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-2xl">verified</span>
+<div>
+<h4 class="text-xs sm:text-sm font-semibold text-primary">Nguồn gốc rõ ràng</h4>
+<p class="text-[11px] text-outline mt-0.5 leading-relaxed">100% chuẩn zin, bảo đảm chưa qua sửa chữa tráo đổi linh kiện.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-2xl">published_with_changes</span>
+<div>
+<h4 class="text-xs sm:text-sm font-semibold text-primary">Đổi mới 30 ngày</h4>
+<p class="text-[11px] text-outline mt-0.5 leading-relaxed">Lỗi phần cứng từ nhà sản xuất được đổi ngay máy tương đương.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-2xl">local_shipping</span>
+<div>
+<h4 class="text-xs sm:text-sm font-semibold text-primary">Kiểm tra khi nhận</h4>
+<p class="text-[11px] text-outline mt-0.5 leading-relaxed">Được mở hộp, kiểm tra máy kỹ lưỡng trước khi thanh toán tiền mặt.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-2xl">build_circle</span>
+<div>
+<h4 class="text-xs sm:text-sm font-semibold text-primary">Hỗ trợ kỹ thuật</h4>
+<p class="text-[11px] text-outline mt-0.5 leading-relaxed">Miễn phí dán màn hình và chuyển toàn bộ dữ liệu máy cũ qua máy mới.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Docked Support Chat Widget (Bottom Right Corner: Screen 5 Specification) -->
+<div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+<!-- Chat Panel (Hidden by default, standard 360x520px) -->
+<div class="hidden w-[340px] sm:w-[360px] h-[480px] sm:h-[520px] bg-white border border-border-hairline rounded-2xl flex-col overflow-hidden shadow-2xl mb-3" id="chat-panel">
+<!-- Chat Header -->
+<div class="px-4 py-3 bg-primary text-white flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="relative">
+<div class="w-8 h-8 rounded-full bg-surface-secondary text-primary font-bold text-xs flex items-center justify-center">
+              TM
+            </div>
+<span class="w-2.5 h-2.5 rounded-full bg-[#34c759] absolute bottom-0 right-0 border-2 border-primary"></span>
+</div>
+<div>
+<h4 class="text-xs font-semibold leading-none">Hỗ trợ Tien Mobile</h4>
+<span class="text-[10px] text-gray-300">Trực tuyến • Trả lời tức thì</span>
+</div>
+</div>
+<button class="text-white/80 hover:text-white cursor-pointer p-1" id="close-chat">
+<span class="material-symbols-outlined text-lg">close</span>
+</button>
+</div>
+<!-- Chat Messages Scroll Area -->
+<div class="flex-1 p-3.5 overflow-y-auto space-y-3 bg-white text-xs">
+<div class="text-center my-1">
+<span class="text-[10px] text-outline uppercase tracking-wider bg-surface-secondary px-2 py-0.5 rounded-full">Hôm nay</span>
+</div>
+<!-- Bot greeting -->
+<div class="flex items-start gap-2 max-w-[90%]">
+<div class="w-6 h-6 rounded-full bg-surface-secondary flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-primary">
+            TM
+          </div>
+<div class="p-2.5 bg-surface-secondary text-primary rounded-2xl rounded-tl-sm leading-relaxed">
+            Xin chào! Bạn đang quan tâm dòng iPhone 16 Pro hay cần tư vấn thu cũ đổi mới giá tốt nhất hôm nay ạ?
+          </div>
+</div>
+<!-- Suggestion pills -->
+<div class="flex flex-wrap gap-1.5 pl-8">
+<button class="text-[11px] px-2.5 py-1 bg-white border border-border-hairline rounded-full text-secondary hover:border-secondary transition-colors">
+            Tư vấn iPhone 16 Pro
+          </button>
+<button class="text-[11px] px-2.5 py-1 bg-white border border-border-hairline rounded-full text-secondary hover:border-secondary transition-colors">
+            Định giá máy cũ
+          </button>
+</div>
+<!-- Customer message -->
+<div class="flex items-start justify-end gap-2">
+<div class="p-2.5 bg-primary text-white rounded-2xl rounded-tr-sm max-w-[85%] leading-relaxed">
+            Bản iPhone 16 Pro 256GB Titan Tự Nhiên còn sẵn hàng tại shop không em?
+          </div>
+</div>
+<!-- Agent reply -->
+<div class="flex items-start gap-2 max-w-[90%]">
+<div class="w-6 h-6 rounded-full bg-surface-secondary flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-primary">
+            TM
+          </div>
+<div class="p-2.5 bg-surface-secondary text-primary rounded-2xl rounded-tl-sm leading-relaxed">
+            Dạ còn sẵn hàng tại cửa hàng ạ. Nếu ghé hôm nay sẽ được tặng kèm củ sạc nhanh 20W chính hãng!
+          </div>
+</div>
+</div>
+<!-- Chat Input Field -->
+<div class="p-2.5 border-t border-border-hairline bg-white flex items-center gap-2">
+<input class="flex-1 px-3 py-1.5 bg-surface-secondary border border-border-hairline rounded-full text-xs text-primary focus:outline-none focus:border-secondary" placeholder="Nhập câu hỏi của bạn..." type="text"/>
+<button class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center hover:opacity-90 flex-shrink-0 cursor-pointer">
+<span class="material-symbols-outlined text-sm">send</span>
+</button>
+</div>
+</div>
+<!-- Toggle Circle Trigger (56px) -->
+<button aria-label="Mở khung hỗ trợ trực tuyến" class="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center cursor-pointer shadow-lg hover:scale-105 active:scale-95 transition-all" id="toggle-chat-btn">
+<span class="material-symbols-outlined text-2xl" id="chat-icon-open">chat</span>
+<span class="material-symbols-outlined text-2xl hidden" id="chat-icon-close">close</span>
+</button>
+</div>
+<!-- Interactive JavaScript -->
+<script>
+    const toggleChatBtn = document.getElementById('toggle-chat-btn');
+    const chatPanel = document.getElementById('chat-panel');
+    const closeChatBtn = document.getElementById('close-chat');
+    const chatIconOpen = document.getElementById('chat-icon-open');
+    const chatIconClose = document.getElementById('chat-icon-close');
+
+    function toggleChat() {
+      const isHidden = chatPanel.classList.contains('hidden');
+      if (isHidden) {
+        chatPanel.classList.remove('hidden');
+        chatPanel.classList.add('flex');
+        chatIconOpen.classList.add('hidden');
+        chatIconClose.classList.remove('hidden');
+      } else {
+        chatPanel.classList.add('hidden');
+        chatPanel.classList.remove('flex');
+        chatIconOpen.classList.remove('hidden');
+        chatIconClose.classList.add('hidden');
+      }
+    }
+
+    if (toggleChatBtn) toggleChatBtn.addEventListener('click', toggleChat);
+    if (closeChatBtn) closeChatBtn.addEventListener('click', toggleChat);
+
+    const resetFiltersBtn = document.getElementById('reset-filters');
+    if (resetFiltersBtn) {
+      resetFiltersBtn.addEventListener('click', () => {
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+      });
+    }
+  </script>
+</body></html>

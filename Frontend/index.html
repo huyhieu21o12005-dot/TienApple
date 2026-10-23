@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tien Mobile — Điện thoại chính hãng & Sửa chữa lấy ngay</title>
+  <meta name="description" content="Tien Mobile - Hệ thống phân phối iPhone, Samsung chính hãng và trung tâm sửa chữa điện thoại lấy liền minh bạch, chuẩn phong cách Apple." />
+  
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              black: "#1D1D1F",
+              gray: "#6E6E73",
+              light: "#F5F5F7",
+              border: "#D2D2D7",
+              blue: "#0071E3"
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Design System Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body class="min-h-screen bg-white text-[#1D1D1F] flex flex-col font-sans antialiased">
+
+  <!-- ======================================================================
+       1. TOP HEADER (Cố định chuẩn Apple Minimal)
+       ====================================================================== -->
+  <header class="w-full h-16 border-b border-[#D2D2D7] bg-white/90 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between px-6 sm:px-10 lg:px-16 transition-all" id="mainHeader">
+    <!-- Brand / Logo -->
+    <a href="#" class="flex items-center gap-2.5 text-[#1D1D1F] font-semibold text-[18px] tracking-[-0.015em] no-underline header-item">
+      <svg class="w-5 h-5 text-[#1D1D1F]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <rect height="20" rx="3" ry="3" width="14" x="5" y="2"></rect>
+        <line x1="12" x2="12.01" y1="18" y2="18"></line>
+      </svg>
+      <span>Tien Mobile</span>
+    </a>
+
+    <!-- Center Navigation Links (Chuyển đổi từng layer độc lập) -->
+    <nav class="hidden lg:flex items-center gap-8">
+      <a href="#trangchu" class="nav-layer-link text-[13px] font-semibold text-[#0071E3] transition-colors header-item" data-layer="layer-trangchu">Trang chủ</a>
+      <a href="#dienthoai" class="nav-layer-link text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-dienthoai">Điện thoại</a>
+      <a href="#suachua" class="nav-layer-link text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-suachua">Sửa chữa</a>
+      <a href="#dienthoai" class="nav-layer-link text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-dienthoai" data-filter="accessories">Phụ kiện</a>
+      <a href="#camket" class="nav-layer-link text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-camket">Thu cũ đổi mới</a>
+      <a href="#camket" class="nav-layer-link text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-camket">Liên hệ</a>
+    </nav>
+
+    <!-- Right Header Actions -->
+    <div class="flex items-center gap-5">
+      <button class="cart-open-trigger inline-flex items-center gap-1.5 text-[13px] font-normal text-[#1D1D1F] hover:text-[#0071E3] transition-colors cursor-pointer bg-transparent border-0 p-0 header-item" type="button">
+        <span class="material-symbols-outlined text-[19px]">shopping_bag</span>
+        <span>Giỏ hàng <span class="text-[#0071E3] font-medium">(<span class="cart-badge-number">2</span>)</span></span>
+      </button>
+
+      <button class="booking-trigger inline-flex items-center justify-center h-9 px-5 bg-[#1D1D1F] text-white text-[13px] font-medium rounded-full hover:bg-black transition-all cursor-pointer header-item" data-service-context="Đặt lịch sửa tổng quát" type="button">
+        Đặt lịch sửa
+      </button>
+    </div>
+  </header>
+
+  <!-- Quick Layer Switcher Bar (Thanh chuyển đổi Layer tối ưu 1 màn hình duy nhất) -->
+  <div class="w-full bg-[#F5F5F7] border-b border-[#D2D2D7]/60 py-2 px-4 sm:px-8 flex items-center justify-start sm:justify-center overflow-x-auto no-scrollbar gap-2 sticky top-16 z-30" id="layerSwitcherBar">
+    <button class="layer-tab-btn active px-3.5 py-1.5 rounded-full text-[12px] font-medium transition-all" data-layer="layer-trangchu">
+      <span class="flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#0071E3] tab-dot"></span>
+        Trang chủ
+      </span>
+    </button>
+    <button class="layer-tab-btn px-3.5 py-1.5 rounded-full text-[12px] font-medium transition-all" data-layer="layer-dienthoai">
+      Điện thoại &amp; Phụ kiện
+    </button>
+    <button class="layer-tab-btn px-3.5 py-1.5 rounded-full text-[12px] font-medium transition-all" data-layer="layer-suachua">
+      Dịch vụ Sửa chữa
+    </button>
+    <button class="layer-tab-btn px-3.5 py-1.5 rounded-full text-[12px] font-medium transition-all" data-layer="layer-camket">
+      Thu cũ &amp; Cam kết
+    </button>
+  </div>
+
+  <main class="w-full flex-grow">
+
+    <!-- LAYER 1: TRANG CHỦ (18 Pro Max 3D + Studio Editorial Hero + Metric Cards) -->
+    <div class="app-layer active" id="layer-trangchu">
+      <!-- ======================================================================
+           2. HERO SECTION (Apple Minimalist Studio Style: 3 Cột tích hợp Elements 3D)
+           ====================================================================== -->
+      <section class="w-full border-b border-[#D2D2D7]/60 bg-white py-10 lg:py-16 px-6 sm:px-10 lg:px-16 relative overflow-hidden" id="heroSection">
+      
+      <!-- Studio Water Ripples Stage (Hồ nước gợn sóng tròn lan tỏa với tâm dưới chân 18 Pro Max) -->
+      <div class="water-ripples-stage pointer-events-none" id="waterRipplesStage">
+        <canvas id="waterRipplesCanvas"></canvas>
+      </div>
+
+      <div class="max-w-[1380px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center relative z-10">
+        
+        <!-- Cột trái: Editorial Copy (5 cols) - Có Logo Táo làm background cho "Điện thoại mới. Sửa xong trong ngày." -->
+        <div class="lg:col-span-5 flex flex-col justify-center relative hero-editorial-col" id="heroEditorialCol">
+          
+          <!-- Subtle Frosted Apple Logo Background cho phần "Điện thoại mới. Sửa xong trong ngày." -->
+          <div class="apple-bg-watermark" id="appleBgWatermark" aria-hidden="true">
+            <svg class="apple-watermark-svg" viewBox="0 0 170 170" fill="currentColor">
+              <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.58-7.77-11.64-14.18-5.88-9.24-10.36-19.53-13.43-30.86-3.08-11.34-4.62-22.39-4.62-33.15 0-14.65 3.73-26.79 11.19-36.43 7.45-9.63 16.92-14.54 28.4-14.74 4.89 0 10.15 1.25 15.78 3.75 5.62 2.5 9.4 3.8 11.33 3.9 1.52-.1 5.37-1.45 11.55-4.04 6.18-2.6 11.45-3.8 15.82-3.61 12.06.55 21.75 5.02 29.07 13.43-10.43 6.31-15.54 14.97-15.33 25.99.21 8.48 3.37 15.66 9.49 21.54 6.12 5.88 13.44 9.17 21.96 9.87-2.06 6.09-4.58 12.33-7.55 18.72zM119.22 33.11c0-7.39 2.66-14.38 7.97-20.97 5.31-6.59 11.96-10.87 19.95-12.83.22 1.3.33 2.4.33 3.27 0 7.39-2.73 14.33-8.19 20.81-5.46 6.48-12.23 10.74-20.31 12.78-.11-1.09-.16-2.11-.16-3.06z"/>
+            </svg>
+          </div>
+
+          <div class="relative z-10">
+            <div class="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#6E6E73] mb-4" id="heroEyebrow">
+              <span class="w-2 h-2 rounded-full bg-[#1D1D1F] relative flex items-center justify-center">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1D1D1F] opacity-75"></span>
+              </span>
+              <span>CHÍNH HÃNG, BẢO HÀNH 12 THÁNG</span>
+            </div>
+
+            <div class="overflow-hidden mb-1">
+              <h1 class="display-hero hero-line-mask" id="heroLine1">
+                Điện thoại mới.
+              </h1>
+            </div>
+            <div class="overflow-hidden mb-5">
+              <div class="display-hero hero-line-mask" id="heroLine2">
+                Sửa xong trong ngày.
+              </div>
+            </div>
+
+            <p class="body-lg max-w-[440px] mb-8 font-normal" id="heroParagraph">
+              Bán iPhone và điện thoại chính hãng đã qua kiểm định nghiêm ngặt. Sửa chữa lấy ngay, minh bạch trước mặt khách.
+            </p>
+
+            <div class="flex flex-wrap sm:flex-nowrap items-center gap-3.5" id="heroCtaWrap">
+              <a href="#dienthoai" class="btn-pill-primary shadow-sm hover:shadow-md nav-layer-link" data-layer="layer-dienthoai">
+                Đặt mua sản phẩm
+              </a>
+              <button class="booking-trigger btn-pill-secondary" data-service-context="Tư vấn sửa chữa trực tiếp" type="button">
+                Đặt lịch sửa chữa
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cột giữa: Trọng tâm 18 Pro Max 3D lơ lửng trên mặt nước gợn sóng tinh tế -->
+        <div class="lg:col-span-4 flex justify-center items-center relative py-2 perspective-container h-[520px] sm:h-[560px]" id="phoneContainer3D">
+          <!-- Mô hình 3D iPhone 18 Pro Max chính hãng xoay 360° bằng Three.js -->
+          <div class="phone-3d-canvas-wrap cursor-grab active:cursor-grabbing w-full h-full flex items-center justify-center relative" id="phone3DCanvasWrap" title="Xoay tương tác iPhone 18 Pro Max">
+            <canvas id="phone3DCanvas" class="w-full h-full"></canvas>
+          </div>
+        </div>
+
+        <!-- Cột phải: 3 Thẻ chỉ số Frosted Glass phẳng viền 1px bo góc 16px (3 cols) -->
+        <div class="lg:col-span-3 flex flex-col justify-center gap-3.5" id="heroCardsWrap">
+          <article class="info-card hero-glass-metric" id="metricCard1">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">SỬA CHỮA</span>
+              <span class="material-symbols-outlined text-[18px] text-[#6E6E73]">schedule</span>
+            </div>
+            <div class="text-[32px] font-light leading-[1.1] tracking-[-0.02em] text-[#1D1D1F] mt-2 mb-1">
+              30 phút
+            </div>
+            <div class="text-[13px] text-[#6E6E73] font-normal leading-[1.35]">
+              Thay màn hình lấy liền, xem trực tiếp tại quầy
+            </div>
+          </article>
+
+          <article class="info-card hero-glass-metric" id="metricCard2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">BẢO HÀNH</span>
+              <span class="material-symbols-outlined text-[18px] text-[#6E6E73]">verified_user</span>
+            </div>
+            <div class="text-[32px] font-light leading-[1.1] tracking-[-0.02em] text-[#1D1D1F] mt-2 mb-1">
+              12 tháng
+            </div>
+            <div class="text-[13px] text-[#6E6E73] font-normal leading-[1.35]">
+              Toàn bộ máy chính hãng &amp; dịch vụ kỹ thuật
+            </div>
+          </article>
+
+          <article class="info-card hero-glass-metric" id="metricCard3">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">ĐÁNH GIÁ</span>
+              <span class="material-symbols-outlined text-[18px] text-[#6E6E73]">thumb_up</span>
+            </div>
+            <div class="text-[32px] font-light leading-[1.1] tracking-[-0.02em] text-[#1D1D1F] mt-2 mb-1">
+              4,9 / 5
+            </div>
+            <div class="text-[13px] text-[#6E6E73] font-normal leading-[1.35]">
+              Hơn 2.400 khách hàng đánh giá hài lòng
+            </div>
+          </article>
+        </div>
+
+      </div>
+      </section>
+    </div>
+
+    <!-- LAYER 2: ĐIỆN THOẠI & PHỤ KIỆN (Catalog, Bộ lọc, Bảng sản phẩm) -->
+    <div class="app-layer hidden" id="layer-dienthoai">
+      <!-- ======================================================================
+           3. PRODUCT SHOWCASE SECTION (Đồng bộ tuyệt đối layout 5 cột Desktop, 2 cột Mobile)
+           ====================================================================== -->
+      <section class="w-full bg-white py-14 px-6 sm:px-10 lg:px-16 border-b border-[#D2D2D7]/60" id="dienthoai">
+      <div class="max-w-[1380px] mx-auto">
+        
+        <!-- Section Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-4 border-b border-[#D2D2D7]/60 gap-4">
+          <div>
+            <div class="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#6E6E73] mb-1.5">DANH MỤC THIẾT BỊ DI ĐỘNG</div>
+            <h2 class="headline-lg">Điện thoại chính hãng &amp; Like New tuyển chọn</h2>
+          </div>
+          <div class="text-[14px] text-[#6E6E73]">
+            Hiển thị <span id="catalog-count-badge" class="font-semibold text-[#1D1D1F]">8 mẫu có sẵn</span> tại quầy
+          </div>
+        </div>
+
+        <!-- Quick Filter Bar -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+          <!-- Nhóm pills thương hiệu -->
+          <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1" id="brandFilterPills">
+            <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#1D1D1F] text-white transition-colors cursor-pointer shrink-0" data-brand="all">Tất cả (48)</button>
+            <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#EAEAEA] transition-colors cursor-pointer shrink-0" data-brand="apple">Apple iPhone (24)</button>
+            <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#EAEAEA] transition-colors cursor-pointer shrink-0" data-brand="samsung">Samsung Galaxy (14)</button>
+            <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#EAEAEA] transition-colors cursor-pointer shrink-0" data-brand="xiaomi">Xiaomi (6)</button>
+            <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#EAEAEA] transition-colors cursor-pointer shrink-0" data-brand="oppo">OPPO (4)</button>
+          </div>
+
+          <!-- Ô tìm kiếm trực tiếp -->
+          <div class="relative w-full lg:w-72">
+            <span class="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-[#6E6E73]">search</span>
+            <input 
+              type="text" 
+              id="product-search-input" 
+              placeholder="Tìm kiếm máy, chip, dung lượng..." 
+              class="w-full h-10 pl-9 pr-4 bg-[#F5F5F7] rounded-full text-[13px] text-[#1D1D1F] border-0 focus:ring-1 focus:ring-[#1D1D1F] outline-none" 
+            />
+          </div>
+        </div>
+
+        <!-- Nhóm dropdowns lọc chi tiết -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+          <select id="filter-condition" class="bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
+            <option value="all">Tình trạng: Tất cả máy</option>
+            <option value="new">Mới 100% Nguyên Seal</option>
+            <option value="likenew">Like New 99% Keng</option>
+          </select>
+
+          <select id="filter-price" class="bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
+            <option value="all">Khoảng giá: Tất cả mức giá</option>
+            <option value="under15">Dưới 15 triệu</option>
+            <option value="15to25">15 - 25 triệu</option>
+            <option value="above25">Trên 25 triệu</option>
+          </select>
+
+          <select id="filter-sort" class="bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
+            <option value="newest">Sắp xếp: Mới nhất</option>
+            <option value="price-asc">Giá: Thấp đến cao</option>
+            <option value="price-desc">Giá: Cao đến thấp</option>
+            <option value="rating">Đánh giá cao nhất</option>
+          </select>
+        </div>
+
+        <!-- Product Grid: 5 Cột trên Desktop, 2 Cột trên Mobile -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-4.5" id="productGrid">
+          <!-- Được render động từ app.js -->
+        </div>
+
+      </div>
+      </section>
+    </div>
+
+    <!-- LAYER 3: DỊCH VỤ SỬA CHỮA MINH BẠCH LẤY NGAY -->
+    <div class="app-layer hidden" id="layer-suachua">
+      <!-- ======================================================================
+           4. REPAIR SERVICES & TRANSPARENT PRICING SECTION
+           ====================================================================== -->
+      <section class="w-full py-16 bg-[#FAFAFC] border-b border-[#D2D2D7]/60" id="suachua">
+      <div class="max-w-[1380px] mx-auto px-6 sm:px-10 lg:px-16">
+        
+        <!-- Header -->
+        <div class="max-w-3xl mb-12">
+          <span class="text-[12px] font-semibold text-[#0071E3] uppercase tracking-widest block mb-2">DỊCH VỤ SỬA CHỮA MINH BẠCH LẤY NGAY</span>
+          <h2 class="display-hero text-[#1D1D1F] mb-4">Sửa xong trong ngày. Báo giá trước khi làm.</h2>
+          <p class="body-lg text-[#6E6E73]">
+            Kỹ thuật viên thao tác trực tiếp trước mặt khách hàng, cam kết 100% linh kiện zin chính hãng, bảo hành điện tử minh bạch đến 18 tháng.
+          </p>
+        </div>
+
+        <!-- Trust Badges 4 Cột -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+          <div class="p-4 rounded-xl bg-white border border-[#D2D2D7]/60 flex items-center gap-3">
+            <span class="material-symbols-outlined text-[#0071E3] text-[28px]">visibility</span>
+            <div>
+              <div class="text-[15px] font-semibold text-[#1D1D1F]">Quan sát trực tiếp</div>
+              <div class="text-[12px] text-[#6E6E73]">Không giữ máy qua đêm</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-white border border-[#D2D2D7]/60 flex items-center gap-3">
+            <span class="material-symbols-outlined text-[#0071E3] text-[28px]">verified_user</span>
+            <div>
+              <div class="text-[15px] font-semibold text-[#1D1D1F]">Bảo hành 12 - 18T</div>
+              <div class="text-[12px] text-[#6E6E73]">Lỗi 1 đổi 1 tức thì</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-white border border-[#D2D2D7]/60 flex items-center gap-3">
+            <span class="material-symbols-outlined text-[#0071E3] text-[28px]">price_check</span>
+            <div>
+              <div class="text-[15px] font-semibold text-[#1D1D1F]">Báo giá trọn gói</div>
+              <div class="text-[12px] text-[#6E6E73]">Không phí phát sinh</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-white border border-[#D2D2D7]/60 flex items-center gap-3">
+            <span class="material-symbols-outlined text-[#0071E3] text-[28px]">security</span>
+            <div>
+              <div class="text-[15px] font-semibold text-[#1D1D1F]">Bảo mật dữ liệu</div>
+              <div class="text-[12px] text-[#6E6E73]">Ký niêm phong phần cứng</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Core Service Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <!-- Card 1 -->
+          <div class="service-card bg-white border border-[#D2D2D7]/60 p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-full bg-[#F5F5F7] flex items-center justify-center mb-5">
+                <span class="material-symbols-outlined text-[#1D1D1F] text-[24px]">screenshot</span>
+              </div>
+              <span class="text-[11px] font-semibold text-[#6E6E73] uppercase tracking-wider block mb-1">Màn hình &amp; Cảm ứng</span>
+              <h3 class="text-[18px] font-semibold text-[#1D1D1F] mb-2">Thay màn hình OLED Retina</h3>
+              <p class="text-[13px] text-[#6E6E73] mb-6">
+                Tấm nền chuẩn màu DCI-P3 sắc nét, cảm ứng mượt mà 120Hz ProMotion, fix TrueTone tự động.
+              </p>
+            </div>
+            <div>
+              <div class="pt-4 border-t border-[#D2D2D7]/50 flex items-baseline justify-between mb-2">
+                <span class="text-[13px] text-[#6E6E73]">Chi phí từ</span>
+                <span class="text-[18px] font-bold text-[#1D1D1F]">650.000₫</span>
+              </div>
+              <div class="flex items-center justify-between text-[12px] text-[#6E6E73]">
+                <span>Thời gian: 30 – 45 phút</span>
+                <button class="booking-trigger text-[#0071E3] font-semibold hover:underline" data-service-context="Thay màn hình OLED Retina" type="button">Đặt hẹn →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="service-card bg-white border border-[#D2D2D7]/60 p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-full bg-[#F5F5F7] flex items-center justify-center mb-5">
+                <span class="material-symbols-outlined text-[#1D1D1F] text-[24px]">battery_charging_full</span>
+              </div>
+              <span class="text-[11px] font-semibold text-[#6E6E73] uppercase tracking-wider block mb-1">Nguồn &amp; Cell Pin</span>
+              <h3 class="text-[18px] font-semibold text-[#1D1D1F] mb-2">Thay pin Chuẩn CE</h3>
+              <p class="text-[13px] text-[#6E6E73] mb-6">
+                Chu kỳ sạc xả 800+ lần, tích hợp IC bảo vệ quá nhiệt an toàn chuẩn châu Âu, báo pin 100%.
+              </p>
+            </div>
+            <div>
+              <div class="pt-4 border-t border-[#D2D2D7]/50 flex items-baseline justify-between mb-2">
+                <span class="text-[13px] text-[#6E6E73]">Chi phí từ</span>
+                <span class="text-[18px] font-bold text-[#1D1D1F]">350.000₫</span>
+              </div>
+              <div class="flex items-center justify-between text-[12px] text-[#6E6E73]">
+                <span>Thời gian: 15 – 20 phút</span>
+                <button class="booking-trigger text-[#0071E3] font-semibold hover:underline" data-service-context="Thay pin dung lượng cao Chuẩn CE" type="button">Đặt hẹn →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="service-card bg-white border border-[#D2D2D7]/60 p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-full bg-[#F5F5F7] flex items-center justify-center mb-5">
+                <span class="material-symbols-outlined text-[#1D1D1F] text-[24px]">memory</span>
+              </div>
+              <span class="text-[11px] font-semibold text-[#6E6E73] uppercase tracking-wider block mb-1">Kỹ thuật chuyên sâu</span>
+              <h3 class="text-[18px] font-semibold text-[#1D1D1F] mb-2">Sửa Mainboard &amp; IC nguồn</h3>
+              <p class="text-[13px] text-[#6E6E73] mb-6">
+                Khám máy chuẩn đoán đo xung vi mạch 0đ, xử lý mất nguồn, treo logo, chạm tụ chuẩn xác.
+              </p>
+            </div>
+            <div>
+              <div class="pt-4 border-t border-[#D2D2D7]/50 flex items-baseline justify-between mb-2">
+                <span class="text-[13px] text-[#6E6E73]">Chi phí từ</span>
+                <span class="text-[18px] font-bold text-[#1D1D1F]">Khám máy 0₫</span>
+              </div>
+              <div class="flex items-center justify-between text-[12px] text-[#6E6E73]">
+                <span>Thời gian: 2 – 4 giờ</span>
+                <button class="booking-trigger text-[#0071E3] font-semibold hover:underline" data-service-context="Sửa Mainboard & IC nguồn" type="button">Đặt hẹn →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="service-card bg-white border border-[#D2D2D7]/60 p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+              <div class="w-12 h-12 rounded-full bg-[#F5F5F7] flex items-center justify-center mb-5">
+                <span class="material-symbols-outlined text-[#1D1D1F] text-[24px]">layers</span>
+              </div>
+              <span class="text-[11px] font-semibold text-[#6E6E73] uppercase tracking-wider block mb-1">Mặt kính &amp; Thẩm mỹ</span>
+              <h3 class="text-[18px] font-semibold text-[#1D1D1F] mb-2">Ép kính chân không Gorilla</h3>
+              <p class="text-[13px] text-[#6E6E73] mb-6">
+                Công nghệ máy hấp nhiệt tự động loại bỏ bọt khí tuyệt đối, giữ trọn phôi màn hình nguyên bản.
+              </p>
+            </div>
+            <div>
+              <div class="pt-4 border-t border-[#D2D2D7]/50 flex items-baseline justify-between mb-2">
+                <span class="text-[13px] text-[#6E6E73]">Chi phí từ</span>
+                <span class="text-[18px] font-bold text-[#1D1D1F]">290.000₫</span>
+              </div>
+              <div class="flex items-center justify-between text-[12px] text-[#6E6E73]">
+                <span>Thời gian: 45 – 60 phút</span>
+                <button class="booking-trigger text-[#0071E3] font-semibold hover:underline" data-service-context="Ép kính chân không Gorilla Glass" type="button">Đặt hẹn →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Booking Bar Form -->
+        <div class="rounded-2xl bg-white border border-[#D2D2D7] p-6 lg:p-8">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+            <div>
+              <span class="text-[12px] font-semibold text-[#0071E3] uppercase tracking-wider block">ƯU ĐÃI HẸN TRƯỚC</span>
+              <h3 class="headline-md text-[#1D1D1F]">Đặt lịch sửa chữa ưu tiên — Giảm ngay 10%</h3>
+            </div>
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F]">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>4 kỹ thuật viên đang sẵn sàng phục vụ</span>
+            </div>
+          </div>
+
+          <form id="quick-repair-bar-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <div>
+              <label class="block text-[12px] font-medium text-[#1D1D1F] mb-1">Dòng điện thoại</label>
+              <input id="quick-bar-device" type="text" placeholder="Ví dụ: iPhone 13 Pro Max" required class="w-full h-11 px-3.5 bg-[#F5F5F7] rounded-xl text-[13px] text-[#1D1D1F] border-0 focus:ring-1 focus:ring-[#1D1D1F] outline-none" />
+            </div>
+
+            <div>
+              <label class="block text-[12px] font-medium text-[#1D1D1F] mb-1">Dịch vụ sửa chữa</label>
+              <select id="quick-bar-service" class="w-full h-11 px-3.5 bg-[#F5F5F7] rounded-xl text-[13px] text-[#1D1D1F] border-0 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
+                <option value="Thay màn hình OLED Retina lấy liền">Thay màn hình OLED Retina lấy liền</option>
+                <option value="Thay pin dung lượng cao Chuẩn CE">Thay pin dung lượng cao Chuẩn CE</option>
+                <option value="Ép kính chân không Gorilla Glass">Ép kính chân không Gorilla Glass</option>
+                <option value="Sửa Mainboard & IC nguồn">Sửa Mainboard & IC nguồn</option>
+                <option value="Khám máy & vệ sinh miễn phí">Khám máy & vệ sinh miễn phí</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[12px] font-medium text-[#1D1D1F] mb-1">Số điện thoại liên hệ</label>
+              <input id="quick-bar-phone" type="tel" placeholder="0909 xxx xxx" required class="w-full h-11 px-3.5 bg-[#F5F5F7] rounded-xl text-[13px] text-[#1D1D1F] border-0 focus:ring-1 focus:ring-[#1D1D1F] outline-none" />
+            </div>
+
+            <div class="flex items-end">
+              <button type="submit" class="w-full h-11 bg-[#1D1D1F] text-white rounded-xl text-[13px] font-medium hover:bg-black transition-colors cursor-pointer flex items-center justify-center gap-2">
+                <span>Nhận ưu đãi 10%</span>
+                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+      </section>
+    </div>
+
+    <!-- LAYER 4: THU CŨ ĐỔI MỚI & CHÍNH SÁCH CAM KẾT VÀNG -->
+    <div class="app-layer hidden" id="layer-camket">
+      <!-- ======================================================================
+           5. TRADE-IN & GOLDEN COMMITMENT POLICIES SECTION
+           ====================================================================== -->
+      <section class="w-full bg-white py-14 px-6 sm:px-10 lg:px-16 border-b border-[#D2D2D7]/60" id="camket">
+      <div class="max-w-[1380px] mx-auto">
+        <div class="mb-10 text-center max-w-2xl mx-auto">
+          <span class="text-[12px] font-semibold text-[#6E6E73] uppercase tracking-widest block mb-1">TIÊU CHUẨN CHẤT LƯỢNG APPLE EDITORIAL</span>
+          <h2 class="headline-lg text-[#1D1D1F]">Chính sách vàng & Bảo hành trọn vẹn</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="flex items-start gap-4 p-5 rounded-2xl bg-[#F5F5F7]">
+            <div class="w-10 h-10 rounded-full bg-white flex-shrink-0 flex items-center justify-center text-[#1D1D1F] shadow-sm">
+              <span class="material-symbols-outlined text-[20px]">verified</span>
+            </div>
+            <div>
+              <h4 class="text-[15px] font-semibold text-[#1D1D1F] mb-1">Linh kiện Zin 100%</h4>
+              <p class="text-[13px] text-[#6E6E73] leading-relaxed">Nguồn gốc rõ ràng, khách hàng trực tiếp kiểm tra và ký tên lên linh kiện trước khi ráp.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4 p-5 rounded-2xl bg-[#F5F5F7]">
+            <div class="w-10 h-10 rounded-full bg-white flex-shrink-0 flex items-center justify-center text-[#1D1D1F] shadow-sm">
+              <span class="material-symbols-outlined text-[20px]">published_with_changes</span>
+            </div>
+            <div>
+              <h4 class="text-[15px] font-semibold text-[#1D1D1F] mb-1">1 đổi 1 trong 30 ngày</h4>
+              <p class="text-[13px] text-[#6E6E73] leading-relaxed">Lỗi phần cứng đổi ngay máy mới không chờ đợi, thủ tục tinh gọn trong vòng 5 phút.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4 p-5 rounded-2xl bg-[#F5F5F7]">
+            <div class="w-10 h-10 rounded-full bg-white flex-shrink-0 flex items-center justify-center text-[#1D1D1F] shadow-sm">
+              <span class="material-symbols-outlined text-[20px]">currency_exchange</span>
+            </div>
+            <div>
+              <h4 class="text-[15px] font-semibold text-[#1D1D1F] mb-1">Thu cũ trợ giá cực cao</h4>
+              <p class="text-[13px] text-[#6E6E73] leading-relaxed">Thẩm định minh bạch bằng máy test chuẩn, trợ giá lên đến 2.000.000₫ khi lên đời iPhone mới.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4 p-5 rounded-2xl bg-[#F5F5F7]">
+            <div class="w-10 h-10 rounded-full bg-white flex-shrink-0 flex items-center justify-center text-[#1D1D1F] shadow-sm">
+              <span class="material-symbols-outlined text-[20px]">support_agent</span>
+            </div>
+            <div>
+              <h4 class="text-[15px] font-semibold text-[#1D1D1F] mb-1">Hỗ trợ kỹ thuật trọn đời</h4>
+              <p class="text-[13px] text-[#6E6E73] leading-relaxed">Miễn phí vệ sinh máy trọn đời, dán màn hình cường lực lần đầu và hỗ trợ phần mềm trọn đời.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- ======================================================================
+       6. FOOTER: APPLE MINIMALIST
+       ====================================================================== -->
+  <footer class="w-full bg-[#F5F5F7] py-12 px-6 sm:px-10 lg:px-16 text-[#6E6E73] text-[13px]" id="lienhe">
+    <div class="max-w-[1380px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-[#D2D2D7]">
+      <div>
+        <div class="flex items-center gap-2 text-[#1D1D1F] font-semibold text-[16px] mb-3">
+          <svg class="w-5 h-5 text-[#1D1D1F]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect height="20" rx="3" ry="3" width="14" x="5" y="2"></rect>
+            <line x1="12" x2="12.01" y1="18" y2="18"></line>
+          </svg>
+          <span>Tien Mobile</span>
+        </div>
+        <p class="leading-[1.5]">Hệ thống phân phối điện thoại cao cấp và trung tâm bảo hành, sửa chữa thiết bị di động uy tín hàng đầu tại Việt Nam.</p>
+      </div>
+
+      <div>
+        <div class="font-semibold text-[#1D1D1F] mb-3">Thiết bị nổi bật</div>
+        <div class="flex flex-col gap-2">
+          <a href="#dienthoai" class="hover:text-[#1D1D1F] transition-colors">iPhone 16 Pro Series</a>
+          <a href="#dienthoai" class="hover:text-[#1D1D1F] transition-colors">iPhone 15 Series</a>
+          <a href="#dienthoai" class="hover:text-[#1D1D1F] transition-colors">Samsung Galaxy S24 Ultra</a>
+          <a href="#dienthoai" class="hover:text-[#1D1D1F] transition-colors">Điện thoại Like New 99%</a>
+        </div>
+      </div>
+
+      <div>
+        <div class="font-semibold text-[#1D1D1F] mb-3">Dịch vụ sửa chữa</div>
+        <div class="flex flex-col gap-2">
+          <a href="#suachua" class="hover:text-[#1D1D1F] transition-colors">Thay màn hình OLED Retina</a>
+          <a href="#suachua" class="hover:text-[#1D1D1F] transition-colors">Thay pin Chuẩn CE châu Âu</a>
+          <a href="#suachua" class="hover:text-[#1D1D1F] transition-colors">Ép kính chân không công nghệ cao</a>
+          <a href="#suachua" class="hover:text-[#1D1D1F] transition-colors">Sửa FaceID & IC nguồn</a>
+        </div>
+      </div>
+
+      <div>
+        <div class="font-semibold text-[#1D1D1F] mb-3">Liên hệ &amp; Showroom</div>
+        <p class="mb-1.5">Hotline bán hàng: <strong class="text-[#1D1D1F]">0909 123 456</strong></p>
+        <p class="mb-1.5">Kỹ thuật - Bảo hành: <strong class="text-[#1D1D1F]">0909 789 101</strong></p>
+        <p class="mb-1.5">Giờ làm việc: 08:30 - 21:30 (Thứ 2 - CN)</p>
+        <p>Địa chỉ: 120 Đường 3/2, Phường 12, Quận 10, TP. Hồ Chí Minh</p>
+      </div>
+    </div>
+
+    <div class="max-w-[1380px] mx-auto pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px]">
+      <p>© 2025 Tien Mobile. Chuẩn mực công nghệ &amp; dịch vụ minh bạch.</p>
+      <div class="flex gap-6">
+        <a href="#" class="hover:text-[#1D1D1F] transition-colors">Chính sách bảo hành 12 tháng</a>
+        <a href="#" class="hover:text-[#1D1D1F] transition-colors">Quy định đổi trả 30 ngày</a>
+        <a href="#" class="hover:text-[#1D1D1F] transition-colors">Bảo mật thông tin khách hàng</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======================================================================
+       7. HỆ THỐNG POPUP / MODAL TƯƠNG TÁC
+       ====================================================================== -->
+
+  <!-- POPUP 1: Modal "Xem Nhanh Chi Tiết Sản Phẩm" (#quickViewModal) -->
+  <div id="quickViewModal" class="fixed inset-0 modal-overlay z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-[20px] max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 shadow-2xl relative border border-[#D2D2D7]">
+      <button id="close-quickview-btn" aria-label="Đóng" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-[#F5F5F7] flex items-center justify-center text-[#1D1D1F] hover:bg-[#E5E5EA] transition-colors cursor-pointer border-0">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mt-2">
+        <!-- Cột trái: Ảnh to + Thumbnail -->
+        <div class="flex flex-col items-center">
+          <div class="w-full bg-[#F5F5F7] rounded-2xl p-8 flex items-center justify-center min-h-[300px]">
+            <img id="modalProductImg" src="" alt="Sản phẩm" class="max-h-[280px] object-contain transition-transform duration-300 hover:scale-105" />
+          </div>
+          <div class="flex items-center gap-2 mt-3">
+            <button class="w-12 h-12 rounded-lg bg-[#F5F5F7] border border-[#1D1D1F] p-1 flex items-center justify-center">
+              <img id="modalThumb1" src="" alt="Thumbnail" class="h-full object-contain" />
+            </button>
+            <button class="w-12 h-12 rounded-lg bg-[#F5F5F7] border border-[#D2D2D7] p-1 flex items-center justify-center opacity-70 hover:opacity-100">
+              <span class="material-symbols-outlined text-[20px] text-[#6E6E73]">smartphone</span>
+            </button>
+            <button class="w-12 h-12 rounded-lg bg-[#F5F5F7] border border-[#D2D2D7] p-1 flex items-center justify-center opacity-70 hover:opacity-100">
+              <span class="material-symbols-outlined text-[20px] text-[#6E6E73]">360</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Cột phải: Thông số, swatches và cấu hình máy -->
+        <div>
+          <div class="inline-block px-2.5 py-0.5 rounded bg-[#F5F5F7] text-[11px] font-semibold uppercase text-[#1D1D1F] mb-2">CHÍNH HÃNG NGUYÊN BẢN</div>
+          <h2 id="modalProductTitle" class="text-[24px] font-semibold text-[#1D1D1F] leading-tight mb-2">Tên sản phẩm</h2>
+          <div class="flex items-baseline gap-3 mb-4">
+            <span id="modalProductPrice" class="text-[24px] font-semibold text-[#1D1D1F]">0₫</span>
+            <span id="modalProductOldPrice" class="text-[14px] text-[#6E6E73] line-through">0₫</span>
+            <span class="text-[12px] font-semibold px-2 py-0.5 rounded bg-[#0071E3]/10 text-[#0071E3]">Tiết kiệm đặc quyền</span>
+          </div>
+
+          <!-- Color Swatches -->
+          <div class="mb-4">
+            <div class="text-[12px] font-semibold text-[#6E6E73] uppercase mb-2">
+              Màu sắc: <span id="modalProductColor" class="text-[#1D1D1F] font-medium">Titan Tự Nhiên</span>
+            </div>
+            <div id="modal-swatches-container" class="flex items-center gap-2.5">
+              <!-- Render động -->
+            </div>
+          </div>
+
+          <!-- Storage Chips -->
+          <div class="mb-5">
+            <div class="text-[12px] font-semibold text-[#6E6E73] uppercase mb-2">Dung lượng bộ nhớ</div>
+            <div id="modal-storage-container" class="flex items-center gap-2 flex-wrap">
+              <!-- Render động -->
+            </div>
+          </div>
+
+          <!-- Specs summary -->
+          <div class="grid grid-cols-2 gap-2.5 text-[12px] p-3.5 bg-[#F5F5F7] rounded-xl mb-5">
+            <div><span class="text-[#6E6E73]">Màn hình:</span> <strong id="modalSpecScreen" class="text-[#1D1D1F]">6.3" OLED 120Hz</strong></div>
+            <div><span class="text-[#6E6E73]">Vi xử lý:</span> <strong id="modalSpecChip" class="text-[#1D1D1F]">A18 Pro</strong></div>
+            <div><span class="text-[#6E6E73]">Camera:</span> <strong id="modalSpecCam" class="text-[#1D1D1F]">48MP Pro</strong></div>
+            <div><span class="text-[#6E6E73]">Dung lượng pin:</span> <strong id="modalSpecBattery" class="text-[#1D1D1F]">3.582 mAh</strong></div>
+          </div>
+
+          <div class="flex items-center gap-2 text-[12px] text-[#6E6E73] mb-5">
+            <span class="material-symbols-outlined text-[16px] text-emerald-600">verified</span>
+            <span>Bảo hành chính hãng 12 tháng • 1 đổi 1 trong 30 ngày nếu phát sinh lỗi</span>
+          </div>
+
+          <!-- CTAs -->
+          <div class="flex items-center gap-3">
+            <button id="modal-add-to-cart-btn" class="flex-1 h-11 rounded-full bg-[#1D1D1F] text-white text-[13px] font-medium hover:bg-black transition-colors cursor-pointer border-0">
+              Thêm vào giỏ hàng
+            </button>
+            <button class="booking-trigger px-5 h-11 rounded-full border border-[#D2D2D7] text-[#1D1D1F] text-[13px] font-medium hover:bg-[#F5F5F7] transition-colors cursor-pointer" data-service-context="Tư vấn mua trả góp 0%" type="button">
+              Tư vấn kỹ thuật
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP 2: Slide-Over Cart Drawer 480px (#cart-drawer-root) -->
+  <aside id="cart-drawer-root" class="fixed inset-0 z-50 overflow-hidden hidden" aria-modal="true" role="dialog">
+    <div id="drawer-backdrop" class="fixed inset-0 bg-black/45 backdrop-blur-sm transition-opacity"></div>
+    <div class="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10">
+      <div id="cart-drawer-panel" class="w-screen max-w-[480px] bg-white shadow-2xl flex flex-col h-full border-l border-[#D2D2D7] drawer-panel">
+        
+        <!-- Header -->
+        <div class="px-6 py-5 border-b border-[#D2D2D7] flex items-center justify-between bg-white sticky top-0 z-10">
+          <div class="flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-[#1D1D1F] text-[22px]">shopping_bag</span>
+            <h3 class="headline-sm text-[20px] text-[#1D1D1F]">Giỏ hàng của bạn (<span class="cart-count-display">2</span>)</h3>
+          </div>
+          <button id="close-drawer-btn" aria-label="Đóng giỏ hàng" class="w-8 h-8 rounded-full bg-[#F5F5F7] hover:bg-[#E5E5EA] flex items-center justify-center text-[#6E6E73] hover:text-[#1D1D1F] transition-colors border-0 cursor-pointer">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+
+        <!-- Scrollable Body -->
+        <div class="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+          
+          <!-- Danh sách sản phẩm -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-[#6E6E73]">Sản phẩm đã chọn</span>
+              <span class="text-[12px] text-[#0071E3] font-medium">Miễn phí giao hỏa tốc 2H</span>
+            </div>
+
+            <div id="cart-items-list" class="space-y-3">
+              <!-- Render động -->
+            </div>
+          </div>
+
+          <!-- Nhập mã giảm giá Voucher -->
+          <div class="p-3.5 rounded-2xl bg-[#F5F5F7]">
+            <label class="block text-[11px] font-semibold text-[#6E6E73] uppercase mb-1.5">Mã giảm giá ưu đãi</label>
+            <div class="flex gap-2">
+              <input id="voucher-input" type="text" placeholder="Nhập mã: MEMBER" class="flex-1 h-9 px-3 bg-white rounded-xl text-[12px] text-[#1D1D1F] border border-[#D2D2D7] outline-none uppercase" />
+              <button id="apply-voucher-btn" class="h-9 px-4 rounded-xl bg-[#1D1D1F] text-white text-[12px] font-medium hover:bg-black transition-colors cursor-pointer border-0">
+                Áp dụng
+              </button>
+            </div>
+            <p class="text-[11px] text-[#6E6E73] mt-1.5">Gợi ý: Nhập <strong>MEMBER</strong> để giảm ngay 300.000₫.</p>
+          </div>
+
+          <!-- Chi tiết thanh toán -->
+          <div class="rounded-2xl bg-[#F5F5F7] p-4 space-y-2.5">
+            <h4 class="text-[11px] font-semibold uppercase tracking-wider text-[#6E6E73] mb-2">Chi tiết thanh toán</h4>
+            <div class="flex justify-between text-[14px]">
+              <span class="text-[#6E6E73]">Tạm tính</span>
+              <span id="cart-subtotal" class="font-medium text-[#1D1D1F]">0₫</span>
+            </div>
+            <div class="flex justify-between text-[14px]">
+              <span class="text-[#6E6E73]">Giảm giá ưu đãi</span>
+              <span id="cart-discount" class="font-medium text-[#0071E3]">-0₫</span>
+            </div>
+            <div class="flex justify-between text-[14px]">
+              <span class="text-[#6E6E73]">Phí giao hàng</span>
+              <span id="cart-shipping" class="font-medium text-[#1D1D1F]">Miễn phí</span>
+            </div>
+            <div class="pt-2 mt-2 border-t border-[#D2D2D7] flex justify-between items-baseline">
+              <div>
+                <span class="font-semibold text-[#1D1D1F]">Tổng thanh toán</span>
+                <span class="block text-[11px] text-[#6E6E73]">(Đã bao gồm VAT)</span>
+              </div>
+              <span id="cart-total" class="text-[22px] font-bold text-[#1D1D1F]">0₫</span>
+            </div>
+          </div>
+
+          <!-- Form thanh toán & Giao hàng nhanh -->
+          <form id="checkout-form" class="space-y-3.5 pt-1">
+            <div class="flex items-center gap-2">
+              <span class="w-1.5 h-4 bg-[#1D1D1F] rounded-full"></span>
+              <h4 class="text-[16px] font-semibold text-[#1D1D1F]">Thông tin giao hàng &amp; Thanh toán</h4>
+            </div>
+
+            <div>
+              <label class="block text-[12px] font-medium text-[#6E6E73] mb-1" for="cust-name">Họ và tên khách hàng</label>
+              <input id="cust-name" type="text" value="Nguyễn Văn An" required class="w-full px-3.5 py-2.5 rounded-xl bg-[#F5F5F7] border border-[#D2D2D7] text-[#1D1D1F] text-[13px] outline-none" />
+            </div>
+
+            <div>
+              <label class="block text-[12px] font-medium text-[#6E6E73] mb-1" for="cust-phone">Số điện thoại nhận hàng</label>
+              <input id="cust-phone" type="tel" value="0908 123 456" required class="w-full px-3.5 py-2.5 rounded-xl bg-[#F5F5F7] border border-[#D2D2D7] text-[#1D1D1F] text-[13px] outline-none" />
+            </div>
+
+            <div>
+              <label class="block text-[12px] font-medium text-[#6E6E73] mb-1" for="cust-address">Địa chỉ nhận hàng (Giao hỏa tốc 2H)</label>
+              <input id="cust-address" type="text" value="120 Đường 3/2, Phường 12, Quận 10, TP.HCM" required class="w-full px-3.5 py-2.5 rounded-xl bg-[#F5F5F7] border border-[#D2D2D7] text-[#1D1D1F] text-[13px] outline-none" />
+            </div>
+
+            <div class="space-y-2 pt-1">
+              <label class="block text-[12px] font-medium text-[#6E6E73]">Phương thức thanh toán</label>
+              <label class="flex items-center gap-3 p-3 rounded-xl bg-[#F5F5F7] hover:bg-[#EAEAEA] transition-colors cursor-pointer border border-[#1D1D1F]">
+                <input type="radio" name="payment_method" value="cod" checked class="accent-[#1D1D1F]" />
+                <div class="flex-1 text-left">
+                  <p class="text-[13px] font-medium text-[#1D1D1F]">Thanh toán khi nhận hàng (COD)</p>
+                  <p class="text-[11px] text-[#6E6E73]">Kiểm tra máy & kích hoạt rồi mới thanh toán</p>
+                </div>
+                <span class="material-symbols-outlined text-[20px] text-[#6E6E73]">local_shipping</span>
+              </label>
+
+              <label class="flex items-center gap-3 p-3 rounded-xl bg-[#F5F5F7] hover:bg-[#EAEAEA] transition-colors cursor-pointer border border-transparent">
+                <input type="radio" name="payment_method" value="qr" class="accent-[#1D1D1F]" />
+                <div class="flex-1 text-left">
+                  <p class="text-[13px] font-medium text-[#1D1D1F]">Chuyển khoản QR ngân hàng (VietQR)</p>
+                  <p class="text-[11px] text-[#6E6E73]">Quét mã QR tự động xác nhận đơn ngay</p>
+                </div>
+                <span class="material-symbols-outlined text-[20px] text-[#6E6E73]">qr_code</span>
+              </label>
+            </div>
+
+            <button type="submit" class="mt-4 w-full h-12 bg-[#1D1D1F] text-white rounded-full text-[14px] font-semibold hover:bg-black transition-all cursor-pointer border-0">
+              Xác nhận đặt hàng ngay
+            </button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- POPUP 3: Modal "Đặt Lịch Sửa Chữa Nhanh" (#repairModal) -->
+  <div id="repairModal" class="fixed inset-0 modal-overlay z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-[20px] max-w-[500px] w-full p-6 sm:p-8 shadow-2xl relative border border-[#D2D2D7]">
+      <button id="close-repair-modal-btn" aria-label="Đóng" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-[#F5F5F7] flex items-center justify-center text-[#1D1D1F] hover:bg-[#E5E5EA] transition-colors cursor-pointer border-0">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+
+      <div class="inline-block px-2.5 py-0.5 rounded bg-[#F5F5F7] text-[11px] font-semibold uppercase text-[#1D1D1F] mb-1.5">ĐẶT LỊCH NHANH</div>
+      <h3 class="text-[22px] font-semibold text-[#1D1D1F] mb-1.5">Đặt lịch sửa chữa &amp; Báo giá</h3>
+      <p class="text-[13px] text-[#6E6E73] mb-5">Tiết kiệm thời gian chờ đợi. Kỹ thuật viên sẽ chuẩn bị linh kiện zin sẵn sàng khi bạn tới shop.</p>
+
+      <form id="repair-modal-form" class="flex flex-col gap-3.5">
+        <div>
+          <label class="block text-[12px] font-medium text-[#1D1D1F] mb-1">Họ và tên của bạn</label>
+          <input id="repairCustName" type="text" placeholder="Nguyễn Văn A" required class="w-full h-10 px-3.5 bg-[#F5F5F7] rounded-xl text-[13px] text-[#1D1D1F] border-0 focus:ring-1 focus:ring-[#1D1D1F] outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-[12px] font-medium text-[#1D1D1F] mb-1">Dòng điện thoại của bạn</label>
+          <input id="repairDeviceInput" type="text" placeholder="Ví dụ: iPhone 14 Pro Max, Galaxy S23..." required class="w-full h-10 px-3.5 bg-[#F5F5F7] rounded-xl text-[13px] text-[#1D1D1F] border-0 focus:ring-1 focus:ring-[#1D1D1F] outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-[12px] font-medium text-[#1D1D1F] mb-1">Dịch vụ sửa chữa cần thực hiện</label>
+          <select id="repairServiceSelect" class="w-full h-10 px-3.5 bg-[#F5F5F7] rounded-xl text-[13px] text-[#1D1D1F] border-0 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
+            <option value="Thay màn hình OLED Retina lấy liền">Thay màn hình OLED Retina lấy liền</option>
+            <option value="Thay pin dung lượng cao Chuẩn CE">Thay pin dung lượng cao Chuẩn CE</option>
+            <option value="Ép kính chân không Gorilla Glass">Ép kính chân không Gorilla Glass</option>
+            <option value="Sửa Mainboard & IC nguồn">Sửa Mainboard & IC nguồn</option>
+            <option value="Khám máy & vệ sinh miễn phí">Khám máy & vệ sinh miễn phí</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[12px] font-medium text-[#1D1D1F] mb-1">Số điện thoại liên hệ</label>
+            <input id="repairCustPhone" type="tel" placeholder="0909 xxx xxx" required class="w-full h-10 px-3.5 bg-[#F5F5F7] rounded-xl text-[13px] text-[#1D1D1F] border-0 focus:ring-1 focus:ring-[#1D1D1F] outline-none" />
+          </div>
+          <div>
+            <label class="block text-[12px] font-medium text-[#1D1D1F] mb-1">Ngày &amp; Giờ ghé shop</label>
+            <input type="text" value="Hôm nay - 10:00" class="w-full h-10 px-3.5 bg-[#F5F5F7] rounded-xl text-[13px] text-[#1D1D1F] border-0 focus:ring-1 focus:ring-[#1D1D1F] outline-none" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[12px] font-medium text-[#1D1D1F] mb-1">Ghi chú tình trạng máy (nếu có)</label>
+          <textarea rows="2" placeholder="Ví dụ: Rơi nứt kính góc trên, cảm ứng vẫn mượt..." class="w-full p-3 bg-[#F5F5F7] rounded-xl text-[13px] text-[#1D1D1F] border-0 focus:ring-1 focus:ring-[#1D1D1F] outline-none resize-none"></textarea>
+        </div>
+
+        <button type="submit" class="mt-2 w-full h-11 bg-[#1D1D1F] text-white rounded-full text-[13px] font-medium hover:bg-black transition-colors cursor-pointer border-0">
+          Xác nhận đặt lịch — Tiết kiệm ngay 10%
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- POPUP 4: Support Chat Widget ở góc dưới cùng bên phải -->
+  <div class="fixed bottom-6 right-6 z-40 flex flex-col items-end">
+    <!-- Popover box chat -->
+    <div id="chatPopover" class="mb-3 w-[340px] bg-white rounded-2xl shadow-2xl border border-[#D2D2D7] p-4 hidden transition-all">
+      <div class="flex items-center justify-between pb-3 border-b border-[#D2D2D7]/60 mb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-[#1D1D1F] text-white flex items-center justify-center text-[12px] font-bold">TM</div>
+          <div>
+            <div class="text-[13px] font-semibold text-[#1D1D1F]">Hỗ trợ kỹ thuật Tien Mobile</div>
+            <div class="text-[11px] text-emerald-600 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span>Đang trực tuyến</span>
+            </div>
+          </div>
+        </div>
+        <button id="close-chat-btn" class="text-[#6E6E73] hover:text-[#1D1D1F] border-0 bg-transparent cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <div class="text-[13px] text-[#6E6E73] bg-[#F5F5F7] p-3 rounded-xl mb-3 leading-relaxed">
+        Chào bạn! Tien Mobile có thể hỗ trợ kiểm tra giá máy, tình trạng còn hàng hoặc tư vấn lỗi máy trực tiếp ngay bây giờ.
+      </div>
+
+      <div class="flex flex-col gap-1.5 mb-3">
+        <button class="chat-quick-btn text-left text-[12px] py-1.5 px-3 bg-[#F5F5F7] hover:bg-[#EAEAEA] rounded-lg text-[#1D1D1F] transition-colors border-0 cursor-pointer" data-chat-query="Tư vấn thay màn hình iPhone lấy ngay">
+          👉 Báo giá thay màn hình lấy ngay
+        </button>
+        <button class="chat-quick-btn text-left text-[12px] py-1.5 px-3 bg-[#F5F5F7] hover:bg-[#EAEAEA] rounded-lg text-[#1D1D1F] transition-colors border-0 cursor-pointer" data-chat-query="Tư vấn thu cũ đổi mới iPhone 16 Pro">
+          👉 Định giá thu cũ lên đời iPhone 16 Pro
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <input id="chat-input" type="text" placeholder="Nhập câu hỏi của bạn..." class="flex-1 h-9 px-3 bg-[#F5F5F7] rounded-xl text-[12px] text-[#1D1D1F] border-0 focus:ring-1 focus:ring-[#1D1D1F] outline-none" />
+        <button id="chat-send-btn" class="w-9 h-9 rounded-xl bg-[#1D1D1F] text-white flex items-center justify-center hover:bg-black transition-colors border-0 cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">send</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <button id="chat-toggle-btn" aria-label="Tư vấn trực tuyến" class="flex items-center gap-2.5 h-12 px-4 rounded-full bg-[#1D1D1F] text-white shadow-xl hover:bg-black transition-all hover:scale-105 cursor-pointer border-0">
+      <span class="material-symbols-outlined text-[20px]">chat</span>
+      <span class="text-[13px] font-medium hidden sm:inline">Tư vấn trực tuyến</span>
+      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+    </button>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Three.js 3D Library & GLTF Loader (Bundled local & zero-latency) -->
+  <script src="js/three.min.js"></script>
+  <script src="js/GLTFLoader.js"></script>
+
+  <!-- Main JavaScript App -->
+  <script type="module" src="js/app.js"></script>
+
+</body>
+</html>

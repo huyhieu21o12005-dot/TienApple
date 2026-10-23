@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-primary-container":"#868587","primary":"#030304","on-secondary-fixed-variant":"#00458f","secondary-fixed-dim":"#abc7ff","error-container":"#ffdad6","on-tertiary":"#ffffff","surface-container-lowest":"#ffffff","surface-variant":"#e3e2e7","primary-fixed":"#e4e2e4","surface-secondary":"#f5f5f7","inverse-on-surface":"#f1f0f6","on-tertiary-container":"#8c8382","primary-container":"#1d1d1f","on-primary":"#ffffff","surface-base":"#ffffff","on-tertiary-fixed":"#1f1a19","surface-container-highest":"#e3e2e7","surface-container-high":"#e9e7ed","on-tertiary-fixed-variant":"#4c4544","inverse-primary":"#c8c6c8","surface-container":"#efedf3","secondary-container":"#0372e4","on-surface-variant":"#46464a","surface-bright":"#faf8fe","surface-container-low":"#f4f3f8","on-secondary-container":"#fefcff","on-background":"#1a1b1f","on-primary-fixed-variant":"#474649","on-surface":"#1a1b1f","tertiary-fixed":"#ebe0de","tertiary":"#040302","on-primary-fixed":"#1b1b1d","on-secondary-fixed":"#001b3f","border-hairline":"#d2d2d7","surface":"#faf8fe","on-error-container":"#93000a","secondary":"#005ab7","on-error":"#ffffff","tertiary-container":"#211c1b","on-secondary":"#ffffff","secondary-fixed":"#d7e2ff","inverse-surface":"#2f3034","background":"#faf8fe","surface-tint":"#5f5e60","primary-fixed-dim":"#c8c6c8","tertiary-fixed-dim":"#cec4c2","outline":"#77767b","error":"#ba1a1a","surface-dim":"#dbd9df","outline-variant":"#c7c6ca"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"gutter-mobile":"1rem","space-lg":"1.5rem","space-md":"1rem","margin-mobile":"1.25rem","margin":"3rem","space-sm":"0.5rem","gutter":"1.5rem","space-xs":"0.25rem","space-xl":"2.5rem"},fontFamily:{"display-hero":["Inter"],"headline-lg":["Inter"],"body-sm":["Inter"],"display-hero-mobile":["Inter"],"headline-md":["Inter"],"body-lg":["Inter"],"label-md":["Inter"],"headline-sm":["Inter"],"body-md":["Inter"],"headline-lg-mobile":["Inter"],"link-md":["Inter"]},fontSize:{"display-hero":["60px",{"lineHeight":"64px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-lg":["48px",{"lineHeight":"52px","letterSpacing":"-0.015em","fontWeight":"600"}],"body-sm":["14px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"display-hero-mobile":["40px",{"lineHeight":"44px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-md":["28px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-lg":["19px",{"lineHeight":"28px","letterSpacing":"0em","fontWeight":"400"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"headline-sm":["21px",{"lineHeight":"26px","letterSpacing":"-0.005em","fontWeight":"600"}],"body-md":["17px",{"lineHeight":"25px","letterSpacing":"0em","fontWeight":"400"}],"headline-lg-mobile":["32px",{"lineHeight":"36px","letterSpacing":"-0.015em","fontWeight":"600"}],"link-md":["17px",{"lineHeight":"25px","letterSpacing":"0em","fontWeight":"400"}]}}}};</script></head><body class="bg-surface-base font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-base/90 backdrop-blur-xl border-b border-border-hairline"><div class="h-16 max-w-[1200px] mx-auto px-gutter-mobile lg:px-margin flex items-center justify-between"><div class="flex items-center gap-8"><a class="flex items-center gap-2 text-primary font-headline-sm tracking-tight" data-path="trang-chu" href="#"><span class="material-symbols-outlined text-primary text-[24px]">smartphone</span><span>Tien Mobile</span></a><nav class="hidden lg:flex items-center gap-6 h-16" data-active-classes="text-primary font-semibold border-b-2 border-primary"><a class="h-full inline-flex items-center text-on-surface-variant hover:text-on-surface font-body-sm transition-colors" data-path="trang-chu" href="#">Trang chủ</a><a class="h-full inline-flex items-center text-on-surface-variant hover:text-on-surface font-body-sm transition-colors" data-path="dien-thoai" href="#">Điện thoại</a><a class="h-full inline-flex items-center text-on-surface-variant hover:text-on-surface font-body-sm transition-colors" data-path="sua-chua" href="#">Sửa chữa</a><a class="h-full inline-flex items-center text-on-surface-variant hover:text-on-surface font-body-sm transition-colors" data-path="phu-kien" href="#">Phụ kiện</a><a class="h-full inline-flex items-center text-on-surface-variant hover:text-on-surface font-body-sm transition-colors" data-path="thu-cu-doi-moi" href="#">Thu cũ đổi mới</a><a class="h-full inline-flex items-center text-on-surface-variant hover:text-on-surface font-body-sm transition-colors" data-path="lien-he" href="#">Liên hệ</a></nav></div><div class="flex items-center gap-3"><button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-border-hairline bg-surface-secondary text-primary font-body-sm hover:bg-surface-variant transition-colors" type="button"><span class="material-symbols-outlined text-[18px]">shopping_bag</span><span>Giỏ hàng (2)</span></button><button class="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-primary-container text-on-primary font-body-sm hover:bg-primary transition-colors" type="button"><span class="material-symbols-outlined text-[18px]">calendar_today</span><span>Đặt lịch sửa</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface-base min-h-screen"><div class="flex flex-col w-full">
+<!-- SECTION 1: REPAIR OVERVIEW & PROCESS BANNER -->
+<section class="w-full py-12 lg:py-20 bg-surface-base">
+<div class="max-w-[1200px] mx-auto px-gutter-mobile lg:px-margin">
+<!-- Section Header -->
+<div class="max-w-3xl mb-12 lg:mb-16">
+<span class="font-label-md text-secondary uppercase tracking-widest block mb-3">DỊCH VỤ SỬA CHỮA MINH BẠCH LẤY NGAY</span>
+<h1 class="font-display-hero text-primary mb-4 tracking-tight">Sửa xong trong ngày. Báo giá trước khi làm.</h1>
+<p class="font-body-lg text-on-surface-variant leading-relaxed">
+          Kỹ thuật viên thao tác trực tiếp trước mặt khách hàng, cam kết 100% linh kiện zin chính hãng, bảo hành điện tử minh bạch đến 18 tháng.
+        </p>
+</div>
+<!-- Trust Badges Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+<div class="p-4 rounded-xl bg-surface-secondary flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary text-[28px]">visibility</span>
+<div>
+<div class="font-headline-sm text-primary text-[15px]">Quan sát trực tiếp</div>
+<div class="font-body-sm text-on-surface-variant text-[12px]">Không giữ máy qua đêm</div>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-surface-secondary flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary text-[28px]">verified_user</span>
+<div>
+<div class="font-headline-sm text-primary text-[15px]">Bảo hành 12 - 18T</div>
+<div class="font-body-sm text-on-surface-variant text-[12px]">Lỗi 1 đổi 1 tức thì</div>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-surface-secondary flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary text-[28px]">price_check</span>
+<div>
+<div class="font-headline-sm text-primary text-[15px]">Báo giá trọn gói</div>
+<div class="font-body-sm text-on-surface-variant text-[12px]">Không phí phát sinh</div>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-surface-secondary flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary text-[28px]">security</span>
+<div>
+<div class="font-headline-sm text-primary text-[15px]">Bảo mật dữ liệu</div>
+<div class="font-body-sm text-on-surface-variant text-[12px]">Ký niêm phong phần cứng</div>
+</div>
+</div>
+</div>
+<!-- 4 Core Service Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+<!-- Card 1 -->
+<div class="rounded-2xl bg-surface-secondary p-6 flex flex-col justify-between hover:bg-surface-variant transition-colors duration-200">
+<div>
+<div class="w-12 h-12 rounded-full bg-surface-base flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-[24px]">screenshot</span>
+</div>
+<span class="font-label-md text-on-surface-variant uppercase tracking-wider block mb-1">Màn hình &amp; Cảm ứng</span>
+<h3 class="font-headline-sm text-primary mb-3">Thay màn hình OLED Retina</h3>
+<p class="font-body-sm text-on-surface-variant mb-6">
+              Tấm nền chuẩn màu DCI-P3 sắc nét, cảm ứng mượt mà 120Hz ProMotion, fix TrueTone tự động.
+            </p>
+</div>
+<div>
+<div class="pt-4 border-t border-border-hairline/60 flex items-baseline justify-between mb-2">
+<span class="font-body-sm text-on-surface-variant">Chi phí từ</span>
+<span class="font-headline-sm text-primary">650.000₫</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-[13px]">
+<span class="material-symbols-outlined text-[16px] text-secondary">schedule</span>
+<span>Thời gian: 30 – 45 phút</span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="rounded-2xl bg-surface-secondary p-6 flex flex-col justify-between hover:bg-surface-variant transition-colors duration-200">
+<div>
+<div class="w-12 h-12 rounded-full bg-surface-base flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-[24px]">battery_charging_full</span>
+</div>
+<span class="font-label-md text-on-surface-variant uppercase tracking-wider block mb-1">Nguồn &amp; Cell Pin</span>
+<h3 class="font-headline-sm text-primary mb-3">Thay pin dung lượng cao Chuẩn CE</h3>
+<p class="font-body-sm text-on-surface-variant mb-6">
+              Chu kỳ sạc xả 800+ lần, tích hợp IC bảo vệ quá nhiệt an toàn chuẩn châu Âu, báo pin 100%.
+            </p>
+</div>
+<div>
+<div class="pt-4 border-t border-border-hairline/60 flex items-baseline justify-between mb-2">
+<span class="font-body-sm text-on-surface-variant">Chi phí từ</span>
+<span class="font-headline-sm text-primary">350.000₫</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-[13px]">
+<span class="material-symbols-outlined text-[16px] text-secondary">schedule</span>
+<span>Thời gian: 15 – 20 phút</span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="rounded-2xl bg-surface-secondary p-6 flex flex-col justify-between hover:bg-surface-variant transition-colors duration-200">
+<div>
+<div class="w-12 h-12 rounded-full bg-surface-base flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-[24px]">memory</span>
+</div>
+<span class="font-label-md text-on-surface-variant uppercase tracking-wider block mb-1">Kỹ thuật chuyên sâu</span>
+<h3 class="font-headline-sm text-primary mb-3">Sửa Mainboard &amp; IC nguồn</h3>
+<p class="font-body-sm text-on-surface-variant mb-6">
+              Khám máy chuẩn đoán đo xung vi mạch 0đ, xử lý mất nguồn, treo logo, chạm tụ chuẩn xác.
+            </p>
+</div>
+<div>
+<div class="pt-4 border-t border-border-hairline/60 flex items-baseline justify-between mb-2">
+<span class="font-body-sm text-on-surface-variant">Chi phí từ</span>
+<span class="font-headline-sm text-primary">Khám máy 0₫</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-[13px]">
+<span class="material-symbols-outlined text-[16px] text-secondary">schedule</span>
+<span>Thời gian: 2 – 4 giờ</span>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="rounded-2xl bg-surface-secondary p-6 flex flex-col justify-between hover:bg-surface-variant transition-colors duration-200">
+<div>
+<div class="w-12 h-12 rounded-full bg-surface-base flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-[24px]">layers</span>
+</div>
+<span class="font-label-md text-on-surface-variant uppercase tracking-wider block mb-1">Mặt kính &amp; Thẩm mỹ</span>
+<h3 class="font-headline-sm text-primary mb-3">Ép kính chân không Gorilla Glass</h3>
+<p class="font-body-sm text-on-surface-variant mb-6">
+              Công nghệ máy hấp nhiệt tự động loại bỏ bọt khí tuyệt đối, giữ trọn phôi màn hình nguyên bản.
+            </p>
+</div>
+<div>
+<div class="pt-4 border-t border-border-hairline/60 flex items-baseline justify-between mb-2">
+<span class="font-body-sm text-on-surface-variant">Chi phí từ</span>
+<span class="font-headline-sm text-primary">290.000₫</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-[13px]">
+<span class="material-symbols-outlined text-[16px] text-secondary">schedule</span>
+<span>Thời gian: 45 – 60 phút</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Booking Bar Form -->
+<div class="rounded-2xl bg-surface-secondary p-6 lg:p-8">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+<div>
+<span class="font-label-md text-secondary uppercase tracking-wider block">Ưu đãi hẹn trước</span>
+<h2 class="font-headline-md text-primary">Đặt lịch sửa chữa ưu tiên</h2>
+</div>
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-base text-primary font-body-sm">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span>Giữ chỗ trước: Không phải xếp hàng chờ đợi</span>
+</div>
+</div>
+<form class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end" id="quick-booking-form">
+<!-- Device Select -->
+<div class="space-y-1.5">
+<label class="block font-label-md text-on-surface-variant" for="device-model">Dòng máy của bạn</label>
+<div class="relative">
+<select class="w-full h-12 px-4 rounded-xl bg-surface-base text-primary font-body-sm appearance-none focus:outline-none focus:ring-2 focus:ring-secondary cursor-pointer" id="device-model" required="">
+<option disabled="" selected="" value="">Chọn thiết bị...</option>
+<option value="iphone-15-series">iPhone 15 Series (15 / Plus / Pro / Pro Max)</option>
+<option value="iphone-14-series">iPhone 14 Series</option>
+<option value="iphone-13-series">iPhone 13 Series</option>
+<option value="iphone-12-series">iPhone 12 / 11 Series</option>
+<option value="samsung-s-series">Samsung Galaxy S24 / S23 Series</option>
+<option value="samsung-fold-flip">Samsung Galaxy Z Fold / Z Flip</option>
+<option value="ipad-series">Apple iPad Pro / Air / Mini</option>
+<option value="other-device">Dòng máy khác...</option>
+</select>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] absolute right-3 top-3.5 pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Issue Select -->
+<div class="space-y-1.5">
+<label class="block font-label-md text-on-surface-variant" for="device-issue">Vấn đề cần xử lý</label>
+<div class="relative">
+<select class="w-full h-12 px-4 rounded-xl bg-surface-base text-primary font-body-sm appearance-none focus:outline-none focus:ring-2 focus:ring-secondary cursor-pointer" id="device-issue" required="">
+<option disabled="" selected="" value="">Chọn tình trạng...</option>
+<option value="screen-replace">Vỡ mặt kính / Hỏng màn hình</option>
+<option value="battery-drain">Pin chai, tụt nhanh, phù pin</option>
+<option value="charging-port">Không nhận sạc / Hỏng chân sạc</option>
+<option value="camera-faceid">Lỗi Camera / Mất Face ID</option>
+<option value="motherboard">Rơi nước / Mất nguồn / Đơ treo</option>
+<option value="free-check">Khám máy, chuẩn đoán tổng quát (0đ)</option>
+</select>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] absolute right-3 top-3.5 pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Phone Number -->
+<div class="space-y-1.5">
+<label class="block font-label-md text-on-surface-variant" for="customer-phone">Số điện thoại liên hệ</label>
+<input class="w-full h-12 px-4 rounded-xl bg-surface-base text-primary font-body-sm focus:outline-none focus:ring-2 focus:ring-secondary placeholder:text-on-surface-variant/60" id="customer-phone" placeholder="09xx xxx xxx" required="" type="tel"/>
+</div>
+<!-- Time slot -->
+<div class="space-y-1.5">
+<label class="block font-label-md text-on-surface-variant" for="booking-time">Khung giờ hẹn</label>
+<div class="relative">
+<select class="w-full h-12 px-4 rounded-xl bg-surface-base text-primary font-body-sm appearance-none focus:outline-none focus:ring-2 focus:ring-secondary cursor-pointer" id="booking-time" required="">
+<option value="09:00 - 10:30">09:00 - 10:30 (Sáng)</option>
+<option value="11:00 - 12:30">11:00 - 12:30 (Trưa)</option>
+<option selected="" value="14:00 - 16:00">14:00 - 16:00 (Chiều)</option>
+<option value="17:00 - 19:00">17:00 - 19:00 (Tan tầm)</option>
+<option value="19:30 - 21:00">19:30 - 21:00 (Tối)</option>
+</select>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] absolute right-3 top-3.5 pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Submit Button -->
+<div>
+<button class="w-full h-12 px-5 rounded-full bg-primary-container text-on-primary font-body-sm hover:bg-primary transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm" type="submit">
+<span class="material-symbols-outlined text-[18px]">calendar_add_on</span>
+<span class="font-medium whitespace-nowrap">Đặt lịch ngay (-10%)</span>
+</button>
+</div>
+</form>
+<div class="hidden mt-4 p-4 rounded-xl bg-surface-base text-primary font-body-sm flex items-center gap-3" id="booking-feedback">
+<span class="material-symbols-outlined text-secondary text-[22px]">check_circle</span>
+<span class="text-primary font-medium">Đặt lịch thành công! Nhân viên điều phối tại Tien Mobile sẽ gọi xác nhận trong 5 phút kèm mã voucher giảm 10%.</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 2: SMART CONSULTATION WIZARD (SCREEN 3 PRD SPEC) -->
+<section class="w-full py-16 lg:py-24 bg-surface-secondary">
+<div class="max-w-[1200px] mx-auto px-gutter-mobile lg:px-margin">
+<!-- Section Intro -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div>
+<span class="font-label-md text-secondary uppercase tracking-widest block mb-2">HỆ THỐNG GỢI Ý THIẾT BỊ CHUẨN XÁC</span>
+<h2 class="font-headline-lg text-primary tracking-tight">Tư vấn chọn máy thông minh</h2>
+</div>
+<p class="font-body-md text-on-surface-variant max-w-md">
+          Chỉ mất 30 giây để tìm chiếc máy tối ưu dựa trên nhu cầu sử dụng thực tế và mức đầu tư hợp lý nhất.
+        </p>
+</div>
+<!-- Main Layout: 2 Columns (Survey Interactive Left, Dynamic Recommendations Right) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- LEFT COLUMN: Interactive Questionnaire Card (7 cols) -->
+<div class="lg:col-span-7 bg-surface-base rounded-2xl p-6 lg:p-8 space-y-8">
+<div class="flex items-center justify-between pb-4 border-b border-border-hairline">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<h3 class="font-headline-sm text-primary text-[20px]">Bạn cần máy như thế nào?</h3>
+</div>
+<span class="font-label-md text-on-surface-variant bg-surface-secondary px-3 py-1 rounded-full">Khảo sát cá nhân hóa</span>
+</div>
+<!-- Step 1: Budget Range -->
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-primary font-semibold">1. Ngân sách dự kiến đầu tư:</span>
+<span class="font-label-md text-secondary" id="selected-budget-label">20 - 35 triệu</span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5" id="budget-options">
+<button class="budget-btn px-3 py-3 rounded-xl bg-surface-secondary text-primary font-body-sm text-[13px] hover:bg-surface-variant text-center transition-all" data-budget="under10" type="button">
+                &lt; 10 triệu
+              </button>
+<button class="budget-btn px-3 py-3 rounded-xl bg-surface-secondary text-primary font-body-sm text-[13px] hover:bg-surface-variant text-center transition-all" data-budget="10to20" type="button">
+                10 – 20 triệu
+              </button>
+<button class="budget-btn px-3 py-3 rounded-xl bg-primary-container text-on-primary font-body-sm text-[13px] text-center transition-all" data-budget="20to35" type="button">
+                20 – 35 triệu
+              </button>
+<button class="budget-btn px-3 py-3 rounded-xl bg-surface-secondary text-primary font-body-sm text-[13px] hover:bg-surface-variant text-center transition-all" data-budget="above35" type="button">
+                &gt; 35 triệu Flagship
+              </button>
+</div>
+</div>
+<!-- Step 2: Primary Use-Cases (Multi-select) -->
+<div class="space-y-3">
+<span class="font-body-sm text-primary font-semibold block">2. Nhu cầu sử dụng chính (chọn tối đa 2 mục):</span>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="usecase-options">
+<label class="usecase-card flex items-center justify-between p-3.5 rounded-xl bg-surface-secondary cursor-pointer hover:bg-surface-variant transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px] text-primary">photo_camera</span>
+<div>
+<div class="font-body-sm text-primary font-medium text-[14px]">Chụp ảnh &amp; Quay video đẹp</div>
+<div class="font-body-sm text-on-surface-variant text-[12px]">Camera zoom, 4K Cinematic, màu chân thực</div>
+</div>
+</div>
+<input checked="" class="w-4 h-4 accent-secondary rounded" name="usecase" type="checkbox" value="camera"/>
+</label>
+<label class="usecase-card flex items-center justify-between p-3.5 rounded-xl bg-surface-secondary cursor-pointer hover:bg-surface-variant transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px] text-primary">sports_esports</span>
+<div>
+<div class="font-body-sm text-primary font-medium text-[14px]">Chơi game &amp; Hiệu năng cao</div>
+<div class="font-body-sm text-on-surface-variant text-[12px]">Chip đầu bảng, tản nhiệt buồng hơi</div>
+</div>
+</div>
+<input checked="" class="w-4 h-4 accent-secondary rounded" name="usecase" type="checkbox" value="gaming"/>
+</label>
+<label class="usecase-card flex items-center justify-between p-3.5 rounded-xl bg-surface-secondary cursor-pointer hover:bg-surface-variant transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px] text-primary">battery_saver</span>
+<div>
+<div class="font-body-sm text-primary font-medium text-[14px]">Pin 2 ngày &amp; Sạc siêu nhanh</div>
+<div class="font-body-sm text-on-surface-variant text-[12px]">Dung lượng 5000mAh+, onscreen 8 tiếng</div>
+</div>
+</div>
+<input class="w-4 h-4 accent-secondary rounded" name="usecase" type="checkbox" value="battery"/>
+</label>
+<label class="usecase-card flex items-center justify-between p-3.5 rounded-xl bg-surface-secondary cursor-pointer hover:bg-surface-variant transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px] text-primary">school</span>
+<div>
+<div class="font-body-sm text-primary font-medium text-[14px]">Học tập &amp; Nghe gọi bền bỉ</div>
+<div class="font-body-sm text-on-surface-variant text-[12px]">Nhẹ nhàng, mượt mà các tác vụ thường ngày</div>
+</div>
+</div>
+<input class="w-4 h-4 accent-secondary rounded" name="usecase" type="checkbox" value="daily"/>
+</label>
+</div>
+</div>
+<!-- Step 3: Brand Preference -->
+<div class="space-y-3">
+<span class="font-body-sm text-primary font-semibold block">3. Hãng ưa thích:</span>
+<div class="grid grid-cols-3 gap-3" id="brand-options">
+<button class="brand-btn px-4 py-3 rounded-xl bg-primary-container text-on-primary font-body-sm text-center flex items-center justify-center gap-2 transition-all" data-brand="apple" type="button">
+<span class="material-symbols-outlined text-[18px]">phone_iphone</span>
+<span>Apple iPhone</span>
+</button>
+<button class="brand-btn px-4 py-3 rounded-xl bg-surface-secondary text-primary font-body-sm text-center flex items-center justify-center gap-2 hover:bg-surface-variant transition-all" data-brand="samsung" type="button">
+<span class="material-symbols-outlined text-[18px]">phone_android</span>
+<span>Samsung Galaxy</span>
+</button>
+<button class="brand-btn px-4 py-3 rounded-xl bg-surface-secondary text-primary font-body-sm text-center flex items-center justify-center gap-2 hover:bg-surface-variant transition-all" data-brand="any" type="button">
+<span class="material-symbols-outlined text-[18px]">balance</span>
+<span>Không quan trọng</span>
+</button>
+</div>
+</div>
+<!-- Bottom Action Prompt -->
+<div class="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-border-hairline">
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm">
+<span class="material-symbols-outlined text-[18px] text-secondary">tune</span>
+<span>Đang lọc 32 mẫu máy có sẵn tại kho Tien Mobile</span>
+</div>
+<button class="inline-flex items-center gap-1 text-secondary font-body-sm font-semibold hover:underline" id="refresh-recommendation-btn" type="button">
+<span>Làm mới bộ lọc</span>
+<span class="material-symbols-outlined text-[18px]">sync</span>
+</button>
+</div>
+</div>
+<!-- RIGHT COLUMN: Recommended Devices Showcase (5 cols) -->
+<div class="lg:col-span-5 space-y-4">
+<div class="flex items-center justify-between px-2">
+<div>
+<span class="font-label-md text-secondary uppercase tracking-widest block">AI MATCHING ENGINE</span>
+<h3 class="font-headline-sm text-primary">Gợi ý chuyên sâu cho bạn</h3>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-surface-base text-primary font-body-sm text-[12px] font-medium shadow-sm">3 kết quả tốt nhất</span>
+</div>
+<!-- Recommendation Item 1 (Best Match) -->
+<div class="bg-surface-base rounded-2xl p-5 transition-transform hover:-translate-y-0.5">
+<div class="flex gap-4">
+<div class="w-24 h-28 rounded-xl bg-surface-secondary flex-shrink-0 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Close up studio product shot of Natural Titanium Apple iPhone 15 Pro Max highlighting its brushed titanium texture and triple camera array on clean minimalist white pedestal" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCF_6TBokd3R7FrOshC1Fo62RWghzICz8nreUokHZDDjSI4_J-iDjT9N-08qg2e0TROb6Hza-gIKHWP1SIS-pY8JTqgZ3MtZbmQZRgyd7noakFAJe7c_L7rCCHv9AyP_i6TnJWAD-ijIr_AVDbSI5vksMCF2zAHzV4JqwOBq0scJMNjar0T-e9-zRO-k5rTBI6l98_GDLOIEmwSiBbWYsOL41gGQSpX8pGAfaoOTn79c7b1Wv4E8p6l"/>
+<span class="absolute top-1 left-1 bg-primary text-on-primary font-label-md text-[10px] px-1.5 py-0.5 rounded">98% Match</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-start justify-between gap-2 mb-1">
+<h4 class="font-headline-sm text-primary text-[17px] truncate">iPhone 15 Pro Max 256GB</h4>
+</div>
+<div class="font-body-sm text-secondary font-semibold text-[15px] mb-2">28.490.000₫ <span class="text-on-surface-variant font-normal line-through text-[12px] ml-1">31.990.000₫</span></div>
+<div class="space-y-1 mb-3">
+<div class="flex items-center gap-1.5 text-on-surface-variant font-body-sm text-[12px]">
+<span class="material-symbols-outlined text-[14px]">memory</span>
+<span>Apple A17 Pro (3nm), Ray Tracing</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-body-sm text-[12px]">
+<span class="material-symbols-outlined text-[14px]">photo_camera</span>
+<span>Camera Tele 5x tiềm vọng, 48MP</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex-1 py-1.5 px-3 rounded-full bg-primary-container text-on-primary font-body-sm text-[13px] font-medium hover:bg-primary transition-colors text-center" type="button">
+                    Xem chi tiết máy
+                  </button>
+<button aria-label="So sánh máy" class="w-8 h-8 rounded-full bg-surface-secondary text-primary flex items-center justify-center hover:bg-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">compare_arrows</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Recommendation Item 2 -->
+<div class="bg-surface-base rounded-2xl p-5 transition-transform hover:-translate-y-0.5">
+<div class="flex gap-4">
+<div class="w-24 h-28 rounded-xl bg-surface-secondary flex-shrink-0 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="High tech flat studio photograph of Samsung Galaxy S24 Ultra Titanium Gray alongside integrated S-Pen stylus on bright neutral gradient background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxg8UDfWuTJayWBvT8egepCGUeow0jIxMug1ebyeiD9GIMDhs2aBwHvsNHhbt0pfnFxg4WyuhQZzJLAird-F0th3JaA63vImX05Vv5X_Kl26WqdQy9GZHEn961_O_4W-zB9ZKHTdB1pobiKmX56UsCuLsAJhiT9KA9kH0ba6mg4cDuw6iz3P79ALAimamWVaU5UlikwfHOaUE6dsurhrcgLr-EfdtfDWjriy0CSeG13eQ_FyDWEvGm"/>
+<span class="absolute top-1 left-1 bg-surface-secondary text-primary font-label-md text-[10px] px-1.5 py-0.5 rounded">95% Match</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-start justify-between gap-2 mb-1">
+<h4 class="font-headline-sm text-primary text-[17px] truncate">Galaxy S24 Ultra 12GB/256GB</h4>
+</div>
+<div class="font-body-sm text-secondary font-semibold text-[15px] mb-2">26.890.000₫ <span class="text-on-surface-variant font-normal line-through text-[12px] ml-1">30.500.000₫</span></div>
+<div class="space-y-1 mb-3">
+<div class="flex items-center gap-1.5 text-on-surface-variant font-body-sm text-[12px]">
+<span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+<span>Galaxy AI thông minh, S-Pen vẽ tiện lợi</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-body-sm text-[12px]">
+<span class="material-symbols-outlined text-[14px]">battery_charging_full</span>
+<span>Pin 5.000 mAh + Sạc 45W siêu tốc</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex-1 py-1.5 px-3 rounded-full bg-surface-secondary text-primary font-body-sm text-[13px] font-medium hover:bg-surface-variant transition-colors text-center" type="button">
+                    Xem chi tiết máy
+                  </button>
+<button aria-label="So sánh máy" class="w-8 h-8 rounded-full bg-surface-secondary text-primary flex items-center justify-center hover:bg-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">compare_arrows</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Recommendation Item 3 (Value Option) -->
+<div class="bg-surface-base rounded-2xl p-5 transition-transform hover:-translate-y-0.5">
+<div class="flex gap-4">
+<div class="w-24 h-28 rounded-xl bg-surface-secondary flex-shrink-0 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Studio photograph of Midnight Black Apple iPhone 14 Like New 99 percent in immaculate physical condition placed upon a soft shadowless pure white tech counter" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4IM_ns9_P7eyimq13YgbC1aDnG50OqWrSDnxYAxuaPVEFNLfohPpIm_OChlLC2V9tVyCE1fhYP2Po-H1mH4kBeF34NYYMdaezm8FhfGF4RZIqYyXHxIyKsOL9Y86RVMbdcPnc-vxV8yLONqVi0cSC759pbu_My1oN1lg6BOs7IDpT0XjYPhdYo-PLEjMbLE9Kx0VhHdJ4etLj5UYa0z_6si3Is_imKh2avXeO0rrl5o7CrlIe-uYb"/>
+<span class="absolute top-1 left-1 bg-surface-secondary text-primary font-label-md text-[10px] px-1.5 py-0.5 rounded">Tối ưu chi phí</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-start justify-between gap-2 mb-1">
+<h4 class="font-headline-sm text-primary text-[17px] truncate">iPhone 14 128GB Like New 99%</h4>
+</div>
+<div class="font-body-sm text-secondary font-semibold text-[15px] mb-2">12.990.000₫ <span class="text-on-surface-variant font-normal line-through text-[12px] ml-1">15.500.000₫</span></div>
+<div class="space-y-1 mb-3">
+<div class="flex items-center gap-1.5 text-on-surface-variant font-body-sm text-[12px]">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+<span>Zin ốc, pin 9x%, BH 12T nguồn &amp; màn</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant font-body-sm text-[12px]">
+<span class="material-symbols-outlined text-[14px]">devices</span>
+<span>Gọn nhẹ 6.1 inch, quay Action Mode</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex-1 py-1.5 px-3 rounded-full bg-surface-secondary text-primary font-body-sm text-[13px] font-medium hover:bg-surface-variant transition-colors text-center" type="button">
+                    Xem chi tiết máy
+                  </button>
+<button aria-label="So sánh máy" class="w-8 h-8 rounded-full bg-surface-secondary text-primary flex items-center justify-center hover:bg-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">compare_arrows</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 3: DIRECT TECHNICAL HOTLINE & SHOWROOM ADDRESSES -->
+<section class="w-full py-16 bg-surface-base">
+<div class="max-w-[1200px] mx-auto px-gutter-mobile lg:px-margin">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Direct Technician Call Banner (5 cols) -->
+<div class="lg:col-span-5 rounded-2xl bg-primary-container text-on-primary p-8 flex flex-col justify-between">
+<div>
+<div class="w-12 h-12 rounded-full bg-surface-base/10 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-on-primary text-[26px]">support_agent</span>
+</div>
+<span class="font-label-md text-on-primary-container uppercase tracking-wider block mb-2">TỔNG ĐÀI HỖ TRỢ TRỰC TIẾP 24/7</span>
+<h3 class="font-headline-md text-on-primary mb-3">Gặp kỹ thuật trưởng giải đáp</h3>
+<p class="font-body-sm text-on-primary-container leading-relaxed mb-6">
+              Bạn phân vân tình trạng rơi nước, mất dữ liệu, hoặc muốn so sánh chi tiết hai mã máy? Gọi ngay đường dây nóng miễn cước.
+            </p>
+</div>
+<div class="space-y-4">
+<a class="flex items-center justify-between p-4 rounded-xl bg-surface-base text-primary hover:bg-surface-variant transition-colors" href="tel:18006868">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary text-[24px]">call</span>
+<div>
+<span class="font-label-md text-on-surface-variant block">HOTLINE KỸ THUẬT VIÊN TRƯỞNG</span>
+<span class="font-headline-sm text-primary tracking-tight">1800 6868</span>
+</div>
+</div>
+<span class="font-body-sm text-secondary font-medium">Miễn cước ›</span>
+</a>
+<div class="flex items-center justify-between text-on-primary-container font-body-sm text-[13px] px-1">
+<span>Thời gian phản hồi: &lt; 15 giây</span>
+<span>Làm việc cả Thứ 7 &amp; Chủ Nhật</span>
+</div>
+</div>
+</div>
+<!-- Showroom Network Grid (7 cols) -->
+<div class="lg:col-span-7 rounded-2xl bg-surface-secondary p-8 flex flex-col justify-between">
+<div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 pb-4 border-b border-border-hairline">
+<div>
+<span class="font-label-md text-secondary uppercase tracking-wider block">MẠNG LƯỚI TIẾP NHẬN</span>
+<h3 class="font-headline-sm text-primary">Hệ thống Showroom &amp; Phòng Lab sửa chữa</h3>
+</div>
+<span class="font-body-sm text-on-surface-variant">4 cơ sở tại Hà Nội &amp; TP.HCM</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+<!-- Location 1 -->
+<div class="p-4 rounded-xl bg-surface-base">
+<div class="flex items-center gap-2 mb-1.5">
+<span class="material-symbols-outlined text-secondary text-[18px]">location_on</span>
+<h4 class="font-body-sm text-primary font-semibold">Trung tâm Quận 1 - TP.HCM</h4>
+</div>
+<p class="font-body-sm text-on-surface-variant text-[13px] mb-2">128 Trần Quang Khải, P. Tân Định, Quận 1</p>
+<div class="flex items-center justify-between font-label-md text-on-surface-variant text-[11px]">
+<span>08:30 - 21:30 (Phòng Lab mở)</span>
+<span class="text-secondary font-medium">Có chỗ đỗ ô tô</span>
+</div>
+</div>
+<!-- Location 2 -->
+<div class="p-4 rounded-xl bg-surface-base">
+<div class="flex items-center gap-2 mb-1.5">
+<span class="material-symbols-outlined text-secondary text-[18px]">location_on</span>
+<h4 class="font-body-sm text-primary font-semibold">Trung tâm Quận 10 - TP.HCM</h4>
+</div>
+<p class="font-body-sm text-on-surface-variant text-[13px] mb-2">350 Đường 3 Tháng 2, Phường 12, Quận 10</p>
+<div class="flex items-center justify-between font-label-md text-on-surface-variant text-[11px]">
+<span>08:30 - 21:30 (Ép kính lấy ngay)</span>
+<span class="text-secondary font-medium">Bãi gửi xe miễn phí</span>
+</div>
+</div>
+<!-- Location 3 -->
+<div class="p-4 rounded-xl bg-surface-base">
+<div class="flex items-center gap-2 mb-1.5">
+<span class="material-symbols-outlined text-secondary text-[18px]">location_on</span>
+<h4 class="font-body-sm text-primary font-semibold">Cơ sở Cầu Giấy - Hà Nội</h4>
+</div>
+<p class="font-body-sm text-on-surface-variant text-[13px] mb-2">195 Cầu Giấy, P. Dịch Vọng, Q. Cầu Giấy</p>
+<div class="flex items-center justify-between font-label-md text-on-surface-variant text-[11px]">
+<span>08:30 - 21:30 (Lab phần cứng)</span>
+<span class="text-secondary font-medium">Đối diện đại học</span>
+</div>
+</div>
+<!-- Location 4 -->
+<div class="p-4 rounded-xl bg-surface-base">
+<div class="flex items-center gap-2 mb-1.5">
+<span class="material-symbols-outlined text-secondary text-[18px]">location_on</span>
+<h4 class="font-body-sm text-primary font-semibold">Cơ sở Đống Đa - Hà Nội</h4>
+</div>
+<p class="font-body-sm text-on-surface-variant text-[13px] mb-2">82 Thái Hà, P. Trung Liệt, Q. Đống Đa</p>
+<div class="flex items-center justify-between font-label-md text-on-surface-variant text-[11px]">
+<span>08:30 - 21:30 (Khu trải nghiệm máy)</span>
+<span class="text-secondary font-medium">Đầy đủ phụ kiện</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Interactive Location Trigger -->
+<div class="pt-4 border-t border-border-hairline flex flex-col sm:flex-row items-center justify-between gap-3">
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-[13px]">
+<span class="material-symbols-outlined text-[18px]">map</span>
+<span>Khách ngoại thành: Hỗ trợ giao nhận máy sửa tận nơi qua Viettel Post an toàn.</span>
+</div>
+<a class="inline-flex items-center gap-1 text-secondary font-body-sm font-semibold hover:underline whitespace-nowrap" href="#">
+<span>Chỉ đường trên bản đồ</span>
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Interactive Logic for Booking & Consultation Survey -->
+<script>
+    // Quick booking form submission mock
+    const bookingForm = document.getElementById('quick-booking-form');
+    const bookingFeedback = document.getElementById('booking-feedback');
+    if (bookingForm && bookingFeedback) {
+      bookingForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        bookingFeedback.classList.remove('hidden');
+        bookingForm.reset();
+      });
+    }
+
+    // Budget selector toggles
+    const budgetButtons = document.querySelectorAll('.budget-btn');
+    const selectedBudgetLabel = document.getElementById('selected-budget-label');
+    budgetButtons.forEach(btn => {
+      btn.addEventListener('click', function () {
+        budgetButtons.forEach(b => {
+          b.className = 'budget-btn px-3 py-3 rounded-xl bg-surface-secondary text-primary font-body-sm text-[13px] hover:bg-surface-variant text-center transition-all';
+        });
+        this.className = 'budget-btn px-3 py-3 rounded-xl bg-primary-container text-on-primary font-body-sm text-[13px] text-center transition-all';
+        if (selectedBudgetLabel) {
+          selectedBudgetLabel.textContent = this.textContent.trim();
+        }
+      });
+    });
+
+    // Brand selector toggles
+    const brandButtons = document.querySelectorAll('.brand-btn');
+    brandButtons.forEach(btn => {
+      btn.addEventListener('click', function () {
+        brandButtons.forEach(b => {
+          b.className = 'brand-btn px-4 py-3 rounded-xl bg-surface-secondary text-primary font-body-sm text-center flex items-center justify-center gap-2 hover:bg-surface-variant transition-all';
+        });
+        this.className = 'brand-btn px-4 py-3 rounded-xl bg-primary-container text-on-primary font-body-sm text-center flex items-center justify-center gap-2 transition-all';
+      });
+    });
+
+    // Refresh survey state
+    const refreshBtn = document.getElementById('refresh-recommendation-btn');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', function () {
+        if (budgetButtons.length > 2) {
+          budgetButtons[2].click();
+        }
+        if (brandButtons.length > 0) {
+          brandButtons[0].click();
+        }
+      });
+    }
+  </script>
+</div></main><footer class="w-full bg-surface-secondary border-t border-border-hairline py-12"><div class="max-w-[1200px] mx-auto px-gutter-mobile lg:px-margin"><div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-border-hairline"><div class="space-y-3"><div class="flex items-center gap-2 text-primary font-headline-sm tracking-tight"><span class="material-symbols-outlined text-primary text-[20px]">smartphone</span><span>Tien Mobile</span></div><p class="text-on-surface-variant font-body-sm">Hệ sinh thái bán lẻ &amp; trung tâm dịch vụ kỹ thuật tiêu chuẩn Apple Editorial hàng đầu.</p></div><div><h4 class="font-label-md uppercase tracking-wider text-on-surface-variant mb-4">Dịch vụ &amp; Sản phẩm</h4><ul class="space-y-2 text-on-surface-variant font-body-sm"><li><a class="hover:text-on-surface" data-path="dien-thoai" href="#">iPhone chính hãng</a></li><li><a class="hover:text-on-surface" data-path="sua-chua" href="#">Thay màn hình &amp; Pin</a></li><li><a class="hover:text-on-surface" data-path="phu-kien" href="#">Phụ kiện cao cấp</a></li><li><a class="hover:text-on-surface" data-path="thu-cu-doi-moi" href="#">Thu cũ đổi mới</a></li></ul></div><div><h4 class="font-label-md uppercase tracking-wider text-on-surface-variant mb-4">Hỗ trợ khách hàng</h4><ul class="space-y-2 text-on-surface-variant font-body-sm"><li><a class="hover:text-on-surface" href="#">Chính sách bảo hành</a></li><li><a class="hover:text-on-surface" href="#">Chính sách đổi trả</a></li><li><a class="hover:text-on-surface" href="#">Tra cứu đơn hàng sửa chữa</a></li><li><a class="hover:text-on-surface" href="#">Hướng dẫn thanh toán</a></li></ul></div><div><h4 class="font-label-md uppercase tracking-wider text-on-surface-variant mb-4">Liên hệ</h4><p class="text-on-surface-variant font-body-sm mb-1">Hotline: 1900 8899</p><p class="text-on-surface-variant font-body-sm mb-1">Giờ làm việc: 08:30 – 21:30</p><p class="text-on-surface-variant font-body-sm">Email: support@tienmobile.vn</p></div></div><div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4"><p class="text-on-surface-variant font-body-sm">© 2025 Tien Mobile. Giữ toàn bộ quyền sở hữu trí tuệ.</p><div class="flex items-center gap-6 text-on-surface-variant font-body-sm"><a class="hover:text-on-surface" href="#">Điều khoản dịch vụ</a><a class="hover:text-on-surface" href="#">Chính sách quyền riêng tư</a><a class="hover:text-on-surface" href="#">Bảo mật dữ liệu</a></div></div></div></footer><div class="fixed bottom-6 right-6 z-50"><button aria-label="Hỗ trợ trực tuyến" class="flex items-center gap-2 px-4 py-3 rounded-full bg-primary-container text-on-primary hover:bg-primary transition-colors border border-border-hairline" type="button"><span class="material-symbols-outlined text-[20px]">chat_bubble</span><span class="font-body-sm font-medium hidden sm:inline">Hỗ trợ kỹ thuật</span></button></div><div aria-modal="true" class="fixed inset-0 z-50 hidden" id="cart-modal-container" role="dialog"><div class="fixed inset-0 bg-primary/20 backdrop-blur-sm"></div><div class="fixed right-0 top-0 bottom-0 w-full max-w-md bg-surface-base border-l border-border-hairline p-6 flex flex-col"><div class="flex items-center justify-between pb-4 border-b border-border-hairline"><h3 class="font-headline-sm text-primary">Giỏ hàng của bạn</h3><button class="p-1 text-on-surface-variant hover:text-on-surface rounded-full" type="button"><span class="material-symbols-outlined text-[20px]">close</span></button></div><div class="flex-1 overflow-y-auto py-6"><p class="text-on-surface-variant font-body-sm">Chưa có sản phẩm được chọn.</p></div></div></div><div aria-modal="true" class="fixed inset-0 z-50 hidden" id="repair-booking-modal" role="dialog"><div class="fixed inset-0 bg-primary/20 backdrop-blur-sm"></div><div class="fixed inset-0 m-auto w-full max-w-lg h-fit bg-surface-base border border-border-hairline rounded-xl p-6"><div class="flex items-center justify-between pb-4 border-b border-border-hairline"><h3 class="font-headline-sm text-primary">Đặt lịch dịch vụ sửa chữa</h3><button class="p-1 text-on-surface-variant hover:text-on-surface rounded-full" type="button"><span class="material-symbols-outlined text-[20px]">close</span></button></div><div class="py-4"><p class="text-on-surface-variant font-body-sm">Vui lòng chọn trung tâm dịch vụ gần nhất.</p></div></div></div></body></html>

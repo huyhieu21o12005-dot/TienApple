@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tien Mobile — Điện thoại chính hãng &amp; Sửa chữa</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #FFFFFF;
+      --card-bg: #FFFFFF;
+      --border: #D2D2D7;
+      --border-nav: rgba(0, 0, 0, 0.08);
+      --text-primary: #1D1D1F;
+      --text-secondary: #6E6E73;
+      --font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    @media (min-width: 1024px) {
+      body {
+        overflow: hidden;
+      }
+    }
+
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--text-primary);
+      outline-offset: 2px;
+    }
+
+    /* 3-Column True Grid to ensure completely distinct columns with zero overlap */
+    .hero-layout-grid {
+      display: grid;
+      grid-template-columns: minmax(360px, 1.25fr) minmax(280px, 1.05fr) minmax(250px, 0.9fr);
+      column-gap: clamp(20px, 3.5vw, 48px);
+      align-items: stretch;
+      width: 100%;
+      max-width: 1560px;
+      margin: 0 auto;
+      height: calc(100vh - 64px);
+      padding: 0 clamp(24px, 5vw, 80px);
+      position: relative;
+    }
+
+    /* Center column container: flex aligned strictly to the bottom edge */
+    .center-visual-col {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .hero-phone-arm {
+      height: clamp(480px, 78vh, 760px);
+      width: auto;
+      max-width: 100%;
+      object-fit: contain;
+      object-position: bottom center;
+      display: block;
+      /* Seamlessly blend the cut off wrist to the bottom edge */
+      mask-image: linear-gradient(to top, rgba(0,0,0,1) 95%, rgba(0,0,0,1) 100%);
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 95%, rgba(0,0,0,1) 100%);
+    }
+
+    .info-card {
+      background-color: #FFFFFF;
+      border: 1px solid #D2D2D7;
+      border-radius: 16px;
+      padding: 20px 24px;
+      box-shadow: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .info-card:hover {
+      border-color: #8E8E93;
+    }
+
+    @media (max-width: 1023px) {
+      .hero-layout-grid {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        min-height: calc(100vh - 64px);
+        padding: 36px 24px 0;
+        align-items: center;
+      }
+      .center-visual-col {
+        order: 2;
+        width: 100%;
+        height: 480px;
+        margin-top: 24px;
+      }
+      .hero-phone-arm {
+        height: 100%;
+      }
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen bg-white text-[#1D1D1F]">
+<!-- Header: Apple minimal aesthetic (64px height, padding 0 80px) -->
+<header class="w-full h-16 border-b border-[rgba(0,0,0,0.08)] bg-white sticky top-0 z-50 flex items-center justify-between px-6 sm:px-12 lg:px-20">
+<!-- Brand / Logo -->
+<a aria-label="Tien Mobile Trang chủ" class="flex items-center gap-2.5 text-[#1D1D1F] font-semibold text-[18px] tracking-[-0.015em] no-underline" href="#">
+<svg class="w-5 h-5 text-[#1D1D1F]" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<rect height="20" rx="3" ry="3" width="14" x="5" y="2"></rect>
+<line x1="12" x2="12.01" y1="18" y2="18"></line>
+</svg>
+<span>Tien Mobile</span>
+</a>
+<!-- Center Navigation Links -->
+<nav aria-label="Điều hướng chính" class="hidden md:flex items-center gap-8">
+<a class="text-[13px] font-normal text-[#1D1D1F] hover:text-[#0071E3] transition-colors" href="#dienthoai">Điện thoại</a>
+<a class="text-[13px] font-normal text-[#1D1D1F] hover:text-[#0071E3] transition-colors" href="#suachua">Sửa chữa</a>
+<a class="text-[13px] font-normal text-[#1D1D1F] hover:text-[#0071E3] transition-colors" href="#phukien">Phụ kiện</a>
+<a class="text-[13px] font-normal text-[#1D1D1F] hover:text-[#0071E3] transition-colors" href="#thucu">Thu cũ đổi mới</a>
+<a class="text-[13px] font-normal text-[#1D1D1F] hover:text-[#0071E3] transition-colors" href="#lienhe">Liên hệ</a>
+</nav>
+<!-- Header Actions -->
+<div class="flex items-center gap-6">
+<a aria-label="Giỏ hàng" class="hidden sm:inline-flex items-center gap-2 text-[13px] font-normal text-[#1D1D1F] hover:text-[#0071E3] transition-colors" href="#giohang">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" viewbox="0 0 24 24">
+<circle cx="9" cy="21" r="1"></circle>
+<circle cx="20" cy="21" r="1"></circle>
+<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+</svg>
+<span>Giỏ hàng</span>
+</a>
+<a class="inline-flex items-center justify-center h-9 px-5 bg-[#1D1D1F] text-white text-[13px] font-medium rounded-full hover:opacity-90 transition-opacity" href="#datlich">
+        Đặt lịch sửa
+      </a>
+<!-- Mobile menu button -->
+<button aria-label="Mở menu" class="md:hidden text-[#1D1D1F] p-1">
+<svg fill="none" height="24" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="24">
+<line x1="3" x2="21" y1="12" y2="12"></line>
+<line x1="3" x2="21" y1="6" y2="6"></line>
+<line x1="3" x2="21" y1="18" y2="18"></line>
+</svg>
+</button>
+</div>
+</header>
+<!-- Hero Section: Balanced 3-Zone Composition -->
+<main class="w-full flex-1 flex items-center justify-center">
+<div class="hero-layout-grid">
+<!-- Zone 1: Left Column (~35-40%) - Vertically Centered Copy & CTA -->
+<section aria-label="Giới thiệu Tien Mobile" class="flex flex-col justify-center py-6 z-10">
+<!-- Eyebrow with dot -->
+<div class="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#6E6E73] mb-4">
+<span class="w-1.5 h-1.5 rounded-full bg-[#1D1D1F] inline-block"></span>
+<span>CHÍNH HÃNG, BẢO HÀNH 12 THÁNG</span>
+</div>
+<!-- Headline -->
+<h1 class="text-[44px] sm:text-[52px] lg:text-[58px] font-semibold leading-[1.05] tracking-[-0.025em] text-[#1D1D1F] mb-5">
+<span class="block">Điện thoại mới.</span>
+<span class="block">Sửa xong trong ngày.</span>
+</h1>
+<!-- Paragraph -->
+<p class="text-[17px] leading-[1.5] text-[#6E6E73] max-w-[420px] mb-8 font-normal">
+          Bán iPhone và điện thoại chính hãng. Sửa màn hình, pin, mainboard, báo giá trước khi làm.
+        </p>
+<!-- CTAs -->
+<div class="flex flex-wrap sm:flex-nowrap items-center gap-3.5">
+<a class="inline-flex items-center justify-center h-12 px-7 bg-[#1D1D1F] text-white text-[14px] font-medium rounded-full hover:opacity-90 transition-opacity" href="#xemdienthoai">
+            Xem điện thoại
+          </a>
+<a class="inline-flex items-center justify-center h-12 px-7 bg-transparent border border-[#1D1D1F] text-[#1D1D1F] text-[14px] font-medium rounded-full hover:bg-[rgba(0,0,0,0.04)] transition-colors" href="#datlichsuachua">
+            Đặt lịch sửa chữa
+          </a>
+</div>
+</section>
+<!-- Zone 2: Center Column (~28-35%) - Centered Product Image Rising From Bottom -->
+<section aria-hidden="true" class="center-visual-col">
+<img alt="Bàn tay cầm điện thoại thông minh thế hệ mới không viền trên nền trắng" class="hero-phone-arm" loading="eager" src="https://lh3.googleusercontent.com/aida/AEtjO1VUbGK3WNLO8poAF98XiXefTSZt2bwhgKrjfKsOCdQ8c_50DymaSe2xXtJKF-z_LkeiF1ViYNQOxZLODFnoygBypFplDc8vdSLh2lhIc0sQFmO-t-_X1YiJX92SZWJCm2sxF_UzZDOhMJsfd-bJDpVoy5Q80B_6pUZejJth45DdckxRxOf-QOyxxdv7UQ2B0fwhX2Hkk5wnLM98YYHVXnEgHKsgOduTNKBjtRBmR5NwyOaBAGlkcwuWM9E"/>
+</section>
+<!-- Zone 3: Right Column (~25-30%) - Vertically Centered 3 Flat Info Cards -->
+<section aria-label="Chỉ số dịch vụ" class="flex flex-col justify-center py-6 gap-4 z-10 w-full max-w-[280px] lg:max-w-[260px] xl:max-w-[280px] mx-auto lg:mx-0 lg:ml-auto">
+<!-- Card 1: SỬA CHỮA -->
+<article class="info-card">
+<div class="flex items-center justify-between">
+<span class="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">SỬA CHỮA</span>
+<svg class="w-4 h-4 text-[#6E6E73]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+</div>
+<div class="text-[38px] font-light leading-[1.1] tracking-[-0.02em] text-[#1D1D1F] mt-2 mb-1 [font-feature-settings:'tnum']">
+            30 phút
+          </div>
+<div class="text-[13px] text-[#6E6E73] font-normal leading-[1.35]">
+            Thay màn hình lấy liền
+          </div>
+</article>
+<!-- Card 2: BẢO HÀNH -->
+<article class="info-card">
+<div class="flex items-center justify-between">
+<span class="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">BẢO HÀNH</span>
+<svg class="w-4 h-4 text-[#6E6E73]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewbox="0 0 24 24">
+<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+</svg>
+</div>
+<div class="text-[38px] font-light leading-[1.1] tracking-[-0.02em] text-[#1D1D1F] mt-2 mb-1 [font-feature-settings:'tnum']">
+            12 tháng
+          </div>
+<div class="text-[13px] text-[#6E6E73] font-normal leading-[1.35]">
+            Máy chính hãng toàn quốc
+          </div>
+</article>
+<!-- Card 3: ĐÁNH GIÁ -->
+<article class="info-card">
+<div class="flex items-center justify-between">
+<span class="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#6E6E73]">ĐÁNH GIÁ</span>
+<svg class="w-4 h-4 text-[#6E6E73]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewbox="0 0 24 24">
+<path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+</svg>
+</div>
+<div class="text-[38px] font-light leading-[1.1] tracking-[-0.02em] text-[#1D1D1F] mt-2 mb-1 [font-feature-settings:'tnum']">
+            4,9 / 5
+          </div>
+<div class="text-[13px] text-[#6E6E73] font-normal leading-[1.35]">
+            Hơn 2.400 khách hàng
+          </div>
+</article>
+</section>
+</div>
+</main>
+</body></html>

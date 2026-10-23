@@ -1,0 +1,46 @@
+[
+  {
+    "id": "screen-oled",
+    "name": "Thay màn hình OLED Retina",
+    "category": "Màn hình & Cảm ứng",
+    "icon": "screenshot",
+    "description": "Tấm nền chuẩn màu DCI-P3 sắc nét, cảm ứng mượt mà 120Hz ProMotion, fix TrueTone tự động.",
+    "priceFrom": 650000,
+    "priceFormatted": "650.000₫",
+    "duration": "30 – 45 phút",
+    "warranty": "12 tháng 1 đổi 1"
+  },
+  {
+    "id": "battery-ce",
+    "name": "Thay pin dung lượng cao Chuẩn CE",
+    "category": "Nguồn & Cell Pin",
+    "icon": "battery_charging_full",
+    "description": "Chu kỳ sạc xả 800+ lần, tích hợp IC bảo vệ quá nhiệt an toàn chuẩn châu Âu, báo pin 100%.",
+    "priceFrom": 350000,
+    "priceFormatted": "350.000₫",
+    "duration": "15 – 20 phút",
+    "warranty": "18 tháng đổi mới"
+  },
+  {
+    "id": "mainboard-ic",
+    "name": "Sửa Mainboard & IC nguồn",
+    "category": "Kỹ thuật chuyên sâu",
+    "icon": "memory",
+    "description": "Khám máy chuẩn đoán đo xung vi mạch 0đ, xử lý mất nguồn, treo logo, chạm tụ chuẩn xác.",
+    "priceFrom": 0,
+    "priceFormatted": "Khám máy 0₫",
+    "duration": "2 – 4 giờ",
+    "warranty": "6 tháng bảo hành"
+  },
+  {
+    "id": "glass-gorilla",
+    "name": "Ép kính chân không Gorilla Glass",
+    "category": "Mặt kính & Thẩm mỹ",
+    "icon": "layers",
+    "description": "Công nghệ máy hấp nhiệt tự động loại bỏ bọt khí tuyệt đối, giữ trọn phôi màn hình nguyên bản.",
+    "priceFrom": 290000,
+    "priceFormatted": "290.000₫",
+    "duration": "45 – 60 phút",
+    "warranty": "12 tháng keo bọt"
+  }
+]
