@@ -534,27 +534,19 @@ class App {
     void targetLayer.offsetWidth; // Force reflow
     targetLayer.classList.add('active');
 
-    // 2. Update Header Navigation Links Active State
+    // 2. Update Header Navigation Links Active State (Chữ đen khi chọn kèm thanh ngang gạch dưới, chữ xám khi không chọn)
     const navLinks = document.querySelectorAll('.nav-layer-link');
     navLinks.forEach(link => {
       const linkLayer = link.getAttribute('data-layer');
+      const bar = link.querySelector('.nav-active-bar');
       if (linkLayer === layerId) {
-        link.classList.remove('text-[#6E6E73]', 'font-normal');
-        link.classList.add('text-[#0071E3]', 'font-semibold');
+        link.classList.remove('text-[#6E6E73]', 'font-normal', 'text-[#0071E3]');
+        link.classList.add('text-[#1D1D1F]', 'font-semibold', 'active');
+        if (bar) bar.classList.remove('hidden');
       } else {
-        link.classList.remove('text-[#0071E3]', 'font-semibold');
+        link.classList.remove('text-[#1D1D1F]', 'font-semibold', 'active', 'text-[#0071E3]');
         link.classList.add('text-[#6E6E73]', 'font-normal');
-      }
-    });
-
-    // 3. Update Quick Layer Switcher Buttons Active State
-    const tabBtns = document.querySelectorAll('.layer-tab-btn');
-    tabBtns.forEach(btn => {
-      const btnLayer = btn.getAttribute('data-layer');
-      if (btnLayer === layerId) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
+        if (bar) bar.classList.add('hidden');
       }
     });
 

@@ -44,31 +44,48 @@
   <!-- ======================================================================
        1. TOP HEADER (Cố định chuẩn Apple Minimal)
        ====================================================================== -->
-  <header class="w-full h-16 border-b border-[#D2D2D7] bg-white/90 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between px-6 sm:px-10 lg:px-16 transition-all" id="mainHeader">
+  <header class="w-full h-16 bg-white/95 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between px-6 sm:px-10 lg:px-16 transition-all" id="mainHeader">
     <!-- Brand / Logo -->
-    <a href="#" class="flex items-center gap-2.5 text-[#1D1D1F] font-semibold text-[18px] tracking-[-0.015em] no-underline header-item">
-      <svg class="w-5 h-5 text-[#1D1D1F]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <rect height="20" rx="3" ry="3" width="14" x="5" y="2"></rect>
-        <line x1="12" x2="12.01" y1="18" y2="18"></line>
+    <a href="#trangchu" class="flex items-center gap-2.5 text-[#1D1D1F] font-semibold text-[18px] tracking-[-0.015em] no-underline header-item nav-layer-link" data-layer="layer-trangchu">
+      <svg class="w-5 h-5 text-[#1D1D1F]" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 3.5c.62-.75 1.04-1.8 1.01-2.85-.9.04-1.99.6-2.61 1.34-.55.63-1.03 1.68-.9 2.71 1 .08 1.88-.45 2.5-1.2z"/>
       </svg>
       <span>Tien Mobile</span>
     </a>
 
-    <!-- Center Navigation Links (Chuyển đổi từng layer độc lập) -->
-    <nav class="hidden lg:flex items-center gap-8">
-      <a href="#trangchu" class="nav-layer-link text-[13px] font-semibold text-[#0071E3] transition-colors header-item" data-layer="layer-trangchu">Trang chủ</a>
-      <a href="#dienthoai" class="nav-layer-link text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-dienthoai">Điện thoại</a>
-      <a href="#suachua" class="nav-layer-link text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-suachua">Sửa chữa</a>
-      <a href="#dienthoai" class="nav-layer-link text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-dienthoai" data-filter="accessories">Phụ kiện</a>
-      <a href="#camket" class="nav-layer-link text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-camket">Thu cũ đổi mới</a>
-      <a href="#camket" class="nav-layer-link text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-camket">Liên hệ</a>
+    <!-- Center Navigation Links (Chỉ 1 dòng duy nhất, có thanh ngang dưới mục được chọn, chữ đen khi chọn, chữ xám khi chưa chọn) -->
+    <nav class="hidden lg:flex items-center gap-8 h-full" id="mainNav">
+      <a href="#trangchu" class="nav-layer-link active h-full flex items-center relative text-[13px] font-semibold text-[#1D1D1F] transition-colors header-item" data-layer="layer-trangchu">
+        <span>Trang chủ</span>
+        <span class="nav-active-bar absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#1D1D1F]"></span>
+      </a>
+      <a href="#dienthoai" class="nav-layer-link h-full flex items-center relative text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-dienthoai">
+        <span>Điện thoại</span>
+        <span class="nav-active-bar absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#1D1D1F] hidden"></span>
+      </a>
+      <a href="#suachua" class="nav-layer-link h-full flex items-center relative text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-suachua">
+        <span>Sửa chữa</span>
+        <span class="nav-active-bar absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#1D1D1F] hidden"></span>
+      </a>
+      <a href="#dienthoai" class="nav-layer-link h-full flex items-center relative text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-dienthoai" data-filter="accessories">
+        <span>Phụ kiện</span>
+        <span class="nav-active-bar absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#1D1D1F] hidden"></span>
+      </a>
+      <a href="#camket" class="nav-layer-link h-full flex items-center relative text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-camket">
+        <span>Thu cũ &amp; Cam kết</span>
+        <span class="nav-active-bar absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#1D1D1F] hidden"></span>
+      </a>
+      <a href="#lienhe" class="nav-layer-link h-full flex items-center relative text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-camket">
+        <span>Liên hệ</span>
+        <span class="nav-active-bar absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#1D1D1F] hidden"></span>
+      </a>
     </nav>
 
     <!-- Right Header Actions -->
     <div class="flex items-center gap-5">
-      <button class="cart-open-trigger inline-flex items-center gap-1.5 text-[13px] font-normal text-[#1D1D1F] hover:text-[#0071E3] transition-colors cursor-pointer bg-transparent border-0 p-0 header-item" type="button">
+      <button class="cart-open-trigger inline-flex items-center gap-1.5 text-[13px] font-normal text-[#1D1D1F] hover:text-black transition-colors cursor-pointer bg-transparent border-0 p-0 header-item" type="button">
         <span class="material-symbols-outlined text-[19px]">shopping_bag</span>
-        <span>Giỏ hàng <span class="text-[#0071E3] font-medium">(<span class="cart-badge-number">2</span>)</span></span>
+        <span>Giỏ hàng <span class="text-[#1D1D1F] font-semibold">(<span class="cart-badge-number">2</span>)</span></span>
       </button>
 
       <button class="booking-trigger inline-flex items-center justify-center h-9 px-5 bg-[#1D1D1F] text-white text-[13px] font-medium rounded-full hover:bg-black transition-all cursor-pointer header-item" data-service-context="Đặt lịch sửa tổng quát" type="button">
@@ -77,33 +94,14 @@
     </div>
   </header>
 
-  <!-- Quick Layer Switcher Bar (Thanh chuyển đổi Layer tối ưu 1 màn hình duy nhất) -->
-  <div class="w-full bg-[#F5F5F7] border-b border-[#D2D2D7]/60 py-2 px-4 sm:px-8 flex items-center justify-start sm:justify-center overflow-x-auto no-scrollbar gap-2 sticky top-16 z-30" id="layerSwitcherBar">
-    <button class="layer-tab-btn active px-3.5 py-1.5 rounded-full text-[12px] font-medium transition-all" data-layer="layer-trangchu">
-      <span class="flex items-center gap-1.5">
-        <span class="w-1.5 h-1.5 rounded-full bg-[#0071E3] tab-dot"></span>
-        Trang chủ
-      </span>
-    </button>
-    <button class="layer-tab-btn px-3.5 py-1.5 rounded-full text-[12px] font-medium transition-all" data-layer="layer-dienthoai">
-      Điện thoại &amp; Phụ kiện
-    </button>
-    <button class="layer-tab-btn px-3.5 py-1.5 rounded-full text-[12px] font-medium transition-all" data-layer="layer-suachua">
-      Dịch vụ Sửa chữa
-    </button>
-    <button class="layer-tab-btn px-3.5 py-1.5 rounded-full text-[12px] font-medium transition-all" data-layer="layer-camket">
-      Thu cũ &amp; Cam kết
-    </button>
-  </div>
-
   <main class="w-full flex-grow">
 
     <!-- LAYER 1: TRANG CHỦ (18 Pro Max 3D + Studio Editorial Hero + Metric Cards) -->
     <div class="app-layer active" id="layer-trangchu">
       <!-- ======================================================================
-           2. HERO SECTION (Apple Minimalist Studio Style: 3 Cột tích hợp Elements 3D)
+           2. HERO SECTION (Apple Minimalist Studio Style: Không có vạch kẻ ngang cắt đứt)
            ====================================================================== -->
-      <section class="w-full border-b border-[#D2D2D7]/60 bg-white py-10 lg:py-16 px-6 sm:px-10 lg:px-16 relative overflow-hidden" id="heroSection">
+      <section class="w-full bg-white py-10 lg:py-16 px-6 sm:px-10 lg:px-16 relative overflow-hidden" id="heroSection">
       
       <!-- Studio Water Ripples Stage (Hồ nước gợn sóng tròn lan tỏa với tâm dưới chân 18 Pro Max) -->
       <div class="water-ripples-stage pointer-events-none" id="waterRipplesStage">
@@ -115,10 +113,10 @@
         <!-- Cột trái: Editorial Copy (5 cols) - Có Logo Táo làm background cho "Điện thoại mới. Sửa xong trong ngày." -->
         <div class="lg:col-span-5 flex flex-col justify-center relative hero-editorial-col" id="heroEditorialCol">
           
-          <!-- Subtle Frosted Apple Logo Background cho phần "Điện thoại mới. Sửa xong trong ngày." -->
+          <!-- Subtle Frosted Apple Logo Background chuẩn Vector Apple chính hãng -->
           <div class="apple-bg-watermark" id="appleBgWatermark" aria-hidden="true">
-            <svg class="apple-watermark-svg" viewBox="0 0 170 170" fill="currentColor">
-              <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.58-7.77-11.64-14.18-5.88-9.24-10.36-19.53-13.43-30.86-3.08-11.34-4.62-22.39-4.62-33.15 0-14.65 3.73-26.79 11.19-36.43 7.45-9.63 16.92-14.54 28.4-14.74 4.89 0 10.15 1.25 15.78 3.75 5.62 2.5 9.4 3.8 11.33 3.9 1.52-.1 5.37-1.45 11.55-4.04 6.18-2.6 11.45-3.8 15.82-3.61 12.06.55 21.75 5.02 29.07 13.43-10.43 6.31-15.54 14.97-15.33 25.99.21 8.48 3.37 15.66 9.49 21.54 6.12 5.88 13.44 9.17 21.96 9.87-2.06 6.09-4.58 12.33-7.55 18.72zM119.22 33.11c0-7.39 2.66-14.38 7.97-20.97 5.31-6.59 11.96-10.87 19.95-12.83.22 1.3.33 2.4.33 3.27 0 7.39-2.73 14.33-8.19 20.81-5.46 6.48-12.23 10.74-20.31 12.78-.11-1.09-.16-2.11-.16-3.06z"/>
+            <svg class="apple-watermark-svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 3.5c.62-.75 1.04-1.8 1.01-2.85-.9.04-1.99.6-2.61 1.34-.55.63-1.03 1.68-.9 2.71 1 .08 1.88-.45 2.5-1.2z"/>
             </svg>
           </div>
 
@@ -543,56 +541,55 @@
   </main>
 
   <!-- ======================================================================
-       6. FOOTER: APPLE MINIMALIST
+       6. FOOTER: APPLE STUDIO DARK CONTRAST (Màu đen/xám tăng tương phản mạnh)
        ====================================================================== -->
-  <footer class="w-full bg-[#F5F5F7] py-12 px-6 sm:px-10 lg:px-16 text-[#6E6E73] text-[13px]" id="lienhe">
-    <div class="max-w-[1380px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-[#D2D2D7]">
+  <footer class="w-full bg-[#161617] py-14 px-6 sm:px-10 lg:px-16 text-[#A1A1A6] text-[13px] border-t border-[#262628]" id="lienhe">
+    <div class="max-w-[1380px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 pb-10 border-b border-[#2C2C2E]">
       <div>
-        <div class="flex items-center gap-2 text-[#1D1D1F] font-semibold text-[16px] mb-3">
-          <svg class="w-5 h-5 text-[#1D1D1F]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <div class="flex items-center gap-2 text-white font-semibold text-[17px] mb-3.5 tracking-[-0.015em]">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <rect height="20" rx="3" ry="3" width="14" x="5" y="2"></rect>
             <line x1="12" x2="12.01" y1="18" y2="18"></line>
           </svg>
           <span>Tien Mobile</span>
         </div>
-        <p class="leading-[1.5]">Hệ thống phân phối điện thoại cao cấp và trung tâm bảo hành, sửa chữa thiết bị di động uy tín hàng đầu tại Việt Nam.</p>
+        <p class="leading-[1.6] text-[#A1A1A6]">Hệ thống phân phối điện thoại cao cấp và trung tâm bảo hành, sửa chữa thiết bị di động uy tín hàng đầu tại Việt Nam.</p>
       </div>
 
       <div>
-        <div class="font-semibold text-[#1D1D1F] mb-3">Thiết bị nổi bật</div>
-        <div class="flex flex-col gap-2">
-          <a href="#dienthoai" class="hover:text-[#1D1D1F] transition-colors">iPhone 16 Pro Series</a>
-          <a href="#dienthoai" class="hover:text-[#1D1D1F] transition-colors">iPhone 15 Series</a>
-          <a href="#dienthoai" class="hover:text-[#1D1D1F] transition-colors">Samsung Galaxy S24 Ultra</a>
-          <a href="#dienthoai" class="hover:text-[#1D1D1F] transition-colors">Điện thoại Like New 99%</a>
+        <div class="font-semibold text-white mb-3.5 text-[14px]">Thiết bị nổi bật</div>
+        <div class="flex flex-col gap-2.5">
+          <a href="#dienthoai" class="text-[#A1A1A6] hover:text-white transition-colors nav-layer-link" data-layer="layer-dienthoai">iPhone 16 Pro Series</a>
+          <a href="#dienthoai" class="text-[#A1A1A6] hover:text-white transition-colors nav-layer-link" data-layer="layer-dienthoai">iPhone 15 Series</a>
+          <a href="#dienthoai" class="text-[#A1A1A6] hover:text-white transition-colors nav-layer-link" data-layer="layer-dienthoai">Samsung Galaxy S24 Ultra</a>
+          <a href="#dienthoai" class="text-[#A1A1A6] hover:text-white transition-colors nav-layer-link" data-layer="layer-dienthoai">Điện thoại Like New 99%</a>
         </div>
       </div>
 
       <div>
-        <div class="font-semibold text-[#1D1D1F] mb-3">Dịch vụ sửa chữa</div>
-        <div class="flex flex-col gap-2">
-          <a href="#suachua" class="hover:text-[#1D1D1F] transition-colors">Thay màn hình OLED Retina</a>
-          <a href="#suachua" class="hover:text-[#1D1D1F] transition-colors">Thay pin Chuẩn CE châu Âu</a>
-          <a href="#suachua" class="hover:text-[#1D1D1F] transition-colors">Ép kính chân không công nghệ cao</a>
-          <a href="#suachua" class="hover:text-[#1D1D1F] transition-colors">Sửa FaceID & IC nguồn</a>
+        <div class="font-semibold text-white mb-3.5 text-[14px]">Dịch vụ sửa chữa</div>
+        <div class="flex flex-col gap-2.5">
+          <a href="#suachua" class="text-[#A1A1A6] hover:text-white transition-colors nav-layer-link" data-layer="layer-suachua">Thay màn hình OLED Retina</a>
+          <a href="#suachua" class="text-[#A1A1A6] hover:text-white transition-colors nav-layer-link" data-layer="layer-suachua">Thay pin Chuẩn CE châu Âu</a>
+          <a href="#suachua" class="text-[#A1A1A6] hover:text-white transition-colors nav-layer-link" data-layer="layer-suachua">Ép kính chân không công nghệ cao</a>
+          <a href="#suachua" class="text-[#A1A1A6] hover:text-white transition-colors nav-layer-link" data-layer="layer-suachua">Sửa FaceID &amp; IC nguồn</a>
         </div>
       </div>
 
       <div>
-        <div class="font-semibold text-[#1D1D1F] mb-3">Liên hệ &amp; Showroom</div>
-        <p class="mb-1.5">Hotline bán hàng: <strong class="text-[#1D1D1F]">0909 123 456</strong></p>
-        <p class="mb-1.5">Kỹ thuật - Bảo hành: <strong class="text-[#1D1D1F]">0909 789 101</strong></p>
-        <p class="mb-1.5">Giờ làm việc: 08:30 - 21:30 (Thứ 2 - CN)</p>
-        <p>Địa chỉ: 120 Đường 3/2, Phường 12, Quận 10, TP. Hồ Chí Minh</p>
+        <div class="font-semibold text-white mb-3.5 text-[14px]">Liên hệ &amp; Showroom</div>
+        <p class="mb-2">Hotline: <strong class="text-white font-medium">0986 455 457</strong> &amp; <strong class="text-white font-medium">0933 266 179</strong></p>
+        <p class="mb-2">Giờ làm việc: <strong class="text-white font-medium">7h – 21h (T2 – CN)</strong></p>
+        <p class="leading-[1.5]">Địa chỉ: <span class="text-white font-normal">54a8 Ngô Chí Quốc, Tam Bình, Thủ Đức, HCM</span></p>
       </div>
     </div>
 
-    <div class="max-w-[1380px] mx-auto pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px]">
-      <p>© 2025 Tien Mobile. Chuẩn mực công nghệ &amp; dịch vụ minh bạch.</p>
+    <div class="max-w-[1380px] mx-auto pt-7 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] text-[#86868B]">
+      <p>© 2026 Tien Mobile. Chuẩn mực công nghệ &amp; dịch vụ minh bạch.</p>
       <div class="flex gap-6">
-        <a href="#" class="hover:text-[#1D1D1F] transition-colors">Chính sách bảo hành 12 tháng</a>
-        <a href="#" class="hover:text-[#1D1D1F] transition-colors">Quy định đổi trả 30 ngày</a>
-        <a href="#" class="hover:text-[#1D1D1F] transition-colors">Bảo mật thông tin khách hàng</a>
+        <a href="#" class="text-[#86868B] hover:text-white transition-colors">Chính sách bảo hành 12 tháng</a>
+        <a href="#" class="text-[#86868B] hover:text-white transition-colors">Quy định đổi trả 30 ngày</a>
+        <a href="#" class="text-[#86868B] hover:text-white transition-colors">Bảo mật thông tin khách hàng</a>
       </div>
     </div>
   </footer>
@@ -769,7 +766,7 @@
 
             <div>
               <label class="block text-[12px] font-medium text-[#6E6E73] mb-1" for="cust-address">Địa chỉ nhận hàng (Giao hỏa tốc 2H)</label>
-              <input id="cust-address" type="text" value="120 Đường 3/2, Phường 12, Quận 10, TP.HCM" required class="w-full px-3.5 py-2.5 rounded-xl bg-[#F5F5F7] border border-[#D2D2D7] text-[#1D1D1F] text-[13px] outline-none" />
+              <input id="cust-address" type="text" value="54a8 Ngô Chí Quốc, Tam Bình, Thủ Đức, HCM" required class="w-full px-3.5 py-2.5 rounded-xl bg-[#F5F5F7] border border-[#D2D2D7] text-[#1D1D1F] text-[13px] outline-none" />
             </div>
 
             <div class="space-y-2 pt-1">
