@@ -10,32 +10,6 @@ import { WaterRipplesEngine } from './waterRipples.js';
 // Dữ liệu dự phòng nhúng sẵn (phòng trường hợp người dùng mở trực tiếp file:// mà không qua HTTP server)
 const FALLBACK_PRODUCTS = [
   {
-    "id": "halora-ring",
-    "name": "Nhẫn thông minh Halora Smart Ring Rose Gold",
-    "brand": "halora",
-    "brandName": "Halora Wellness",
-    "condition": "new",
-    "conditionLabel": "Mới 100%",
-    "badge": "Siêu phẩm 2025",
-    "price": 7490000,
-    "oldPrice": 8990000,
-    "rating": 5.0,
-    "reviewCount": 98,
-    "defaultColor": "Vàng Hồng Rose Gold",
-    "colors": [
-      { "name": "Vàng Hồng Rose Gold", "hex": "#B76E79" },
-      { "name": "Titanium Đen", "hex": "#1E1E1E" },
-      { "name": "Bạc Ánh Kim", "hex": "#E0E0E0" }
-    ],
-    "storages": ["Size 7 (54mm)", "Size 8 (57mm)", "Size 9 (60mm)", "Size 10 (63mm)"],
-    "chip": "Bio-Sensors PPG Gen 3",
-    "camera": "Không có",
-    "battery": "Pin 7 ngày liên tục",
-    "screen": "Titanium Chống nước 50M",
-    "image": "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&auto=format&fit=crop&q=80",
-    "description": "Vàng Hồng Rose Gold • Cảm biến nhịp tim, HRV, giấc ngủ 24/7 • Pin 7 ngày • Chống nước chuẩn 5ATM."
-  },
-  {
     "id": "ip16-pro",
     "name": "iPhone 16 Pro 256GB",
     "brand": "apple",
@@ -303,18 +277,6 @@ const ACCESSORIES_DATA = [
     "reviewCount": 450,
     "image": "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&auto=format&fit=crop&q=80",
     "description": "Độ cứng 9H chống trầy xước • Cảm ứng mượt mà • Hỗ trợ dán chuẩn đẹp không bong bóng tại quầy."
-  },
-  {
-    "id": "halora-ring",
-    "name": "Nhẫn thông minh Halora Smart Ring Rose Gold",
-    "category": "smart",
-    "badge": "Siêu phẩm 2025",
-    "price": 7490000,
-    "oldPrice": 8990000,
-    "rating": 5.0,
-    "reviewCount": 98,
-    "image": "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&auto=format&fit=crop&q=80",
-    "description": "Vàng Hồng Rose Gold • Cảm biến nhịp tim, HRV, giấc ngủ 24/7 • Pin 7 ngày • Chống nước chuẩn 5ATM."
   }
 ];
 
