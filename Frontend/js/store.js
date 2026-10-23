@@ -7,7 +7,8 @@ export class CartManager {
   constructor(initialItems = []) {
     this.items = [...initialItems];
     this.appliedVoucher = null;
-    this.voucherDiscount = 0;
+    this.voucherDiscount = 0; // giảm cố định (đồng)
+    this.voucherRate = 0; // giảm theo tỉ lệ, tính lại theo giỏ hàng hiện tại
   }
 
   getItems() {
@@ -19,6 +20,7 @@ export class CartManager {
   }
 
   addItem(product, quantity = 1, color = '', storage = '') {
+    const qty = Math.max(1, Math.floor(Number(quantity)) || 1);
     const selectedColor = color || product.defaultColor || '';
     const selectedStorage = storage || (product.storages && product.storages[0]) || '';
 
@@ -30,11 +32,11 @@ export class CartManager {
     );
 
     if (existingIndex > -1) {
-      this.items[existingIndex].quantity += quantity;
+      this.items[existingIndex].quantity += qty;
     } else {
       this.items.push({
         product,
-        quantity,
+        quantity: qty,
         color: selectedColor,
         storage: selectedStorage
       });
@@ -49,10 +51,11 @@ export class CartManager {
       return this.items;
     }
 
-    if (quantity <= 0) {
+    const qty = Math.floor(Number(quantity));
+    if (!isFinite(qty) || qty <= 0) {
       this.items.splice(itemIndex, 1);
     } else {
-      this.items[itemIndex].quantity = quantity;
+      this.items[itemIndex].quantity = qty;
     }
 
     this._saveToLocalStorage();
@@ -71,6 +74,7 @@ export class CartManager {
     this.items = [];
     this.appliedVoucher = null;
     this.voucherDiscount = 0;
+    this.voucherRate = 0;
     this._saveToLocalStorage();
   }
 
@@ -83,18 +87,23 @@ export class CartManager {
     if (normalized === 'MEMBER' || normalized === 'TIENMOBILE300') {
       this.appliedVoucher = normalized;
       this.voucherDiscount = 300000;
+      this.voucherRate = 0;
       return { success: true, message: 'Áp dụng mã giảm giá 300.000₫ thành công!' };
     }
     if (normalized === 'VIP10') {
       this.appliedVoucher = normalized;
-      this.voucherDiscount = Math.round(this.getSubtotal() * 0.1);
+      this.voucherDiscount = 0;
+      this.voucherRate = 0.1;
       return { success: true, message: 'Áp dụng mã giảm giá 10% thành công!' };
     }
     return { success: false, message: 'Mã giảm giá không hợp lệ hoặc đã hết hạn.' };
   }
 
   getDiscount() {
-    return this.voucherDiscount;
+    const subtotal = this.getSubtotal();
+    if (subtotal === 0) return 0;
+    const discount = this.voucherDiscount + Math.round(subtotal * this.voucherRate);
+    return Math.min(discount, subtotal);
   }
 
   getShippingFee() {
@@ -131,12 +140,52 @@ export class CartManager {
       try {
         const saved = window.localStorage.getItem('tien_mobile_cart');
         if (saved) {
-          this.items = JSON.parse(saved);
+          const parsed = JSON.parse(saved);
+          this.items = Array.isArray(parsed) ? parsed.filter(CartManager.isValidItem) : [];
         }
       } catch (e) {
         this.items = [];
       }
     }
+  }
+
+  static isValidItem(item) {
+    return !!item &&
+      typeof item === 'object' &&
+      !!item.product &&
+      typeof item.product.id === 'string' &&
+      isFinite(Number(item.product.price)) &&
+      Number(item.quantity) >= 1;
+  }
+
+  /**
+   * Đồng bộ giỏ hàng đã lưu với danh mục hiện tại: cập nhật giá/tên/ảnh mới nhất,
+   * loại sản phẩm đã bị xóa, ẩn hoặc hết hàng. Giá thay đổi liên tục nên không được tin giá đã lưu.
+   * @param {Array<object>} catalog
+   * @returns {{ removed: string[], priceChanged: string[] }}
+   */
+  reconcile(catalog) {
+    const byId = new Map((Array.isArray(catalog) ? catalog : []).filter(Boolean).map(p => [p.id, p]));
+    const removed = [];
+    const priceChanged = [];
+    const next = [];
+
+    for (const item of this.items) {
+      const fresh = byId.get(item.product.id);
+      const soldOut = fresh && fresh.stock !== undefined && fresh.stock !== null && Number(fresh.stock) <= 0;
+      if (!fresh || soldOut) {
+        removed.push(item.product.name || item.product.id);
+        continue;
+      }
+      if (Number(fresh.price) !== Number(item.product.price)) {
+        priceChanged.push(fresh.name || fresh.id);
+      }
+      next.push({ ...item, product: fresh });
+    }
+
+    this.items = next;
+    this._saveToLocalStorage();
+    return { removed, priceChanged };
   }
 }
 
@@ -145,14 +194,14 @@ export class ProductFilter {
     if (!brand || brand.toLowerCase() === 'all') {
       return [...products];
     }
-    return products.filter(p => p.brand.toLowerCase() === brand.toLowerCase());
+    return products.filter(p => (p.brand || '').toLowerCase() === brand.toLowerCase());
   }
 
   static filterByCondition(products, condition) {
     if (!condition || condition.toLowerCase() === 'all') {
       return [...products];
     }
-    return products.filter(p => p.condition.toLowerCase() === condition.toLowerCase());
+    return products.filter(p => (p.condition || '').toLowerCase() === condition.toLowerCase());
   }
 
   static filterByPriceRange(products, rangeKey) {

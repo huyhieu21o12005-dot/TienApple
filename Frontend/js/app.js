@@ -7,6 +7,15 @@ import { CartManager, ProductFilter, BookingValidator } from './store.js';
 import { Phone3DStudio } from './hero3d.js';
 import { WaterRipplesEngine } from './waterRipples.js';
 import { fetchProducts } from './productsApi.js';
+import { safeUrl, partitionProducts } from './utils.js';
+import {
+  productCardHtml,
+  emptyCatalogHtml,
+  swatchesHtml,
+  storageChipsHtml,
+  cartItemHtml,
+  emptyCartHtml
+} from './templates.js';
 
 // Dữ liệu dự phòng nhúng sẵn (phòng trường hợp người dùng mở trực tiếp file:// mà không qua HTTP server)
 const FALLBACK_PRODUCTS = [
@@ -284,7 +293,7 @@ const ACCESSORIES_DATA = [
 class App {
   constructor() {
     window.tienApp = this;
-    this.products = [...FALLBACK_PRODUCTS];
+    this.products = partitionProducts(FALLBACK_PRODUCTS).phones;
     this.accessories = ACCESSORIES_DATA;
     this.cart = new CartManager();
     this.activeCategory = 'all';
@@ -303,38 +312,38 @@ class App {
 
   async init() {
     // Thử tải dữ liệu từ Supabase trước; nếu chưa cấu hình hoặc lỗi sẽ fallback về data/products.json hoặc dữ liệu dự phòng
+    let loaded = null;
     try {
       const remoteProducts = await fetchProducts();
       if (remoteProducts && Array.isArray(remoteProducts) && remoteProducts.length > 0) {
-        this.products = remoteProducts;
+        loaded = remoteProducts;
       } else {
         let res = await fetch('data/products.json');
         if (!res.ok) {
           res = await fetch('../Data/products.json');
         }
         if (res.ok) {
-          this.products = await res.json();
+          const json = await res.json();
+          if (Array.isArray(json) && json.length > 0) loaded = json;
         }
       }
     } catch (e) {
       console.log('Using bundled fallback products data.', e);
     }
 
-    // Load giỏ hàng từ localStorage nếu có
-    this.cart.loadFromLocalStorage();
+    if (loaded) {
+      const { phones, accessories } = partitionProducts(loaded);
+      if (phones.length > 0) this.products = phones;
+      if (accessories.length > 0) this.accessories = accessories;
+    }
 
-    // Khởi tạo các item mặc định ban đầu nếu giỏ hàng trống (giống bản thiết kế gốc có 2 items)
-    if (this.cart.getItemCount() === 0) {
-      const initialPhone = this.products.find(p => p.id === 'ip16-pro') || this.products[0];
-      const initialAccessory = this.accessories.find(a => a.id === 'charger-30w') || this.products.find(p => p.id === 'charger-30w');
-      if (initialPhone) {
-        const phoneColor = initialPhone.defaultColor || (initialPhone.colors && initialPhone.colors[0]?.name) || 'Titan Tự Nhiên';
-        const phoneStorage = (initialPhone.storages && initialPhone.storages[1]) || (initialPhone.storages && initialPhone.storages[0]) || '256GB';
-        this.cart.addItem(initialPhone, 1, phoneColor, phoneStorage);
-      }
-      if (initialAccessory) {
-        this.cart.addItem(initialAccessory, 1, 'Trắng', 'Chuẩn 30W');
-      }
+    // Load giỏ hàng từ localStorage rồi đồng bộ giá mới nhất (giá có thể đổi liên tục từ trang quản trị)
+    this.cart.loadFromLocalStorage();
+    const { removed, priceChanged } = this.cart.reconcile([...this.products, ...this.accessories]);
+    if (removed.length > 0) {
+      this.showToast(`Đã bỏ khỏi giỏ hàng vì không còn bán: ${removed.join(', ')}`);
+    } else if (priceChanged.length > 0) {
+      this.showToast('Giá một số sản phẩm trong giỏ hàng đã được cập nhật.');
     }
 
     this.renderProducts();
@@ -344,6 +353,34 @@ class App {
     this.initHero3DInteraction();
     this.initHeroMotion();
     this.initLayerNavigation();
+    this.initMobileMenu();
+  }
+
+  initMobileMenu() {
+    const btn = document.getElementById('mobileMenuBtn');
+    const panel = document.getElementById('mobileMenuPanel');
+    const icon = document.getElementById('mobileMenuIcon');
+    if (!btn || !panel) return;
+
+    const setOpen = (open) => {
+      panel.classList.toggle('hidden', !open);
+      document.body.classList.toggle('menu-open', open);
+      btn.setAttribute('aria-expanded', String(open));
+      btn.setAttribute('aria-label', open ? 'Đóng menu' : 'Mở menu');
+      if (icon) icon.textContent = open ? 'close' : 'menu';
+    };
+
+    btn.addEventListener('click', () => setOpen(panel.classList.contains('hidden')));
+    panel.querySelectorAll('a, button').forEach(el => el.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !panel.classList.contains('hidden')) {
+        setOpen(false);
+        btn.focus();
+      }
+    });
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 1024) setOpen(false);
+    });
   }
 
   bindEvents() {
@@ -830,64 +867,11 @@ class App {
     if (!grid) return;
 
     if (filtered.length === 0) {
-      grid.innerHTML = `
-        <div class="col-span-full py-16 text-center text-[#6E6E73]">
-          <span class="material-symbols-outlined text-[48px] text-[#D2D2D7] mb-2 block">devices_off</span>
-          <p class="text-[17px] font-medium text-[#1D1D1F]">Không tìm thấy thiết bị phù hợp</p>
-          <p class="text-[14px]">Vui lòng điều chỉnh lại bộ lọc hoặc từ khóa tìm kiếm.</p>
-        </div>
-      `;
+      grid.innerHTML = emptyCatalogHtml();
       return;
     }
 
-    grid.innerHTML = filtered.map(p => `
-      <article class="product-card" data-id="${p.id}">
-        <div>
-          <div class="flex items-center justify-between gap-1 mb-2">
-            <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-white text-[#1D1D1F] border border-[#D2D2D7]/70">${p.conditionLabel}</span>
-            <span class="text-[10px] font-medium text-[#0071E3] bg-[#0071E3]/5 px-2 py-0.5 rounded">${p.badge}</span>
-          </div>
-
-          <div class="h-44 w-full flex items-center justify-center p-3 mb-2 bg-[#F5F5F7] rounded-xl cursor-pointer overflow-hidden group" onclick="window.tienApp.openProductModalById('${p.id}')">
-            <img 
-              alt="${p.name}" 
-              class="h-full object-contain group-hover:scale-105 transition-transform duration-300" 
-              src="${p.image}"
-              loading="lazy"
-            />
-          </div>
-
-          <div class="text-[11px] text-[#6E6E73] flex items-center gap-1 mb-1">
-            <span class="text-amber-500 font-semibold">★ ${p.rating.toFixed(1)}</span>
-            <span>(${p.reviewCount} đánh giá)</span>
-          </div>
-
-          <h3 class="text-[16px] font-semibold text-[#1D1D1F] leading-snug line-clamp-1 cursor-pointer hover:text-[#0071E3] transition-colors" onclick="window.tienApp.openProductModalById('${p.id}')">
-            ${p.name}
-          </h3>
-          <p class="text-[12px] text-[#6E6E73] line-clamp-1 mt-0.5">${p.description}</p>
-        </div>
-
-        <div class="mt-4 pt-3 border-t border-[#D2D2D7]/50">
-          <div class="flex items-baseline justify-between mb-3">
-            <div>
-              <div class="text-[18px] font-semibold text-[#1D1D1F] leading-tight">${CartManager.formatCurrency(p.price)}</div>
-              ${p.oldPrice ? `<div class="text-[12px] text-[#6E6E73] line-through">${CartManager.formatCurrency(p.oldPrice)}</div>` : ''}
-            </div>
-            ${p.oldPrice ? `<span class="text-[10px] font-medium text-[#0071E3] bg-[#0071E3]/10 px-1.5 py-0.5 rounded">-${Math.round((1 - p.price / p.oldPrice) * 100)}%</span>` : ''}
-          </div>
-
-          <div class="grid grid-cols-2 gap-1.5">
-            <button class="w-full py-2 text-center rounded-full bg-[#F5F5F7] text-[#1D1D1F] text-[12px] font-medium hover:bg-[#EAEAEA] transition-colors cursor-pointer" onclick="window.tienApp.openProductModalById('${p.id}')">
-              Xem & Đặt mua
-            </button>
-            <button class="w-full py-2 text-center rounded-full bg-[#1D1D1F] text-white text-[12px] font-medium hover:bg-black transition-colors cursor-pointer" onclick="window.tienApp.quickAddToCart('${p.id}')">
-              + Giỏ hàng
-            </button>
-          </div>
-        </div>
-      </article>
-    `).join('');
+    grid.innerHTML = filtered.map(p => productCardHtml(p)).join('');
   }
 
   // Render danh mục Phụ kiện chính hãng riêng biệt
@@ -895,63 +879,20 @@ class App {
     const grid = document.getElementById('accessoryGrid');
     if (!grid) return;
 
-    let items = ACCESSORIES_DATA;
+    let items = this.accessories;
     if (category !== 'all') {
       items = items.filter(a => a.category === category);
     }
 
-    grid.innerHTML = items.map(p => `
-      <article class="product-card" data-id="${p.id}">
-        <div>
-          <div class="flex items-center justify-between gap-1 mb-2">
-            <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-white text-[#1D1D1F] border border-[#D2D2D7]/70">Chính hãng</span>
-            <span class="text-[10px] font-medium text-[#0071E3] bg-[#0071E3]/5 px-2 py-0.5 rounded">${p.badge}</span>
-          </div>
+    grid.innerHTML = items.map(p => productCardHtml(p, { accessory: true })).join('');
+  }
 
-          <div class="h-44 w-full flex items-center justify-center p-3 mb-2 bg-[#F5F5F7] rounded-xl cursor-pointer overflow-hidden group" onclick="window.tienApp.openProductModalById('${p.id}')">
-            <img 
-              alt="${p.name}" 
-              class="h-full object-contain group-hover:scale-105 transition-transform duration-300" 
-              src="${p.image}"
-              loading="lazy"
-            />
-          </div>
-
-          <div class="text-[11px] text-[#6E6E73] flex items-center gap-1 mb-1">
-            <span class="text-amber-500 font-semibold">★ ${p.rating.toFixed(1)}</span>
-            <span>(${p.reviewCount} đánh giá)</span>
-          </div>
-
-          <h3 class="text-[16px] font-semibold text-[#1D1D1F] leading-snug line-clamp-1 cursor-pointer hover:text-[#0071E3] transition-colors" onclick="window.tienApp.openProductModalById('${p.id}')">
-            ${p.name}
-          </h3>
-          <p class="text-[12px] text-[#6E6E73] line-clamp-1 mt-0.5">${p.description}</p>
-        </div>
-
-        <div class="mt-4 pt-3 border-t border-[#D2D2D7]/50">
-          <div class="flex items-baseline justify-between mb-3">
-            <div>
-              <div class="text-[18px] font-semibold text-[#1D1D1F] leading-tight">${CartManager.formatCurrency(p.price)}</div>
-              ${p.oldPrice ? `<div class="text-[12px] text-[#6E6E73] line-through">${CartManager.formatCurrency(p.oldPrice)}</div>` : ''}
-            </div>
-            ${p.oldPrice ? `<span class="text-[10px] font-medium text-[#0071E3] bg-[#0071E3]/10 px-1.5 py-0.5 rounded">-${Math.round((1 - p.price / p.oldPrice) * 100)}%</span>` : ''}
-          </div>
-
-          <div class="grid grid-cols-2 gap-1.5">
-            <button class="w-full py-2 text-center rounded-full bg-[#F5F5F7] text-[#1D1D1F] text-[12px] font-medium hover:bg-[#EAEAEA] transition-colors cursor-pointer" onclick="window.tienApp.openProductModalById('${p.id}')">
-              Xem & Đặt mua
-            </button>
-            <button class="w-full py-2 text-center rounded-full bg-[#1D1D1F] text-white text-[12px] font-medium hover:bg-black transition-colors cursor-pointer" onclick="window.tienApp.quickAddToCart('${p.id}')">
-              + Giỏ hàng
-            </button>
-          </div>
-        </div>
-      </article>
-    `).join('');
+  findProduct(productId) {
+    return this.products.find(p => p.id === productId) || this.accessories.find(a => a.id === productId) || null;
   }
 
   quickAddToCart(productId) {
-    const product = this.products.find(p => p.id === productId) || ACCESSORIES_DATA.find(a => a.id === productId);
+    const product = this.findProduct(productId);
     if (!product) return;
 
     const color = product.defaultColor || (product.colors && product.colors[0]?.name) || 'Tiêu chuẩn';
@@ -963,7 +904,7 @@ class App {
   }
 
   openProductModalById(productId) {
-    const product = this.products.find(p => p.id === productId) || ACCESSORIES_DATA.find(a => a.id === productId);
+    const product = this.findProduct(productId);
     if (!product) return;
 
     this.selectedProduct = product;
@@ -973,8 +914,8 @@ class App {
     document.getElementById('modalProductTitle').innerText = product.name;
     document.getElementById('modalProductPrice').innerText = CartManager.formatCurrency(product.price);
     document.getElementById('modalProductOldPrice').innerText = product.oldPrice ? CartManager.formatCurrency(product.oldPrice) : '';
-    document.getElementById('modalProductImg').src = product.image;
-    document.getElementById('modalThumb1').src = product.image;
+    document.getElementById('modalProductImg').src = safeUrl(product.image);
+    document.getElementById('modalThumb1').src = safeUrl(product.image);
 
     document.getElementById('modalSpecChip').innerText = product.chip || 'Chuẩn Apple';
     document.getElementById('modalSpecCam').innerText = product.camera || 'Phụ kiện zin';
@@ -987,29 +928,13 @@ class App {
     colorLabel.innerText = this.selectedColor;
 
     if (swatchesContainer) {
-      const colors = product.colors || [{ name: 'Tiêu chuẩn', hex: '#FFFFFF' }];
-      swatchesContainer.innerHTML = colors.map(c => `
-        <button 
-          title="${c.name}"
-          class="swatch-btn ${c.name === this.selectedColor ? 'active' : ''}" 
-          style="background-color: ${c.hex};"
-          onclick="window.tienApp.selectModalColor('${c.name}')"
-        ></button>
-      `).join('');
+      swatchesContainer.innerHTML = swatchesHtml(product.colors, this.selectedColor);
     }
 
     // Render Storage Chips
     const storageContainer = document.getElementById('modal-storage-container');
     if (storageContainer) {
-      const storages = product.storages || ['Chuẩn Zin'];
-      storageContainer.innerHTML = storages.map(s => `
-        <button 
-          class="storage-chip ${s === this.selectedStorage ? 'active' : ''}"
-          onclick="window.tienApp.selectModalStorage('${s}')"
-        >
-          ${s}
-        </button>
-      `).join('');
+      storageContainer.innerHTML = storageChipsHtml(product.storages, this.selectedStorage);
     }
 
     const modal = document.getElementById('quickViewModal');
@@ -1083,42 +1008,9 @@ class App {
     const itemsContainer = document.getElementById('cart-items-list');
     if (!itemsContainer) return;
 
-    if (items.length === 0) {
-      itemsContainer.innerHTML = `
-        <div class="py-12 text-center text-[#6E6E73]">
-          <span class="material-symbols-outlined text-[44px] text-[#D2D2D7] mb-2 block">shopping_cart</span>
-          <p class="text-[15px] font-medium text-[#1D1D1F]">Giỏ hàng của bạn đang trống</p>
-          <p class="text-[13px] mt-1">Hãy khám phá các mẫu điện thoại chính hãng và thêm vào giỏ.</p>
-        </div>
-      `;
-    } else {
-      itemsContainer.innerHTML = items.map((item, index) => `
-        <div class="p-3.5 rounded-2xl bg-[#F5F5F7] flex gap-3.5 relative">
-          <div class="w-18 h-18 rounded-xl bg-white flex-shrink-0 p-1 flex items-center justify-center border border-[#D2D2D7]/50">
-            <img class="max-h-full max-w-full object-contain" src="${item.product.image}" alt="${item.product.name}" />
-          </div>
-          <div class="flex-1 min-w-0 flex flex-col justify-between">
-            <div>
-              <div class="flex items-start justify-between gap-1">
-                <h4 class="text-[14px] font-semibold text-[#1D1D1F] truncate leading-tight">${item.product.name}</h4>
-                <button class="text-[#6E6E73] hover:text-red-600 transition-colors cursor-pointer p-0.5" onclick="window.tienApp.removeCartItem(${index})" title="Xóa">
-                  <span class="material-symbols-outlined text-[17px]">delete</span>
-                </button>
-              </div>
-              <p class="text-[11px] text-[#6E6E73] mt-0.5">${item.color} • ${item.storage}</p>
-            </div>
-            <div class="flex items-center justify-between mt-2 pt-2 border-t border-[#D2D2D7]/60">
-              <div class="flex items-center rounded-full bg-white px-2 py-0.5 gap-2 border border-[#D2D2D7]">
-                <button class="text-[#6E6E73] hover:text-[#1D1D1F] font-bold text-xs w-4 h-4 flex items-center justify-center cursor-pointer" onclick="window.tienApp.updateCartQty(${index}, ${item.quantity - 1})">-</button>
-                <span class="text-xs font-semibold text-[#1D1D1F] px-1">${item.quantity}</span>
-                <button class="text-[#6E6E73] hover:text-[#1D1D1F] font-bold text-xs w-4 h-4 flex items-center justify-center cursor-pointer" onclick="window.tienApp.updateCartQty(${index}, ${item.quantity + 1})">+</button>
-              </div>
-              <span class="text-[15px] font-semibold text-[#1D1D1F]">${CartManager.formatCurrency(item.product.price * item.quantity)}</span>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
+    itemsContainer.innerHTML = items.length === 0
+      ? emptyCartHtml()
+      : items.map((item, index) => cartItemHtml(item, index)).join('');
 
     // Update Summary
     document.getElementById('cart-subtotal').innerText = CartManager.formatCurrency(this.cart.getSubtotal());
@@ -1258,10 +1150,13 @@ class App {
 
     const toast = document.createElement('div');
     toast.className = 'toast';
-    toast.innerHTML = `
-      <span class="material-symbols-outlined text-[18px] text-emerald-400">check_circle</span>
-      <span>${message}</span>
-    `;
+    const icon = document.createElement('span');
+    icon.className = 'material-symbols-outlined text-[18px] text-emerald-400';
+    icon.textContent = 'check_circle';
+    const text = document.createElement('span');
+    text.textContent = message;
+    toast.append(icon, text);
+    toast.setAttribute('role', 'status');
 
     container.appendChild(toast);
 

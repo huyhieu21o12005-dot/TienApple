@@ -76,7 +76,8 @@ body {
 
 /* Typography Presets */
 .display-hero {
-  font-size: clamp(38px, 5vw, 56px);
+  font-size: clamp(32px, 8.2vw, 56px);
+  text-wrap: balance;
   font-weight: 600;
   line-height: 1.08;
   letter-spacing: -0.025em;
@@ -152,17 +153,25 @@ body {
   background: var(--surface-base);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
-  padding: 16px;
+  padding: 12px;
+  min-width: 0; /* cho phép thẻ co lại trong lưới, tránh tràn ngang trên màn hình hẹp */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transition: border-color var(--transition-normal), transform var(--transition-normal), box-shadow var(--transition-normal);
 }
 
-.product-card:hover {
-  border-color: #8E8E93;
-  transform: translateY(-3px);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.05);
+@media (min-width: 640px) {
+  .product-card { padding: 16px; }
+}
+
+/* Hiệu ứng hover chỉ cho thiết bị có chuột, tránh bị "kẹt" hover trên cảm ứng */
+@media (hover: hover) {
+  .product-card:hover {
+    border-color: #8E8E93;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.05);
+  }
 }
 
 /* Pill Buttons */
@@ -859,3 +868,50 @@ body {
   }
 }
 
+
+
+/* ==========================================================================
+   Mobile / tablet navigation (menu < 1024px)
+   ========================================================================== */
+.mobile-nav-link {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ink-primary);
+  text-decoration: none;
+  border-bottom: 1px solid #D2D2D7;
+}
+
+.mobile-nav-link:focus-visible,
+#mobileMenuBtn:focus-visible {
+  outline: 2px solid #0071E3;
+  outline-offset: 2px;
+}
+
+body.menu-open {
+  overflow: hidden;
+}
+
+/* Vùng an toàn của iPhone (tai thỏ / thanh home) */
+#mainHeader {
+  padding-top: env(safe-area-inset-top);
+}
+
+@media (max-width: 1023px) {
+  #mobileMenuPanel {
+    padding-bottom: calc(40px + env(safe-area-inset-bottom));
+  }
+}
+
+/* Người dùng bật giảm chuyển động: tắt animation và chuyển cảnh */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

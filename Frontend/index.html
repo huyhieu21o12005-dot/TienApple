@@ -46,7 +46,7 @@
        ====================================================================== -->
   <header class="w-full h-16 bg-white/95 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between px-6 sm:px-10 lg:px-16 transition-all" id="mainHeader">
     <!-- Brand / Logo -->
-    <a href="#trangchu" class="flex items-center gap-2.5 text-[#1D1D1F] font-semibold text-[18px] tracking-[-0.015em] no-underline header-item nav-layer-link" data-layer="layer-trangchu">
+    <a href="#trangchu" class="flex items-center gap-2.5 text-[#1D1D1F] font-semibold text-[18px] tracking-[-0.015em] no-underline header-item nav-layer-link whitespace-nowrap shrink-0" data-layer="layer-trangchu">
       <svg class="w-5 h-5 text-[#1D1D1F]" fill="currentColor" viewBox="0 0 24 24">
         <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 3.5c.62-.75 1.04-1.8 1.01-2.85-.9.04-1.99.6-2.61 1.34-.55.63-1.03 1.68-.9 2.71 1 .08 1.88-.45 2.5-1.2z"/>
       </svg>
@@ -83,16 +83,32 @@
 
     <!-- Right Header Actions -->
     <div class="flex items-center gap-3 sm:gap-5">
-      <button class="cart-open-trigger inline-flex items-center gap-1.5 text-[13px] font-normal text-[#1D1D1F] hover:text-black transition-colors cursor-pointer bg-transparent border-0 p-0 header-item" type="button">
+      <button class="cart-open-trigger inline-flex items-center gap-1.5 text-[13px] font-normal text-[#1D1D1F] hover:text-black transition-colors cursor-pointer bg-transparent border-0 p-0 min-h-[44px] header-item whitespace-nowrap" type="button" aria-label="Mở giỏ hàng">
         <span class="material-symbols-outlined text-[19px]">shopping_bag</span>
-        <span>Giỏ hàng <span class="text-[#1D1D1F] font-semibold">(<span class="cart-badge-number">2</span>)</span></span>
+        <span><span class="hidden sm:inline">Giỏ hàng </span><span class="text-[#1D1D1F] font-semibold">(<span class="cart-badge-number">0</span>)</span></span>
       </button>
 
-      <button class="booking-trigger inline-flex items-center justify-center h-9 px-5 bg-[#1D1D1F] text-white text-[13px] font-medium rounded-full hover:bg-black transition-all cursor-pointer header-item" data-service-context="Đặt lịch sửa tổng quát" type="button">
+      <button class="booking-trigger hidden sm:inline-flex items-center justify-center h-9 px-5 whitespace-nowrap bg-[#1D1D1F] text-white text-[13px] font-medium rounded-full hover:bg-black transition-all cursor-pointer header-item" data-service-context="Đặt lịch sửa tổng quát" type="button">
         Đặt lịch sửa
+      </button>
+
+      <!-- Nút menu cho điện thoại và máy tính bảng (menu ngang chỉ hiện từ 1024px) -->
+      <button id="mobileMenuBtn" class="lg:hidden inline-flex items-center justify-center w-11 h-11 -mr-2 rounded-full bg-transparent border-0 cursor-pointer text-[#1D1D1F]" type="button" aria-label="Mở menu" aria-expanded="false" aria-controls="mobileMenuPanel">
+        <span class="material-symbols-outlined text-[24px]" id="mobileMenuIcon">menu</span>
       </button>
     </div>
   </header>
+
+  <!-- Menu điều hướng trên điện thoại / máy tính bảng -->
+  <nav id="mobileMenuPanel" class="lg:hidden hidden fixed inset-x-0 top-16 bottom-0 z-30 bg-white overflow-y-auto px-6 sm:px-10 pb-10" aria-label="Điều hướng chính">
+    <a href="#trangchu" class="nav-layer-link mobile-nav-link" data-layer="layer-trangchu">Trang chủ</a>
+    <a href="#dienthoai" class="nav-layer-link mobile-nav-link" data-layer="layer-dienthoai">Điện thoại</a>
+    <a href="#suachua" class="nav-layer-link mobile-nav-link" data-layer="layer-suachua">Sửa chữa</a>
+    <a href="#phukien" class="nav-layer-link mobile-nav-link" data-layer="layer-phukien">Phụ kiện</a>
+    <a href="#camket" class="nav-layer-link mobile-nav-link" data-layer="layer-camket">Thu cũ &amp; Cam kết</a>
+    <a href="#lienhe" class="nav-layer-link mobile-nav-link" data-layer="layer-lienhe">Liên hệ</a>
+    <button class="booking-trigger mt-6 w-full h-12 rounded-full bg-[#1D1D1F] text-white text-[15px] font-medium cursor-pointer border-0" data-service-context="Đặt lịch sửa tổng quát" type="button">Đặt lịch sửa</button>
+  </nav>
 
   <main class="w-full flex-grow">
 
@@ -274,7 +290,7 @@
         </div>
 
         <!-- Product Grid: 5 Cột trên Desktop, 2 Cột trên Mobile -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-4.5" id="productGrid">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-4.5" id="productGrid">
           <!-- Được render động từ app.js -->
         </div>
 
@@ -306,7 +322,7 @@
         </div>
 
         <!-- Accessory Products Grid (5 Cột Desktop, 2 Cột Mobile) -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-4.5" id="accessoryGrid">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-4.5" id="accessoryGrid">
           <!-- Rendered dynamically -->
         </div>
       </div>

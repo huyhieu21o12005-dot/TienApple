@@ -39,16 +39,17 @@ export async function getSupabase() {
  * 
  * @param {object} [options]
  * @param {string} [options.kind] Lọc theo loại 'phone' hoặc 'accessory' (tùy chọn)
+ * @param {object} [options.client] Supabase client truyền sẵn (dùng cho kiểm thử)
  * @returns {Promise<Array<object>|null>}
  */
 export async function fetchProducts(options = {}) {
-  if (!isSupabaseConfigured()) {
+  if (!options.client && !isSupabaseConfigured()) {
     console.info('[productsApi] Supabase chưa được cấu hình trong js/config.js. Dùng dữ liệu fallback.');
     return null;
   }
 
   try {
-    const supabase = await getSupabase();
+    const supabase = options.client || await getSupabase();
     if (!supabase) return null;
 
     let query = supabase

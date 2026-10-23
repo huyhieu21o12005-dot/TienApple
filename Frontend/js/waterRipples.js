@@ -38,7 +38,8 @@ export class WaterRipplesEngine {
 
   init() {
     this.resize();
-    window.addEventListener('resize', () => this.resize());
+    this._onResize = () => this.resize();
+    window.addEventListener('resize', this._onResize);
 
     // Khởi tạo sẵn một xung gợn nước đang lan tỏa nhẹ để mặt nước có sức sống tự nhiên ngay khi mở trang
     this.pulses.push({
@@ -55,7 +56,33 @@ export class WaterRipplesEngine {
 
     // Vòng lặp animation
     this.animate = this.animate.bind(this);
-    requestAnimationFrame(this.animate);
+    this._raf = null;
+    this._visible = true;
+
+    // Người dùng bật "giảm chuyển động": chỉ vẽ một khung tĩnh, không chạy vòng lặp
+    this.reducedMotion = typeof window.matchMedia === 'function' &&
+      !!window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (this.reducedMotion) {
+      this.renderFrame();
+      return;
+    }
+
+    // Tạm dừng khi canvas ra khỏi màn hình để tiết kiệm pin và CPU trên điện thoại
+    if (typeof IntersectionObserver === 'function') {
+      this._observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => this.setVisible(entry.isIntersecting));
+      });
+      this._observer.observe(this.container);
+    }
+
+    this._raf = requestAnimationFrame(this.animate);
+  }
+
+  setVisible(visible) {
+    this._visible = !!visible;
+    if (this._visible && this.running && !this._raf) {
+      this._raf = requestAnimationFrame(this.animate);
+    }
   }
 
   resize() {
@@ -119,9 +146,13 @@ export class WaterRipplesEngine {
   }
 
   animate() {
-    if (!this.running) return;
-    requestAnimationFrame(this.animate);
+    this._raf = null;
+    if (!this.running || !this._visible) return;
+    this._raf = requestAnimationFrame(this.animate);
+    this.renderFrame();
+  }
 
+  renderFrame() {
     this.waveTime += 0.018;
 
     // 1. Nền nước hoàn toàn trong suốt - không vẽ vạch gạch ngang, không vẽ màu nền background
@@ -456,5 +487,16 @@ export class WaterRipplesEngine {
 
   destroy() {
     this.running = false;
+    if (this._raf && typeof cancelAnimationFrame === 'function') {
+      cancelAnimationFrame(this._raf);
+    }
+    this._raf = null;
+    if (this._observer) {
+      this._observer.disconnect();
+      this._observer = null;
+    }
+    if (this._onResize && typeof window !== 'undefined') {
+      window.removeEventListener('resize', this._onResize);
+    }
   }
 }

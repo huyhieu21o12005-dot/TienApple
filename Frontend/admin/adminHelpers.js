@@ -32,6 +32,27 @@ export function parseCurrency(val) {
 }
 
 /**
+ * Giá trị người dùng nhập có phải số âm không (parseCurrency bỏ dấu "-" nên cần kiểm tra riêng)
+ * @param {string|number} val
+ * @returns {boolean}
+ */
+export function isNegativeInput(val) {
+  if (typeof val === 'number') return val < 0;
+  return typeof val === 'string' && /^\s*-/.test(val);
+}
+
+/**
+ * Ép về số nguyên, trả về giá trị mặc định khi không hợp lệ (tránh NaN gửi lên database)
+ * @param {*} val
+ * @param {number} [fallback]
+ * @returns {number}
+ */
+export function toInt(val, fallback = 0) {
+  const n = parseInt(val, 10);
+  return isNaN(n) ? fallback : n;
+}
+
+/**
  * Tạo slug sạch từ tên sản phẩm tiếng Việt
  * Hỗ trợ chuyển đổi có dấu thành không dấu chuẩn
  * Ví dụ: "iPhone 16 Pro Max 256GB" -> "iphone-16-pro-max-256gb"
@@ -93,14 +114,14 @@ export function validateProduct(data, isEdit = false) {
 
   // Giá bán (price)
   const price = parseCurrency(data.price);
-  if (isNaN(price) || price < 0) {
+  if (isNegativeInput(data.price) || isNaN(price) || price < 0) {
     errors.push('Giá bán phải là số nguyên không âm');
   }
 
   // Giá cũ (old_price) nếu có
   if (data.old_price !== undefined && data.old_price !== null && data.old_price !== '') {
     const oldPrice = parseCurrency(data.old_price);
-    if (isNaN(oldPrice) || oldPrice < 0) {
+    if (isNegativeInput(data.old_price) || isNaN(oldPrice) || oldPrice < 0) {
       errors.push('Giá gốc phải là số nguyên không âm');
     } else if (oldPrice > 0 && oldPrice < price) {
       errors.push('Giá gốc (khi có giảm giá) phải lớn hơn hoặc bằng giá bán');
@@ -175,7 +196,7 @@ export function mapDbToProduct(row) {
     badge: row.badge || '',
     price: Number(row.price) || 0,
     oldPrice: row.old_price ? Number(row.old_price) : undefined,
-    rating: Number(row.rating) || 5.0,
+    rating: row.rating !== null && row.rating !== undefined && isFinite(Number(row.rating)) ? Number(row.rating) : 5.0,
     reviewCount: Number(row.review_count) || 0,
     defaultColor: row.default_color || (Array.isArray(row.colors) && row.colors[0]?.name) || '',
     colors: Array.isArray(row.colors) ? row.colors : [],
@@ -222,8 +243,8 @@ export function mapProductToDb(product) {
       : (product.old_price !== undefined && product.old_price !== null && product.old_price !== ''
         ? parseCurrency(product.old_price)
         : null),
-    rating: product.rating !== undefined ? Number(product.rating) : 5.0,
-    review_count: product.reviewCount !== undefined ? Number(product.reviewCount) : (product.review_count !== undefined ? Number(product.review_count) : 0),
+    rating: product.rating !== undefined && isFinite(Number(product.rating)) ? Number(product.rating) : 5.0,
+    review_count: toInt(product.reviewCount !== undefined ? product.reviewCount : product.review_count, 0),
     default_color: product.defaultColor || product.default_color || '',
     colors: Array.isArray(product.colors) ? product.colors : [],
     storages: Array.isArray(product.storages) ? product.storages : [],
@@ -233,9 +254,9 @@ export function mapProductToDb(product) {
     screen: product.screen || '',
     image_url: product.image || product.image_url || '',
     description: product.description || '',
-    stock: product.stock !== undefined ? parseInt(product.stock, 10) : 0,
+    stock: Math.max(0, toInt(product.stock, 0)),
     is_visible: product.is_visible !== undefined ? Boolean(product.is_visible) : true,
-    sort_order: product.sort_order !== undefined ? parseInt(product.sort_order, 10) : 0
+    sort_order: toInt(product.sort_order, 0)
   };
 }
 
