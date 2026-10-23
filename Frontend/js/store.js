@@ -208,9 +208,10 @@ export class BookingValidator {
       errors.push({ field: 'name', message: 'Vui lòng nhập họ và tên của bạn.' });
     }
 
-    // Số điện thoại Việt Nam: 10 chữ số, bắt đầu bằng 0 (03, 05, 07, 08, 09)
+    // Số điện thoại Việt Nam: 10 chữ số, bắt đầu bằng 0 (03, 05, 07, 08, 09), hỗ trợ định dạng +84
+    let cleanPhone = (phone || '').replace(/[\s.-]/g, '');
+    cleanPhone = cleanPhone.replace(/^\+?84/, '0');
     const phoneRegex = /^(0)(3|5|7|8|9)[0-9]{8}$/;
-    const cleanPhone = (phone || '').replace(/[\s.-]/g, '');
     if (!cleanPhone || !phoneRegex.test(cleanPhone)) {
       errors.push({ field: 'phone', message: 'Số điện thoại không hợp lệ (cần 10 chữ số).' });
     }
@@ -225,7 +226,33 @@ export class BookingValidator {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
+      normalizedPhone: cleanPhone
+    };
+  }
+
+  static validateOrderForm({ name, phone, address }) {
+    const errors = [];
+
+    if (!name || !name.trim()) {
+      errors.push({ field: 'name', message: 'Vui lòng nhập họ và tên nhận hàng.' });
+    }
+
+    let cleanPhone = (phone || '').replace(/[\s.-]/g, '');
+    cleanPhone = cleanPhone.replace(/^\+?84/, '0');
+    const phoneRegex = /^(0)(3|5|7|8|9)[0-9]{8}$/;
+    if (!cleanPhone || !phoneRegex.test(cleanPhone)) {
+      errors.push({ field: 'phone', message: 'Số điện thoại nhận hàng không hợp lệ (cần 10 chữ số).' });
+    }
+
+    if (!address || !address.trim() || address.trim().length < 5) {
+      errors.push({ field: 'address', message: 'Vui lòng nhập địa chỉ cụ thể để giao hàng hỏa tốc 2H.' });
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      normalizedPhone: cleanPhone
     };
   }
 }

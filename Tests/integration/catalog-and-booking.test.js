@@ -74,4 +74,17 @@ describe('Tien Mobile Integration Test Suite - Real Catalog Data & End-to-End Sc
     assert.equal(validation.isValid, true);
     assert.equal(validation.errors.length, 0);
   });
+
+  it('kịch bản hoàn tất thông tin đặt mua sản phẩm giao hàng tận nơi', () => {
+    const orderPayload = {
+      name: 'Nguyễn Tiến Đạt',
+      phone: '+84933266179',
+      address: '54a8 Ngô Chí Quốc, Tam Bình, Thủ Đức, HCM'
+    };
+
+    const validation = BookingValidator.validateOrderForm(orderPayload);
+    assert.equal(validation.isValid, true);
+    assert.equal(validation.normalizedPhone, '0933266179');
+    assert.equal(validation.errors.length, 0);
+  });
 });

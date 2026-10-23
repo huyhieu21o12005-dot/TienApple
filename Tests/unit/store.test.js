@@ -229,5 +229,31 @@ describe('Tien Mobile TDD Suite - Store & Cart Logic', () => {
       assert.equal(result.isValid, false);
       assert.equal(result.errors.length >= 2, true);
     });
+
+    it('validateOrderForm: thành công khi đầy đủ tên, sđt (hỗ trợ +84) và địa chỉ nhận hàng', () => {
+      const orderPayload = {
+        name: 'Trần Văn Nam',
+        phone: '+84 986 455 457',
+        address: '54a8 Ngô Chí Quốc, Tam Bình, Thủ Đức, HCM'
+      };
+
+      const result = BookingValidator.validateOrderForm(orderPayload);
+      assert.equal(result.isValid, true);
+      assert.equal(result.normalizedPhone, '0986455457');
+      assert.equal(result.errors.length, 0);
+    });
+
+    it('validateOrderForm: báo lỗi khi địa chỉ trống hoặc sđt sai định dạng', () => {
+      const invalidOrder = {
+        name: 'Lê Thị Thu',
+        phone: '012345',
+        address: ''
+      };
+
+      const result = BookingValidator.validateOrderForm(invalidOrder);
+      assert.equal(result.isValid, false);
+      assert.equal(result.errors.some(e => e.field === 'phone'), true);
+      assert.equal(result.errors.some(e => e.field === 'address'), true);
+    });
   });
 });

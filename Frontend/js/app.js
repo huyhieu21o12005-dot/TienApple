@@ -320,6 +320,7 @@ const ACCESSORIES_DATA = [
 
 class App {
   constructor() {
+    window.tienApp = this;
     this.products = [...FALLBACK_PRODUCTS];
     this.accessories = ACCESSORIES_DATA;
     this.cart = new CartManager();
@@ -356,8 +357,16 @@ class App {
 
     // Khởi tạo các item mặc định ban đầu nếu giỏ hàng trống (giống bản thiết kế gốc có 2 items)
     if (this.cart.getItemCount() === 0) {
-      this.cart.addItem(this.products[0], 1, 'Titan Tự Nhiên', '256GB');
-      this.cart.addItem(this.products[7], 1, 'Trắng', 'Chuẩn 30W');
+      const initialPhone = this.products.find(p => p.id === 'ip16-pro') || this.products[0];
+      const initialAccessory = this.accessories.find(a => a.id === 'charger-30w') || this.products.find(p => p.id === 'charger-30w');
+      if (initialPhone) {
+        const phoneColor = initialPhone.defaultColor || (initialPhone.colors && initialPhone.colors[0]?.name) || 'Titan Tự Nhiên';
+        const phoneStorage = (initialPhone.storages && initialPhone.storages[1]) || (initialPhone.storages && initialPhone.storages[0]) || '256GB';
+        this.cart.addItem(initialPhone, 1, phoneColor, phoneStorage);
+      }
+      if (initialAccessory) {
+        this.cart.addItem(initialAccessory, 1, 'Trắng', 'Chuẩn 30W');
+      }
     }
 
     this.renderProducts();
@@ -513,7 +522,24 @@ class App {
       });
     }
 
-    // Modal Add To Cart
+    // Modal Buy Now & Add To Cart
+    const modalBuyNowBtn = document.getElementById('modal-buy-now-btn');
+    if (modalBuyNowBtn) {
+      modalBuyNowBtn.addEventListener('click', () => {
+        if (this.selectedProduct) {
+          this.cart.addItem(this.selectedProduct, 1, this.selectedColor, this.selectedStorage);
+          this.updateCartBadge();
+          this.showToast(`Đã chọn mua "${this.selectedProduct.name}"!`);
+          this.closeProductModal();
+          this.openCartDrawer();
+          setTimeout(() => {
+            const custName = document.getElementById('cust-name');
+            if (custName) custName.focus();
+          }, 350);
+        }
+      });
+    }
+
     const modalAddToCartBtn = document.getElementById('modal-add-to-cart-btn');
     if (modalAddToCartBtn) {
       modalAddToCartBtn.addEventListener('click', () => {
@@ -574,9 +600,26 @@ class App {
 
   // Single-Layer Navigation Architecture (Chuyển đổi từng layer độc lập)
   initLayerNavigation() {
+    // 0. Nút CTA "Đặt mua sản phẩm" trên Hero Section
+    const heroBuyBtn = document.getElementById('heroBuyProductBtn');
+    if (heroBuyBtn) {
+      heroBuyBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.switchLayer('layer-dienthoai');
+        setTimeout(() => {
+          const productSection = document.getElementById('dienthoai');
+          if (productSection) {
+            productSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+      });
+    }
+
     // 1. Listen to layer links (Header links, CTA buttons, Layer Switcher tabs)
     const layerTriggers = document.querySelectorAll('[data-layer], .nav-layer-link');
     layerTriggers.forEach(trigger => {
+      // Bỏ qua nếu là heroBuyBtn đã được gắn handler riêng
+      if (trigger.id === 'heroBuyProductBtn') return;
       trigger.addEventListener('click', (e) => {
         const layerId = trigger.getAttribute('data-layer');
         if (!layerId) return;
@@ -637,12 +680,12 @@ class App {
     targetLayer.classList.add('active');
 
     // 2. Cập nhật trạng thái Active trên Top Header:
-    // Đảm bảo "Điện thoại" và "Phụ kiện" tách biệt độc lập 100%, không bị trùng nhau
+    // Mỗi link trên navbar có data-layer độc lập ('layer-dienthoai' vs 'layer-phukien'), đảm bảo active chính xác
     const navLinks = document.querySelectorAll('#mainNav .nav-layer-link');
     navLinks.forEach(link => {
       const linkLayer = link.getAttribute('data-layer');
       const bar = link.querySelector('.nav-active-bar');
-      const isMatch = trigger ? (link === trigger) : (linkLayer === layerId);
+      const isMatch = (linkLayer === layerId);
 
       if (isMatch) {
         link.classList.remove('text-[#6E6E73]', 'font-normal');
@@ -868,7 +911,7 @@ class App {
 
           <div class="grid grid-cols-2 gap-1.5">
             <button class="w-full py-2 text-center rounded-full bg-[#F5F5F7] text-[#1D1D1F] text-[12px] font-medium hover:bg-[#EAEAEA] transition-colors cursor-pointer" onclick="window.tienApp.openProductModalById('${p.id}')">
-              Chi tiết
+              Xem & Đặt mua
             </button>
             <button class="w-full py-2 text-center rounded-full bg-[#1D1D1F] text-white text-[12px] font-medium hover:bg-black transition-colors cursor-pointer" onclick="window.tienApp.quickAddToCart('${p.id}')">
               + Giỏ hàng
@@ -928,7 +971,7 @@ class App {
 
           <div class="grid grid-cols-2 gap-1.5">
             <button class="w-full py-2 text-center rounded-full bg-[#F5F5F7] text-[#1D1D1F] text-[12px] font-medium hover:bg-[#EAEAEA] transition-colors cursor-pointer" onclick="window.tienApp.openProductModalById('${p.id}')">
-              Chi tiết
+              Xem & Đặt mua
             </button>
             <button class="w-full py-2 text-center rounded-full bg-[#1D1D1F] text-white text-[12px] font-medium hover:bg-black transition-colors cursor-pointer" onclick="window.tienApp.quickAddToCart('${p.id}')">
               + Giỏ hàng
@@ -1143,15 +1186,14 @@ class App {
       return;
     }
 
-    const name = document.getElementById('cust-name').value;
-    const phone = document.getElementById('cust-phone').value;
-    const address = document.getElementById('cust-address').value;
+    const name = document.getElementById('cust-name')?.value || '';
+    const phone = document.getElementById('cust-phone')?.value || '';
+    const address = document.getElementById('cust-address')?.value || '';
 
-    const validation = BookingValidator.validateBookingForm({
+    const validation = BookingValidator.validateOrderForm({
       name,
       phone,
-      device: 'Đơn mua online',
-      service: 'Giao hàng tận nơi'
+      address
     });
 
     if (!validation.isValid) {
@@ -1160,11 +1202,12 @@ class App {
     }
 
     const totalStr = CartManager.formatCurrency(this.cart.getTotal());
+    const formattedPhone = validation.normalizedPhone || phone;
     this.cart.clearCart();
     this.updateCartBadge();
     this.closeCartDrawer();
 
-    alert(`🎉 ĐẶT HÀNG THÀNH CÔNG!\n\nCảm ơn bạn ${name} (${phone}).\nTổng thanh toán: ${totalStr}\nĐịa chỉ nhận: ${address}\n\nNhân viên Tien Mobile sẽ gọi xác nhận đơn và giao hàng siêu tốc trong 2 giờ.`);
+    alert(`🎉 ĐẶT HÀNG THÀNH CÔNG!\n\nCảm ơn bạn ${name} (${formattedPhone}).\nTổng thanh toán: ${totalStr}\nĐịa chỉ nhận: ${address}\n\nNhân viên Tien Mobile sẽ gọi xác nhận đơn và giao hàng siêu tốc trong 2 giờ.`);
   }
 
   // Booking Modal

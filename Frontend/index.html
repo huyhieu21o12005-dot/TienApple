@@ -144,7 +144,7 @@
             </p>
 
             <div class="flex flex-wrap sm:flex-nowrap items-center gap-3.5" id="heroCtaWrap">
-              <a href="#dienthoai" class="btn-pill-primary shadow-sm hover:shadow-md nav-layer-link" data-layer="layer-dienthoai">
+              <a href="#dienthoai" id="heroBuyProductBtn" class="btn-pill-primary shadow-sm hover:shadow-md nav-layer-link" data-layer="layer-dienthoai">
                 Đặt mua sản phẩm
               </a>
               <button class="booking-trigger btn-pill-secondary" data-service-context="Tư vấn sửa chữa trực tiếp" type="button">
@@ -698,12 +698,16 @@
           </div>
 
           <!-- CTAs -->
-          <div class="flex items-center gap-3">
-            <button id="modal-add-to-cart-btn" class="flex-1 h-11 rounded-full bg-[#1D1D1F] text-white text-[13px] font-medium hover:bg-black transition-colors cursor-pointer border-0">
-              Thêm vào giỏ hàng
+          <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5">
+            <button id="modal-buy-now-btn" class="flex-1 h-11 px-5 rounded-full bg-[#1D1D1F] text-white text-[13px] font-medium hover:bg-black transition-colors cursor-pointer border-0 flex items-center justify-center gap-1.5" type="button">
+              <span class="material-symbols-outlined text-[17px]">shopping_bag</span>
+              <span>Đặt mua ngay (Giao 2H)</span>
             </button>
-            <button class="booking-trigger px-5 h-11 rounded-full border border-[#D2D2D7] text-[#1D1D1F] text-[13px] font-medium hover:bg-[#F5F5F7] transition-colors cursor-pointer" data-service-context="Tư vấn mua trả góp 0%" type="button">
-              Tư vấn kỹ thuật
+            <button id="modal-add-to-cart-btn" class="h-11 px-4 rounded-full border border-[#D2D2D7] text-[#1D1D1F] text-[13px] font-medium hover:bg-[#F5F5F7] transition-colors cursor-pointer" type="button">
+              + Giỏ hàng
+            </button>
+            <button class="booking-trigger h-11 px-4 rounded-full border border-[#D2D2D7] text-[#6E6E73] text-[12px] font-medium hover:text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors cursor-pointer hidden sm:inline-flex items-center justify-center" data-service-context="Tư vấn mua trả góp 0%" type="button">
+              Tư vấn 0%
             </button>
           </div>
         </div>
