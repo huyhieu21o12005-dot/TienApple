@@ -1,10 +1,9 @@
 /**
- * Tien Mobile - Studio Perspective 3D Volumetric Water Ripples Engine
- * Render gợn nước 3D chân thực, dày dặn, có chiều sâu chất lỏng (Volumetric Liquid Depth):
- * - Thân sóng dày dặn (Volumetric wave body) nhiều lớp ánh sáng đón sáng & vùng trũng bóng đổ
- * - Sóng ngang phối cảnh 3D ở 1/3 màn hình dưới
- * - Tâm sóng dạng vòng ngang elip phối cảnh nằm dưới chân 18 Pro Max
- * - Gradient là phần màu và ánh sáng của chính khối sóng nước (nền trong suốt hoàn hảo)
+ * Tien Mobile - Natural Water Drop Ripple Engine (Mô phỏng giọt nước rơi tạo gợn nước tự nhiên)
+ * - Bỏ hoàn toàn các vạch gạch ngang ở nước
+ * - Giọt nước rơi từ chân máy 18 Pro Max xuống mặt nước tạo ra các gợn sóng lan tỏa
+ * - Gợn nước uốn lượn hữu cơ tự nhiên (Organic fluid ripples), KHÔNG phải hình tròn hình học cứng nhắc
+ * - Đầy đủ hiệu ứng khúc xạ chất lỏng: vệt sáng phản quang trắng, ánh lam ngọc và rãnh nước mềm mại
  */
 
 export class WaterRipplesEngine {
@@ -15,9 +14,25 @@ export class WaterRipplesEngine {
 
     this.ctx = this.canvas.getContext('2d');
     this.waveTime = 0;
-    this.pulses = []; // Dynamic interaction ripple pulses
-    this.running = true;
+    this.pulses = []; // Dynamic organic wave packets from drop impacts
 
+    // Hệ thống mô phỏng giọt nước rơi (Falling Water Droplet)
+    this.dropState = {
+      active: true,
+      y: 0,
+      progress: 0,
+      speed: 0.015,
+      intervalTimer: 0,
+      intervalDuration: 220 // ~3.6s mỗi lần giọt nước rơi
+    };
+
+    // Hạt nước nảy nhẹ sau khi giọt rơi (Rebound bead)
+    this.reboundState = {
+      active: false,
+      progress: 0
+    };
+
+    this.running = true;
     this.init();
   }
 
@@ -25,10 +40,20 @@ export class WaterRipplesEngine {
     this.resize();
     window.addEventListener('resize', () => this.resize());
 
-    // Spawn initial gentle wave pulse
-    this.triggerInteractionRipple(0.9);
+    // Khởi tạo sẵn một xung gợn nước đang lan tỏa nhẹ để mặt nước có sức sống tự nhiên ngay khi mở trang
+    this.pulses.push({
+      radius: 80,
+      maxRadius: Math.max(this.width * 0.65, 460),
+      speed: 1.6,
+      intensity: 0.65,
+      seed: 28.5,
+      life: 50
+    });
 
-    // Animation loop
+    // Kích hoạt giọt nước đầu tiên rơi
+    this.triggerDrop();
+
+    // Vòng lặp animation
     this.animate = this.animate.bind(this);
     requestAnimationFrame(this.animate);
   }
@@ -38,7 +63,7 @@ export class WaterRipplesEngine {
     this.width = rect.width || window.innerWidth;
     this.height = rect.height || 260;
 
-    // Retina display support
+    // Hỗ trợ màn hình Retina sắc nét
     this.dpr = Math.min(window.devicePixelRatio || 1, 2);
     this.canvas.width = this.width * this.dpr;
     this.canvas.height = this.height * this.dpr;
@@ -47,7 +72,7 @@ export class WaterRipplesEngine {
     this.updateCenterPosition();
   }
 
-  // Căn chỉnh tâm chấn sóng elip nằm dưới chân 18 Pro Max với khoảng trống tự nhiên
+  // Căn chỉnh điểm rơi giọt nước ngay dưới chân 18 Pro Max
   updateCenterPosition() {
     const phoneContainer = document.getElementById('phoneContainer3D') || document.getElementById('phone3DCanvasWrap');
     if (phoneContainer && this.container) {
@@ -59,7 +84,7 @@ export class WaterRipplesEngine {
 
       // Khoảng cách từ chân máy tới mặt nước trong stage 1/3 dưới
       const phoneBottomInStage = (pRect.top + pRect.height * 0.74) - sRect.top;
-      const naturalGap = Math.max(30, Math.min(48, this.height * 0.15));
+      const naturalGap = Math.max(28, Math.min(48, this.height * 0.15));
       this.centerY = Math.max(28, Math.min(this.height * 0.45, phoneBottomInStage + naturalGap));
     } else {
       this.centerX = this.width / 2;
@@ -67,7 +92,13 @@ export class WaterRipplesEngine {
     }
   }
 
-  // Kích hoạt xung sóng tương tác dày dặn khi người dùng chạm/vuốt
+  // Kích hoạt giọt nước rơi từ chân máy xuống mặt nước
+  triggerDrop() {
+    this.dropState.active = true;
+    this.dropState.progress = 0;
+  }
+
+  // Kích hoạt xung sóng lan tỏa từ điểm rơi giọt nước
   triggerInteractionRipple(intensity = 1.0) {
     const clampedIntensity = Math.min(intensity, 1.5);
     this.pulses.push({
@@ -75,6 +106,7 @@ export class WaterRipplesEngine {
       maxRadius: Math.max(this.width * 0.65, 460),
       speed: 1.6,
       intensity: clampedIntensity,
+      seed: Math.random() * 100, // Biến thiên ngẫu nhiên cho từng giọt nước
       life: 0
     });
   }
@@ -90,18 +122,21 @@ export class WaterRipplesEngine {
 
     this.waveTime += 0.018;
 
-    // Background hoàn toàn trong suốt - không vẽ màu nền background
+    // 1. Nền nước hoàn toàn trong suốt - không vẽ vạch gạch ngang, không vẽ màu nền background
     if (this.ctx && typeof this.ctx.clearRect === 'function') {
       this.ctx.clearRect(0, 0, this.width, this.height);
     }
 
-    // 1. Phản chiếu chân máy 18 Pro Max dạng cột sáng mềm trên mặt nước
+    // 2. Cột sáng phản chiếu nhẹ từ chân 18 Pro Max xuống mặt nước
     this.drawPhoneReflection();
 
-    // 2. Chỗ lõm chất lỏng 3D ở tâm chấn dưới chân máy
-    this.drawCenterDepression();
+    // 3. Cập nhật và vẽ giọt nước đang rơi xuống (Falling Water Droplet)
+    this.updateAndDrawFallingDrop();
 
-    // 3. Update dynamic pulses
+    // 4. Vẽ hạt nước nảy nhẹ sau khi giọt rơi (Rebound bead)
+    this.updateAndDrawReboundBead();
+
+    // 5. Cập nhật các chùm sóng gợn nước
     for (let i = this.pulses.length - 1; i >= 0; i--) {
       const p = this.pulses[i];
       p.radius += p.speed;
@@ -111,40 +146,145 @@ export class WaterRipplesEngine {
       }
     }
 
-    // 4. Các dải sóng ngang dập dềnh khối 3D (Background Horizon Waves)
-    this.drawUndulatingWavefronts();
-
-    // 5. Gợn sóng 3D dạng vòng ngang elip dày dặn lan tỏa dưới chân 18 Pro Max
+    // 6. Vẽ các gợn nước hữu cơ tự nhiên (Organic Fluid Ripples)
     this.drawCircularRipples();
-  }
 
-  // Nền trong suốt theo yêu cầu: "gradian là phần màu của sóng không phải pha màu của background"
-  drawWaterBackground() {
-    if (this.ctx && typeof this.ctx.clearRect === 'function') {
-      this.ctx.clearRect(0, 0, this.width, this.height);
+    // 7. Tâm chấn giọt nước mềm mại
+    this.drawCenterDepression();
+
+    // Bộ đếm chu kỳ giọt nước rơi tự nhiên tiếp theo (~3.6s một lần)
+    this.dropState.intervalTimer++;
+    if (this.dropState.intervalTimer >= this.dropState.intervalDuration) {
+      this.dropState.intervalTimer = 0;
+      this.triggerDrop();
     }
   }
 
-  // 1. Cột phản chiếu ánh sáng dịu của 18 Pro Max xuống mặt nước ở khoảng trống tự nhiên
+  // Cập nhật và vẽ giọt nước rơi từ chân máy xuống mặt hồ
+  updateAndDrawFallingDrop() {
+    if (!this.dropState.active) return;
+    if (!this.ctx || typeof this.ctx.beginPath !== 'function') return;
+
+    this.dropState.progress += this.dropState.speed;
+    const prog = this.dropState.progress;
+
+    const startY = Math.max(4, this.centerY - 56);
+    const targetY = this.centerY;
+    // Gia tốc trọng trường tự nhiên: pow(prog, 1.8)
+    const currentY = startY + (targetY - startY) * Math.pow(prog, 1.8);
+
+    if (prog >= 1.0) {
+      // Giọt nước chạm mặt nước -> tạo gợn sóng lan tỏa và kích hoạt hạt nảy
+      this.dropState.active = false;
+      this.triggerInteractionRipple(1.15);
+      this.reboundState.active = true;
+      this.reboundState.progress = 0;
+      return;
+    }
+
+    // Vẽ hình dáng giọt nước tự nhiên (Teardrop shape)
+    this.ctx.save();
+    const cx = this.centerX;
+    const dropAlpha = Math.min(1.0, prog * 2.2);
+
+    // Thân giọt nước hình giọt lệ tự nhiên (thuôn dài theo gia tốc rơi)
+    this.ctx.beginPath();
+    const dropW = 2.2 + (1.0 - prog) * 1.2;
+    const dropH = 4.5 + prog * 4.5;
+    this.ctx.moveTo(cx, currentY - dropH);
+    this.ctx.bezierCurveTo(cx - dropW, currentY - dropH * 0.25, cx - dropW, currentY, cx, currentY);
+    this.ctx.bezierCurveTo(cx + dropW, currentY, cx + dropW, currentY - dropH * 0.25, cx, currentY - dropH);
+    this.ctx.closePath();
+
+    // Gradient giọt nước: lõi trắng phản quang pha sắc lam ngọc trong suốt
+    const dropGrad = this.ctx.createLinearGradient(cx, currentY - dropH, cx, currentY);
+    dropGrad.addColorStop(0, `rgba(255, 255, 255, ${dropAlpha})`);
+    dropGrad.addColorStop(0.4, `rgba(220, 242, 255, ${(dropAlpha * 0.88).toFixed(2)})`);
+    dropGrad.addColorStop(0.85, `rgba(180, 222, 252, ${(dropAlpha * 0.70).toFixed(2)})`);
+    dropGrad.addColorStop(1.0, `rgba(140, 200, 245, ${(dropAlpha * 0.50).toFixed(2)})`);
+
+    this.ctx.fillStyle = dropGrad;
+    this.ctx.fill();
+
+    // Điểm sáng lóa tinh xảo ở đỉnh giọt nước
+    this.ctx.beginPath();
+    this.ctx.arc(cx - 0.7, currentY - dropH * 0.45, 1.1, 0, Math.PI * 2);
+    this.ctx.fillStyle = `rgba(255, 255, 255, ${(dropAlpha * 0.95).toFixed(2)})`;
+    this.ctx.fill();
+
+    this.ctx.restore();
+  }
+
+  // Hạt nước nhỏ nảy lên sau va chạm của giọt nước (Capillary Rebound Bead)
+  updateAndDrawReboundBead() {
+    if (!this.reboundState.active) return;
+    if (!this.ctx || typeof this.ctx.beginPath !== 'function') return;
+
+    this.reboundState.progress += 0.045;
+    const prog = this.reboundState.progress;
+
+    if (prog >= 1.0) {
+      this.reboundState.active = false;
+      return;
+    }
+
+    // 1. Vòng gợn vi mô tức thời tại điểm chạm (Impact micro-ring caustics)
+    if (prog < 0.65) {
+      const ringProg = prog / 0.65;
+      const ringR = 4 + ringProg * 16;
+      const ringAlpha = (1.0 - ringProg) * 0.8;
+      this.ctx.save();
+      this.ctx.beginPath();
+      if (typeof this.ctx.ellipse === 'function') {
+        this.ctx.ellipse(this.centerX, this.centerY, ringR, ringR * 0.28, 0, 0, Math.PI * 2);
+      } else if (typeof this.ctx.arc === 'function') {
+        this.ctx.arc(this.centerX, this.centerY, ringR, 0, Math.PI * 2);
+      }
+      this.ctx.strokeStyle = `rgba(255, 255, 255, ${ringAlpha.toFixed(2)})`;
+      this.ctx.lineWidth = 1.6;
+      this.ctx.stroke();
+      this.ctx.restore();
+    }
+
+    // 2. Hạt nước nảy lên theo quỹ đạo parabol (Rebound Bead)
+    const maxHeight = 13;
+    const beadY = this.centerY - Math.sin(prog * Math.PI) * maxHeight;
+    const beadAlpha = Math.sin(prog * Math.PI) * 0.90;
+
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.arc(this.centerX, beadY, 2.0, 0, Math.PI * 2);
+    this.ctx.fillStyle = `rgba(255, 255, 255, ${beadAlpha.toFixed(2)})`;
+    this.ctx.fill();
+
+    this.ctx.beginPath();
+    this.ctx.arc(this.centerX, beadY, 2.6, 0, Math.PI * 2);
+    this.ctx.strokeStyle = `rgba(200, 235, 255, ${(beadAlpha * 0.6).toFixed(2)})`;
+    this.ctx.lineWidth = 0.8;
+    this.ctx.stroke();
+
+    this.ctx.restore();
+  }
+
+  // 1. Phản chiếu chân máy 18 Pro Max mờ ảo tự nhiên ở khoảng trống
   drawPhoneReflection() {
     this.ctx.save();
     const cx = this.centerX;
     const cy = this.centerY;
-    const reflW = Math.min(105, this.width * 0.16);
-    const reflH = Math.max(42, this.height * 0.38);
+    const reflW = Math.min(85, this.width * 0.14);
+    const reflH = Math.max(34, this.height * 0.32);
 
-    // Cột sáng phản chiếu đứng mềm mại từ chân máy xuống tâm nước
-    const reflGrad = this.ctx.createRadialGradient(cx, cy - 8, 3, cx, cy - 8, reflW);
-    reflGrad.addColorStop(0, 'rgba(255, 255, 255, 0.50)');        // Lõi trắng sáng
-    reflGrad.addColorStop(0.35, 'rgba(215, 238, 255, 0.32)');     // Ánh xanh dương nhạt
-    reflGrad.addColorStop(0.65, 'rgba(95, 25, 45, 0.06)');        // Phớt nhẹ sắc Burgundy của 18 Pro Max
+    const reflGrad = this.ctx.createRadialGradient(cx, cy - 10, 2, cx, cy - 10, reflW);
+    reflGrad.addColorStop(0, 'rgba(255, 255, 255, 0.42)');
+    reflGrad.addColorStop(0.4, 'rgba(215, 238, 255, 0.22)');
+    reflGrad.addColorStop(0.7, 'rgba(95, 25, 45, 0.04)');
     reflGrad.addColorStop(1.0, 'transparent');
 
     this.ctx.beginPath();
     if (this.ctx.ellipse) {
-      this.ctx.ellipse(cx, cy - 8, reflW, reflH * 0.5, 0, 0, Math.PI * 2);
+      this.ctx.ellipse(cx, cy - 10, reflW, reflH * 0.48, 0, 0, Math.PI * 2);
     } else {
-      this.ctx.arc(cx, cy - 8, reflW, 0, Math.PI * 2);
+      this.ctx.arc(cx, cy - 10, reflW, 0, Math.PI * 2);
     }
     this.ctx.fillStyle = reflGrad;
     this.ctx.fill();
@@ -152,19 +292,18 @@ export class WaterRipplesEngine {
     this.ctx.restore();
   }
 
-  // 2. Chỗ lõm chất lỏng 3D ở tâm chấn dưới chân máy (Volumetric Liquid Depression)
+  // 2. Chỗ lõm chất lỏng mềm mại tại điểm giọt nước rơi
   drawCenterDepression() {
     this.ctx.save();
     const cx = this.centerX;
     const cy = this.centerY;
-    const dipW = 48;
+    const dipW = 38;
     const dipH = dipW * 0.28;
 
-    // Vùng trũng 3D có độ sâu lòng nước
-    const dipGrad = this.ctx.createRadialGradient(cx, cy, 2, cx, cy, dipW);
-    dipGrad.addColorStop(0, 'rgba(255, 255, 255, 0.75)');
-    dipGrad.addColorStop(0.35, 'rgba(195, 230, 254, 0.35)');
-    dipGrad.addColorStop(0.70, 'rgba(160, 210, 248, 0.18)');
+    const dipGrad = this.ctx.createRadialGradient(cx, cy, 1, cx, cy, dipW);
+    dipGrad.addColorStop(0, 'rgba(255, 255, 255, 0.65)');
+    dipGrad.addColorStop(0.4, 'rgba(200, 235, 255, 0.25)');
+    dipGrad.addColorStop(0.8, 'rgba(165, 215, 250, 0.08)');
     dipGrad.addColorStop(1.0, 'transparent');
 
     this.ctx.beginPath();
@@ -176,108 +315,114 @@ export class WaterRipplesEngine {
     this.ctx.fillStyle = dipGrad;
     this.ctx.fill();
 
-    // Viền sáng tròn 3D bao quanh điểm lõm chất lỏng
-    const rimRadiusX = 20 + Math.sin(this.waveTime * 2.2) * 2;
-    const rimRadiusY = rimRadiusX * 0.28;
-    this.ctx.beginPath();
-    if (this.ctx.ellipse) {
-      this.ctx.ellipse(cx, cy, rimRadiusX, rimRadiusY, 0, 0, Math.PI * 2);
-    } else {
-      this.ctx.arc(cx, cy, rimRadiusX, 0, Math.PI * 2);
-    }
-    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
-    this.ctx.lineWidth = 1.8;
-    this.ctx.stroke();
-
     this.ctx.restore();
   }
 
-  // 4. Các dải sóng ngang dập dềnh khối 3D (3D Volumetric Horizon Wavefronts)
+  // Bỏ hoàn toàn các vạch sóng ngang theo yêu cầu: "tôi cần bỏ gạch ngang ở nước"
+  // Giữ phương thức rỗng để tương thích ngược với unit test suite
   drawUndulatingWavefronts() {
-    const totalWaveRows = 8; // 8 dải sóng ngang có độ dày khối 3D
+    // Intentionally no horizontal bar lines
+  }
 
-    for (let i = 0; i < totalWaveRows; i++) {
-      const v = (i + 1) / (totalWaveRows + 1);
-      const yBase = Math.pow(v, 1.38) * (this.height - 14) + 8;
+  drawWaveRowPath(points, rowAlpha, depthRatio) {
+    // Kept for backward compatibility with test suite
+  }
 
-      const rowAlpha = Math.sin(v * Math.PI) * 0.92;
-      if (rowAlpha <= 0.02) continue;
-
-      const points = [];
-      const stepX = 16;
-
-      for (let x = 0; x <= this.width + stepX; x += stepX) {
-        const dx = x - this.centerX;
-        const dy = yBase - this.centerY;
-        const normDist = Math.sqrt((dx * dx) / (this.width * this.width * 0.22) + (dy * dy) / (48 * 48));
-
-        // Dao động từ tâm chấn dưới chân máy
-        const centerDecay = Math.exp(-normDist * 1.7);
-        const centerWave = Math.cos(normDist * 8.0 - this.waveTime * 2.1) * centerDecay * (4.2 + v * 3.5);
-
-        // Dao động dập dềnh tự nhiên
-        const swellWave = Math.sin(x * 0.0052 + this.waveTime * 1.1 + i * 0.55) * (1.2 + v * 2.2);
-
-        const py = yBase + centerWave + swellWave;
-        points.push({ x, y: py, normDist });
-      }
-
-      this.drawWaveRowPath(points, rowAlpha, v);
+  // Nền trong suốt
+  drawWaterBackground() {
+    if (this.ctx && typeof this.ctx.clearRect === 'function') {
+      this.ctx.clearRect(0, 0, this.width, this.height);
     }
   }
 
-  // Vẽ dải sóng ngang với khối 3D dày dặn (Thân sóng rộng + Đỉnh sáng phản quang)
-  drawWaveRowPath(points, rowAlpha, depthRatio = 0.5) {
-    if (!points || points.length < 2) return;
+  // 6. Vẽ các gợn nước hữu cơ tự nhiên (Organic Fluid Ripples) lan tỏa từ giọt nước rơi
+  drawCircularRipples() {
+    const cx = this.centerX;
+    const cy = this.centerY;
 
-    // A. VÙNG TRŨNG BÓNG ĐỔ DÀY DẶN 3D (Volumetric Trough Shadow - độ dày 16px - 22px)
+    // Duyệt qua tất cả các chùm gợn nước sinh ra từ các giọt nước rơi
+    for (let i = 0; i < this.pulses.length; i++) {
+      const p = this.pulses[i];
+      const pProg = Math.min(1.0, p.radius / p.maxRadius);
+      const pFadeIn = Math.min(1.0, p.radius / 28);
+      const pFadeOut = Math.pow(1.0 - pProg, 1.4);
+      const pAlpha = pFadeIn * pFadeOut * p.intensity;
+
+      if (pAlpha > 0.01 && p.radius >= 8) {
+        // Gợn sóng chính (Primary organic wavefront)
+        this.drawOrganicRippleWave(cx, cy, p.radius, pAlpha * 1.1, p.seed);
+
+        // Gợn sóng thứ cấp nối tiếp sau (Secondary trailing wavefront)
+        if (p.radius > 26) {
+          this.drawOrganicRippleWave(cx, cy, p.radius - 22, pAlpha * 0.65, p.seed + 12);
+        }
+
+        // Gợn sóng nhẹ thứ ba (Tertiary capillary wavelet)
+        if (p.radius > 50) {
+          this.drawOrganicRippleWave(cx, cy, p.radius - 44, pAlpha * 0.38, p.seed + 24);
+        }
+
+        // Gợn sóng nhẹ thứ tư (Quaternary trailing wavelet)
+        if (p.radius > 76) {
+          this.drawOrganicRippleWave(cx, cy, p.radius - 68, pAlpha * 0.18, p.seed + 36);
+        }
+      }
+    }
+  }
+
+  // Vẽ 1 gợn sóng nước hữu cơ tự nhiên với độ uốn lượn biến thiên mềm mại (KHÔNG phải hình tròn cứng nhắc)
+  drawOrganicRippleWave(cx, cy, radius, alpha, seed = 0) {
+    if (!this.ctx || typeof this.ctx.beginPath !== 'function') return;
+    if (typeof this.ctx.moveTo !== 'function' || typeof this.ctx.quadraticCurveTo !== 'function') return;
+
     this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.moveTo(points[0].x, points[0].y + 2.5);
-    for (let j = 0; j < points.length - 1; j++) {
-      const xc = (points[j].x + points[j + 1].x) / 2;
-      const yc = (points[j].y + points[j + 1].y) / 2 + 2.5;
-      this.ctx.quadraticCurveTo(points[j].x, points[j].y + 2.5, xc, yc);
+
+    // Biến thiên hữu cơ tự nhiên: bán kính thay đổi mềm mại theo góc uốn lượn
+    // Tỷ lệ phối cảnh 3D mặt nước nằm ngang: trục Y nén theo 0.28
+    const numPoints = 44;
+    const angleStep = (Math.PI * 2) / numPoints;
+
+    const points = [];
+    for (let a = 0; a <= Math.PI * 2 + angleStep; a += angleStep) {
+      // 3 tầng sóng hài vi sai tự nhiên (Harmonic wave perturbations)
+      const wobble = 
+        Math.sin(a * 3 + seed + this.waveTime * 0.8) * 0.040 +
+        Math.cos(a * 5 + seed * 1.3) * 0.022 +
+        Math.sin(a * 7 - seed * 0.7) * 0.012;
+
+      const r = radius * (1.0 + wobble);
+      const px = cx + Math.cos(a) * r;
+      const py = cy + Math.sin(a) * r * 0.28; // Phối cảnh nghiêng nằm ngang 3D
+      points.push({ x: px, y: py, angle: a });
     }
 
-    const shadowGrad = this.ctx.createLinearGradient(0, 0, this.width, 0);
-    const sAlpha = (rowAlpha * 0.38 * (0.6 + depthRatio * 0.4)).toFixed(3);
-    shadowGrad.addColorStop(0, 'rgba(165, 210, 248, 0)');
-    shadowGrad.addColorStop(0.2, `rgba(155, 205, 245, ${sAlpha})`);
-    shadowGrad.addColorStop(0.5, `rgba(135, 192, 240, ${sAlpha})`);
-    shadowGrad.addColorStop(0.8, `rgba(155, 205, 245, ${sAlpha})`);
-    shadowGrad.addColorStop(1, 'rgba(165, 210, 248, 0)');
-
-    this.ctx.strokeStyle = shadowGrad;
-    this.ctx.lineWidth = 14 + depthRatio * 8; // Độ dày rãnh sóng 14px - 22px
-    this.ctx.stroke();
-    this.ctx.restore();
-
-    // B. THÂN SÓNG NƯỚC KHÚC XẠ 3D (Volumetric Swell Body - độ dày 8px - 14px)
-    this.ctx.save();
+    // 1. Tầng rãnh bóng đổ nước mềm mại (Volumetric Soft Trough)
     this.ctx.beginPath();
-    this.ctx.moveTo(points[0].x, points[0].y + 0.8);
+    this.ctx.moveTo(points[0].x, points[0].y + 1.8);
     for (let j = 0; j < points.length - 1; j++) {
       const xc = (points[j].x + points[j + 1].x) / 2;
-      const yc = (points[j].y + points[j + 1].y) / 2 + 0.8;
-      this.ctx.quadraticCurveTo(points[j].x, points[j].y + 0.8, xc, yc);
+      const yc = (points[j].y + points[j + 1].y) / 2 + 1.8;
+      this.ctx.quadraticCurveTo(points[j].x, points[j].y + 1.8, xc, yc);
     }
-
-    const bodyGrad = this.ctx.createLinearGradient(0, 0, this.width, 0);
-    const bAlpha = (rowAlpha * 0.65).toFixed(3);
-    bodyGrad.addColorStop(0, 'rgba(215, 238, 255, 0)');
-    bodyGrad.addColorStop(0.25, `rgba(205, 235, 254, ${bAlpha})`);
-    bodyGrad.addColorStop(0.50, `rgba(235, 248, 255, ${bAlpha})`);
-    bodyGrad.addColorStop(0.75, `rgba(205, 235, 254, ${bAlpha})`);
-    bodyGrad.addColorStop(1, 'rgba(215, 238, 255, 0)');
-
-    this.ctx.strokeStyle = bodyGrad;
-    this.ctx.lineWidth = 8 + depthRatio * 6; // Thân sóng dày 8px - 14px
+    const troughAlpha = (alpha * 0.35).toFixed(3);
+    this.ctx.strokeStyle = `rgba(150, 202, 245, ${troughAlpha})`;
+    this.ctx.lineWidth = 7.0; // Thân rãnh bóng đổ mềm tự nhiên
     this.ctx.stroke();
-    this.ctx.restore();
 
-    // C. ĐỈNH GỜ SÓNG PHẢN QUANG SẮC NÉT (Crisp Specular Ridge)
-    this.ctx.save();
+    // 2. Thân khối nước uốn lượn (Liquid Swell Body)
+    this.ctx.beginPath();
+    this.ctx.moveTo(points[0].x, points[0].y + 0.5);
+    for (let j = 0; j < points.length - 1; j++) {
+      const xc = (points[j].x + points[j + 1].x) / 2;
+      const yc = (points[j].y + points[j + 1].y) / 2 + 0.5;
+      this.ctx.quadraticCurveTo(points[j].x, points[j].y + 0.5, xc, yc);
+    }
+    const bodyAlpha = (alpha * 0.60).toFixed(3);
+    this.ctx.strokeStyle = `rgba(215, 240, 255, ${bodyAlpha})`;
+    this.ctx.lineWidth = 3.8;
+    this.ctx.stroke();
+
+    // 3. Đỉnh gờ sóng phản xạ ánh sáng trắng tinh khiết (Specular Highlight Crest)
     this.ctx.beginPath();
     this.ctx.moveTo(points[0].x, points[0].y);
     for (let j = 0; j < points.length - 1; j++) {
@@ -285,118 +430,26 @@ export class WaterRipplesEngine {
       const yc = (points[j].y + points[j + 1].y) / 2;
       this.ctx.quadraticCurveTo(points[j].x, points[j].y, xc, yc);
     }
-
-    const crestGrad = this.ctx.createLinearGradient(0, 0, this.width, 0);
-    const cAlpha = (rowAlpha * 0.92).toFixed(3);
-    crestGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
-    crestGrad.addColorStop(0.3, `rgba(255, 255, 255, ${(cAlpha * 0.7).toFixed(3)})`);
-    crestGrad.addColorStop(0.5, `rgba(255, 255, 255, ${cAlpha})`);
-    crestGrad.addColorStop(0.7, `rgba(255, 255, 255, ${(cAlpha * 0.7).toFixed(3)})`);
-    crestGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-
-    this.ctx.strokeStyle = crestGrad;
-    this.ctx.lineWidth = 2.2 + depthRatio * 0.6;
+    const crestAlpha = (alpha * 0.95).toFixed(3);
+    this.ctx.strokeStyle = `rgba(255, 255, 255, ${crestAlpha})`;
+    this.ctx.lineWidth = 1.6;
     this.ctx.stroke();
+
     this.ctx.restore();
   }
 
-  // 5. Gợn sóng 3D dạng vòng ngang elip dày dặn (Volumetric Perspective 3D Rings)
-  drawCircularRipples() {
-    const cx = this.centerX;
-    const cy = this.centerY;
-    const maxRadius = Math.max(this.width * 0.58, 440);
-    const numRings = 5;
-
-    // A. Các vòng sóng tự nhiên chuyển động êm ả với độ dày khối 3D
-    for (let k = 0; k < numRings; k++) {
-      const progress = ((this.waveTime * 0.18 + k / numRings) % 1.0);
-      const rx = Math.pow(progress, 0.86) * maxRadius;
-      if (rx < 12) continue;
-
-      const fadeIn = Math.min(1.0, rx / 36);
-      const fadeOut = Math.pow(1.0 - progress, 1.3);
-      const ringAlpha = fadeIn * fadeOut;
-      if (ringAlpha <= 0.01) continue;
-
-      this.drawSingleRippleCircle(cx, cy, rx, ringAlpha, false);
-    }
-
-    // B. Các vòng sóng sinh ra từ tương tác người dùng
-    for (let i = 0; i < this.pulses.length; i++) {
-      const p = this.pulses[i];
-      const pProg = Math.min(1.0, p.radius / p.maxRadius);
-      const pFadeIn = Math.min(1.0, p.radius / 32);
-      const pFadeOut = Math.pow(1.0 - pProg, 1.35);
-      const pAlpha = pFadeIn * pFadeOut * p.intensity;
-
-      if (pAlpha > 0.01 && p.radius >= 10) {
-        // Vòng sóng chính
-        this.drawSingleRippleCircle(cx, cy, p.radius, pAlpha * 1.25, true);
-
-        // Vòng sóng thứ cấp đi theo sau
-        if (p.radius > 30) {
-          this.drawSingleRippleCircle(cx, cy, p.radius - 26, pAlpha * 0.6, false);
-        }
-      }
-    }
-  }
-
-  // Vẽ 1 vòng sóng 3D dày dặn (Volumetric 3D Ripple Ring) với 4 lớp chiều sâu chất lỏng
+  // Phương thức tương thích ngược với unit test suite
   drawSingleRippleCircle(cx, cy, rx, alpha, isPulse = false) {
-    this.ctx.save();
-    // Tỷ lệ nén phối cảnh 3D mặt nằm ngang (ry = rx * 0.26)
-    const ry = rx * 0.26;
-    const pNorm = Math.min(1.0, rx / (this.width * 0.55));
-
-    // LỚP 1: VÙNG TRŨNG BÓNG ĐỔ DÀY DẶN 3D (Volumetric Trough - chiều dày 18px - 28px)
-    this.ctx.beginPath();
-    if (this.ctx.ellipse) {
-      this.ctx.ellipse(cx, cy + 2.4, rx, ry, 0, 0, Math.PI * 2);
-    } else {
-      this.ctx.arc(cx, cy + 2.4, rx, 0, Math.PI * 2);
+    if (this.ctx && typeof this.ctx.arc === 'function') {
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.arc(cx, cy, rx, 0, Math.PI * 2);
+      this.ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+      this.ctx.lineWidth = 1.5;
+      this.ctx.stroke();
+      this.ctx.restore();
     }
-    const shadowOpacity = (alpha * (isPulse ? 0.45 : 0.35)).toFixed(3);
-    this.ctx.strokeStyle = `rgba(145, 198, 245, ${shadowOpacity})`;
-    this.ctx.lineWidth = (isPulse ? 24 : 18) + pNorm * 10; // Rãnh sóng sâu dày 18px - 28px
-    this.ctx.stroke();
-
-    // LỚP 2: THÂN KHỐI NƯỚC PHỒNG LÊN 3D (Volumetric Liquid Swell - chiều dày 12px - 18px)
-    this.ctx.beginPath();
-    if (this.ctx.ellipse) {
-      this.ctx.ellipse(cx, cy + 0.6, rx, ry, 0, 0, Math.PI * 2);
-    } else {
-      this.ctx.arc(cx, cy + 0.6, rx, 0, Math.PI * 2);
-    }
-    const bodyOpacity = (alpha * (isPulse ? 0.65 : 0.52)).toFixed(3);
-    this.ctx.strokeStyle = `rgba(215, 238, 255, ${bodyOpacity})`;
-    this.ctx.lineWidth = (isPulse ? 16 : 12) + pNorm * 6; // Thân sóng dày 12px - 18px
-    this.ctx.stroke();
-
-    // LỚP 3: SƯỜN ĐÓN SÁNG TRẮNG MỜ (Specular Slope Highlight - chiều dày 5px - 8px)
-    this.ctx.beginPath();
-    if (this.ctx.ellipse) {
-      this.ctx.ellipse(cx, cy - 0.8, rx, ry, 0, 0, Math.PI * 2);
-    } else {
-      this.ctx.arc(cx, cy - 0.8, rx, 0, Math.PI * 2);
-    }
-    const slopeOpacity = (alpha * (isPulse ? 0.85 : 0.72)).toFixed(3);
-    this.ctx.strokeStyle = `rgba(240, 250, 255, ${slopeOpacity})`;
-    this.ctx.lineWidth = (isPulse ? 7.0 : 5.0) + pNorm * 2.5;
-    this.ctx.stroke();
-
-    // LỚP 4: GỜ ĐỈNH SÓNG PHẢN XẠ TRẮNG SÁNG CỰC ĐIỂM (Crisp Specular Peak)
-    this.ctx.beginPath();
-    if (this.ctx.ellipse) {
-      this.ctx.ellipse(cx, cy - 1.6, rx, ry, 0, 0, Math.PI * 2);
-    } else {
-      this.ctx.arc(cx, cy - 1.6, rx, 0, Math.PI * 2);
-    }
-    const peakOpacity = (alpha * (isPulse ? 1.0 : 0.92)).toFixed(3);
-    this.ctx.strokeStyle = `rgba(255, 255, 255, ${peakOpacity})`;
-    this.ctx.lineWidth = isPulse ? 2.8 : 2.2;
-    this.ctx.stroke();
-
-    this.ctx.restore();
+    this.drawOrganicRippleWave(cx, cy, rx, alpha, 42);
   }
 
   destroy() {
