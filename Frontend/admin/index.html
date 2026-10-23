@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tiến Mobile - Quản Trị Sản Phẩm</title>
+  <link rel="stylesheet" href="./admin.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 170'><path fill='%231D1D1F' d='M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.6-7.8-11.71-14.28-5.66-8.91-10.1-18.73-13.32-29.47-3.21-10.74-4.82-20.93-4.82-30.56 0-14.78 3.82-27.18 11.46-37.19 7.64-10.01 17.2-15.08 28.69-15.22 4.12 0 8.94 1.14 14.46 3.42 5.52 2.28 9.38 3.47 11.59 3.56 1.84 0 5.86-1.22 12.06-3.67 6.2-2.44 11.16-3.52 14.88-3.23 11.52.88 20.73 5.37 27.63 13.48-10.02 6.07-14.92 14.63-14.7 25.68.22 8.7 3.48 15.98 9.79 21.84 6.31 5.86 13.9 9.17 22.77 9.93-2.39 7.39-5.43 14.99-9.12 22.81zM119.22 33.15c0-7.39 2.65-14.18 7.95-20.37 5.3-6.19 11.83-9.98 19.59-11.38.22 1.3.33 2.5.33 3.59 0 7.39-2.76 14.29-8.28 20.7-5.52 6.41-12.08 10.15-19.68 11.22-.11-1.09-.17-2.19-.17-3.3v-.46z'/></svg>">
+</head>
+<body class="admin-body">
+
+  <!-- ========================================================================= -->
+  <!-- 1. LOGIN SCREEN (Hiển thị khi chưa đăng nhập)                             -->
+  <!-- ========================================================================= -->
+  <main id="loginSection" class="login-section">
+    <div class="login-card">
+      <div class="login-header">
+        <svg class="brand-logo" viewBox="0 0 170 170" width="36" height="36" aria-hidden="true">
+          <path fill="#1D1D1F" d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.6-7.8-11.71-14.28-5.66-8.91-10.1-18.73-13.32-29.47-3.21-10.74-4.82-20.93-4.82-30.56 0-14.78 3.82-27.18 11.46-37.19 7.64-10.01 17.2-15.08 28.69-15.22 4.12 0 8.94 1.14 14.46 3.42 5.52 2.28 9.38 3.47 11.59 3.56 1.84 0 5.86-1.22 12.06-3.67 6.2-2.44 11.16-3.52 14.88-3.23 11.52.88 20.73 5.37 27.63 13.48-10.02 6.07-14.92 14.63-14.7 25.68.22 8.7 3.48 15.98 9.79 21.84 6.31 5.86 13.9 9.17 22.77 9.93-2.39 7.39-5.43 14.99-9.12 22.81zM119.22 33.15c0-7.39 2.65-14.18 7.95-20.37 5.3-6.19 11.83-9.98 19.59-11.38.22 1.3.33 2.5.33 3.59 0 7.39-2.76 14.29-8.28 20.7-5.52 6.41-12.08 10.15-19.68 11.22-.11-1.09-.17-2.19-.17-3.3v-.46z"/>
+        </svg>
+        <h1 class="login-title">Đăng Nhập Quản Trị</h1>
+        <p class="login-subtitle">Hệ thống quản lý sản phẩm Tiến Mobile</p>
+      </div>
+
+      <div id="loginAlert" class="alert-box alert-error hidden" role="alert"></div>
+
+      <form id="loginForm" class="login-form" novalidate>
+        <div class="form-group">
+          <label for="loginEmail" class="form-label">Email quản trị</label>
+          <input 
+            type="email" 
+            id="loginEmail" 
+            name="email" 
+            class="form-input" 
+            placeholder="admin@tienmobile.vn" 
+            required 
+            autocomplete="username"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword" class="form-label">Mật khẩu</label>
+          <input 
+            type="password" 
+            id="loginPassword" 
+            name="password" 
+            class="form-input" 
+            placeholder="••••••••" 
+            required 
+            autocomplete="current-password"
+          >
+        </div>
+
+        <button type="submit" id="loginBtn" class="btn btn-primary btn-block">
+          <span class="btn-text">Đăng nhập</span>
+          <span class="btn-loader hidden" aria-hidden="true"></span>
+        </button>
+      </form>
+
+      <div class="login-footer">
+        <a href="../index.html" class="link-back">← Quay lại trang chủ Tiến Mobile</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- 2. MAIN ADMIN APP (Hiển thị khi đã xác thực Supabase Auth)                 -->
+  <!-- ========================================================================= -->
+  <div id="adminApp" class="admin-app hidden">
+    
+    <!-- STICKY TOP BAR -->
+    <header class="admin-topbar">
+      <div class="topbar-inner">
+        <!-- Logo & Shop Title -->
+        <div class="brand-area">
+          <svg class="brand-logo-small" viewBox="0 0 170 170" width="22" height="22" aria-hidden="true">
+            <path fill="#1D1D1F" d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.6-7.8-11.71-14.28-5.66-8.91-10.1-18.73-13.32-29.47-3.21-10.74-4.82-20.93-4.82-30.56 0-14.78 3.82-27.18 11.46-37.19 7.64-10.01 17.2-15.08 28.69-15.22 4.12 0 8.94 1.14 14.46 3.42 5.52 2.28 9.38 3.47 11.59 3.56 1.84 0 5.86-1.22 12.06-3.67 6.2-2.44 11.16-3.52 14.88-3.23 11.52.88 20.73 5.37 27.63 13.48-10.02 6.07-14.92 14.63-14.7 25.68.22 8.7 3.48 15.98 9.79 21.84 6.31 5.86 13.9 9.17 22.77 9.93-2.39 7.39-5.43 14.99-9.12 22.81zM119.22 33.15c0-7.39 2.65-14.18 7.95-20.37 5.3-6.19 11.83-9.98 19.59-11.38.22 1.3.33 2.5.33 3.59 0 7.39-2.76 14.29-8.28 20.7-5.52 6.41-12.08 10.15-19.68 11.22-.11-1.09-.17-2.19-.17-3.3v-.46z"/>
+          </svg>
+          <div class="brand-text-group">
+            <span class="brand-name">Tiến Mobile</span>
+            <span class="brand-tag">Quản Trị</span>
+          </div>
+        </div>
+
+        <!-- Search Box -->
+        <div class="search-bar">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input 
+            type="search" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="Tìm theo tên, mã sản phẩm hoặc thương hiệu..." 
+            aria-label="Tìm kiếm sản phẩm"
+          >
+          <button type="button" id="searchClearBtn" class="search-clear-btn hidden" aria-label="Xóa từ khóa tìm kiếm">✕</button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="topbar-actions">
+          <button type="button" id="addProductBtn" class="btn btn-primary">
+            <span class="btn-icon">+</span>
+            <span>Thêm sản phẩm</span>
+          </button>
+          <div class="user-menu">
+            <span id="userEmailBadge" class="user-email-badge" title="Tài khoản">admin</span>
+            <button type="button" id="logoutBtn" class="btn btn-secondary btn-sm" title="Đăng xuất">Đăng xuất</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- BULK ACTIONS BAR (Tự động hiển thị khi chọn >= 1 sản phẩm) -->
+    <section id="bulkActionBar" class="bulk-action-bar hidden" aria-label="Thao tác hàng loạt">
+      <div class="bulk-inner">
+        <div class="bulk-info">
+          <input type="checkbox" id="selectAllCheckbox" class="checkbox" aria-label="Chọn tất cả">
+          <label for="selectAllCheckbox" class="bulk-count">Đã chọn: <strong id="selectedCount">0</strong> sản phẩm</label>
+        </div>
+        <div class="bulk-buttons">
+          <button type="button" id="bulkShowBtn" class="btn btn-secondary btn-sm">Hiện tất cả</button>
+          <button type="button" id="bulkHideBtn" class="btn btn-secondary btn-sm">Ẩn tất cả</button>
+          <button type="button" id="bulkDiscountBtn" class="btn btn-secondary btn-sm">Giảm giá %</button>
+          <button type="button" id="bulkDeleteBtn" class="btn btn-danger btn-sm">Xóa đã chọn</button>
+          <button type="button" id="bulkDeselectBtn" class="btn btn-ghost btn-sm">Bỏ chọn</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILTER & SORT BAR -->
+    <div class="admin-container">
+      <div class="filter-controls-bar">
+        <!-- Filter Chips -->
+        <div class="filter-chips" role="tablist" aria-label="Bộ lọc nhanh">
+          <button type="button" class="chip active" data-filter="all" role="tab" aria-selected="true">Tất cả</button>
+          <button type="button" class="chip" data-filter="phone" role="tab" aria-selected="false">Điện thoại</button>
+          <button type="button" class="chip" data-filter="accessory" role="tab" aria-selected="false">Phụ kiện</button>
+          <button type="button" class="chip" data-filter="visible" role="tab" aria-selected="false">Đang hiện</button>
+          <button type="button" class="chip" data-filter="hidden" role="tab" aria-selected="false">Đang ẩn</button>
+          <button type="button" class="chip" data-filter="outofstock" role="tab" aria-selected="false">Hết hàng</button>
+        </div>
+
+        <!-- Filter Selects -->
+        <div class="filter-dropdowns">
+          <select id="brandFilter" class="select-input" aria-label="Lọc theo thương hiệu">
+            <option value="all">Tất cả thương hiệu</option>
+            <option value="apple">Apple</option>
+            <option value="samsung">Samsung</option>
+            <option value="xiaomi">Xiaomi</option>
+            <option value="oppo">OPPO</option>
+            <option value="kingkong">KingKong</option>
+            <option value="other">Thương hiệu khác</option>
+          </select>
+
+          <select id="sortOrderSelect" class="select-input" aria-label="Sắp xếp sản phẩm">
+            <option value="sort_order">Thứ tự ưu tiên</option>
+            <option value="created_desc">Mới thêm gần nhất</option>
+            <option value="price_asc">Giá: Thấp đến Cao</option>
+            <option value="price_desc">Giá: Cao đến Thấp</option>
+            <option value="name_asc">Tên: A - Z</option>
+            <option value="stock_asc">Tồn kho ít nhất</option>
+          </select>
+
+          <span id="productCounter" class="product-counter-badge">Đang tải...</span>
+        </div>
+      </div>
+
+      <!-- ERROR STATE BANNER -->
+      <div id="errorState" class="alert-box alert-error hidden" role="alert">
+        <div class="alert-content">
+          <span id="errorMessage">Không thể tải dữ liệu từ máy chủ.</span>
+          <button type="button" id="retryFetchBtn" class="btn btn-secondary btn-sm">Thử lại</button>
+        </div>
+      </div>
+
+      <!-- LOADING SKELETON GRID -->
+      <div id="loadingSkeleton" class="products-grid" aria-hidden="true">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div id="emptyState" class="empty-state hidden">
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#86868B" stroke-width="1.5">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+        </div>
+        <h2 class="empty-title">Không tìm thấy sản phẩm nào</h2>
+        <p class="empty-desc">Không có sản phẩm nào khớp với điều kiện lọc hoặc tìm kiếm hiện tại.</p>
+        <button type="button" id="emptyAddBtn" class="btn btn-primary">+ Thêm sản phẩm mới</button>
+      </div>
+
+      <!-- PRODUCTS CARD GRID -->
+      <section id="productsGrid" class="products-grid" aria-label="Danh sách sản phẩm">
+        <!-- Rendered dynamically by admin.js -->
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 3. ADD / EDIT PRODUCT MODAL (Mobile Sheet / Desktop Modal)                -->
+  <!-- ========================================================================= -->
+  <div id="productModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 id="modalTitle" class="modal-title">Thêm Sản Phẩm Mới</h2>
+        <button type="button" id="closeModalBtn" class="btn-icon-close" aria-label="Đóng cửa sổ">✕</button>
+      </div>
+
+      <form id="productForm" class="modal-form" novalidate>
+        <input type="hidden" id="formMode" value="add">
+
+        <!-- THÔNG TIN CƠ BẢN -->
+        <fieldset class="form-fieldset">
+          <legend class="fieldset-legend">Thông tin cơ bản</legend>
+
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <label for="prodName" class="form-label">Tên sản phẩm <span class="required">*</span></label>
+              <input type="text" id="prodName" name="name" class="form-input" placeholder="Ví dụ: iPhone 16 Pro 256GB" required>
+            </div>
+            <div class="form-group flex-1">
+              <label for="prodId" class="form-label">Mã ID (Slug) <span class="required">*</span></label>
+              <input type="text" id="prodId" name="id" class="form-input" placeholder="ip16-pro" required>
+              <small class="field-hint">Tự động sinh từ tên, không thể sửa sau khi lưu</small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="prodKind" class="form-label">Phân loại <span class="required">*</span></label>
+              <select id="prodKind" name="kind" class="select-input" required>
+                <option value="phone">Điện thoại (Phone)</option>
+                <option value="accessory">Phụ kiện (Accessory)</option>
+              </select>
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="prodCategory" class="form-label">Danh mục phụ kiện</label>
+              <select id="prodCategory" name="category" class="select-input">
+                <option value="">Không có (Điện thoại)</option>
+                <option value="charger">Củ sạc / Cáp sạc</option>
+                <option value="audio">Tai nghe / Âm thanh</option>
+                <option value="case">Ốp lưng / Kính cường lực</option>
+                <option value="other">Phụ kiện khác</option>
+              </select>
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="prodBrand" class="form-label">Thương hiệu</label>
+              <select id="prodBrand" name="brand" class="select-input">
+                <option value="apple">Apple</option>
+                <option value="samsung">Samsung</option>
+                <option value="xiaomi">Xiaomi</option>
+                <option value="oppo">OPPO</option>
+                <option value="kingkong">KingKong</option>
+                <option value="other">Khác</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="prodBrandName" class="form-label">Tên nhãn hiệu hiển thị</label>
+              <input type="text" id="prodBrandName" name="brand_name" class="form-input" placeholder="Apple iPhone">
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="prodCondition" class="form-label">Tình trạng máy</label>
+              <select id="prodCondition" name="condition" class="select-input">
+                <option value="new">Mới 100% (New)</option>
+                <option value="like_new">Like New 99%</option>
+                <option value="used">Đã qua sử dụng</option>
+              </select>
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="prodConditionLabel" class="form-label">Nhãn tình trạng</label>
+              <input type="text" id="prodConditionLabel" name="condition_label" class="form-input" placeholder="Mới 100%">
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="prodBadge" class="form-label">Huy hiệu (Badge)</label>
+              <input type="text" id="prodBadge" name="badge" class="form-input" placeholder="0% LS, Hot deal...">
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- GIÁ & KHO HÀNG -->
+        <fieldset class="form-fieldset">
+          <legend class="fieldset-legend">Giá bán & Kho hàng</legend>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="prodPrice" class="form-label">Giá bán (VNĐ) <span class="required">*</span></label>
+              <input type="text" id="prodPrice" name="price" class="form-input" placeholder="28.990.000" required inputmode="numeric">
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="prodOldPrice" class="form-label">Giá gốc chưa giảm (VNĐ)</label>
+              <input type="text" id="prodOldPrice" name="old_price" class="form-input" placeholder="31.990.000" inputmode="numeric">
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="prodStock" class="form-label">Số lượng tồn kho <span class="required">*</span></label>
+              <input type="number" id="prodStock" name="stock" class="form-input" value="10" min="0" required>
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="prodSortOrder" class="form-label">Thứ tự hiển thị</label>
+              <input type="number" id="prodSortOrder" name="sort_order" class="form-input" value="0">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group-checkbox">
+              <input type="checkbox" id="prodIsVisible" name="is_visible" class="checkbox" checked>
+              <label for="prodIsVisible" class="checkbox-label">Hiển thị công khai trên website</label>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- TÙY CHỌN DUNG LƯỢNG & MÀU SẮC -->
+        <fieldset class="form-fieldset">
+          <legend class="fieldset-legend">Dung lượng & Màu sắc</legend>
+
+          <div class="form-group">
+            <label for="prodStoragesInput" class="form-label">Các phiên bản dung lượng (cách nhau bởi dấu phẩy)</label>
+            <input type="text" id="prodStoragesInput" class="form-input" placeholder="128GB, 256GB, 512GB, 1TB">
+            <div id="storagesChipList" class="chips-container"></div>
+          </div>
+
+          <div class="form-group">
+            <div class="flex-between">
+              <label class="form-label">Danh sách màu sắc</label>
+              <button type="button" id="addColorBtn" class="btn btn-secondary btn-sm">+ Thêm màu</button>
+            </div>
+            <div id="colorsContainer" class="colors-list">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- HÌNH ẢNH SẢN PHẨM (Upload / Camera & Client Resize) -->
+        <fieldset class="form-fieldset">
+          <legend class="fieldset-legend">Hình ảnh sản phẩm</legend>
+
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <label for="prodImageUrl" class="form-label">Đường dẫn ảnh (URL hoặc Tải lên từ máy / Camera)</label>
+              <input type="url" id="prodImageUrl" name="image_url" class="form-input" placeholder="https://... hoặc tải ảnh lên">
+              
+              <div class="upload-actions-row">
+                <!-- Nút chọn ảnh từ thư viện hoặc chụp camera từ điện thoại -->
+                <label for="prodImageFileInput" class="btn btn-secondary btn-file-upload">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                  </svg>
+                  <span>Chụp ảnh / Chọn tệp ảnh</span>
+                </label>
+                <input 
+                  type="file" 
+                  id="prodImageFileInput" 
+                  accept="image/*" 
+                  capture="environment" 
+                  class="sr-only"
+                >
+                <span id="uploadStatusText" class="upload-status-text">Tối đa 5MB. Tự động nén và tối ưu hoá.</span>
+              </div>
+            </div>
+
+            <!-- Preview Card -->
+            <div class="form-group flex-1 image-preview-wrapper">
+              <label class="form-label">Xem trước ảnh</label>
+              <div id="imagePreviewBox" class="image-preview-box">
+                <span id="noImageText" class="no-image-text">Chưa có ảnh</span>
+                <img id="imagePreviewImg" class="preview-img hidden" alt="Xem trước sản phẩm">
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- THÔNG SỐ KỸ THUẬT & MÔ TẢ -->
+        <fieldset class="form-fieldset">
+          <legend class="fieldset-legend">Thông số kỹ thuật & Mô tả</legend>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="prodChip" class="form-label">Vi xử lý (Chip)</label>
+              <input type="text" id="prodChip" name="chip" class="form-input" placeholder="Apple A18 Pro 3nm">
+            </div>
+            <div class="form-group flex-1">
+              <label for="prodCamera" class="form-label">Camera</label>
+              <input type="text" id="prodCamera" name="camera" class="form-input" placeholder="48MP Fusion 5x Zoom">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="prodBattery" class="form-label">Pin & Sạc</label>
+              <input type="text" id="prodBattery" name="battery" class="form-input" placeholder="3.582 mAh (Sạc nhanh 25W)">
+            </div>
+            <div class="form-group flex-1">
+              <label for="prodScreen" class="form-label">Màn hình</label>
+              <input type="text" id="prodScreen" name="screen" class="form-input" placeholder="6.3 inch Super Retina XDR 120Hz">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="prodDescription" class="form-label">Mô tả ngắn</label>
+            <textarea id="prodDescription" name="description" class="form-textarea" rows="3" placeholder="Đặc điểm nổi bật, chính sách bảo hành..."></textarea>
+          </div>
+        </fieldset>
+
+        <!-- FORM ERROR BANNER -->
+        <div id="modalAlert" class="alert-box alert-error hidden" role="alert"></div>
+
+        <!-- MODAL FOOTER -->
+        <div class="modal-footer">
+          <button type="button" id="cancelModalBtn" class="btn btn-secondary">Hủy bỏ</button>
+          <button type="submit" id="saveProductBtn" class="btn btn-primary">
+            <span class="btn-text">Lưu sản phẩm</span>
+            <span class="btn-loader hidden" aria-hidden="true"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 4. DELETE CONFIRMATION DIALOG                                             -->
+  <!-- ========================================================================= -->
+  <div id="deleteModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+    <div class="modal-dialog modal-dialog-sm">
+      <div class="modal-header">
+        <h2 id="deleteTitle" class="modal-title">Xác Nhận Xóa Sản Phẩm</h2>
+        <button type="button" id="closeDeleteBtn" class="btn-icon-close" aria-label="Đóng">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="dialog-text">
+          Bạn có chắc chắn muốn xóa sản phẩm <strong id="deleteProductName" class="text-danger"></strong>?
+        </p>
+        <p class="dialog-subtext">Hành động này sẽ xóa dữ liệu và hình ảnh vĩnh viễn trên Supabase và không thể hoàn tác.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cancelDeleteBtn" class="btn btn-secondary">Giữ lại</button>
+        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">
+          <span class="btn-text">Xóa vĩnh viễn</span>
+          <span class="btn-loader hidden" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 5. BULK DISCOUNT DIALOG                                                   -->
+  <!-- ========================================================================= -->
+  <div id="bulkDiscountModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="bulkDiscountTitle">
+    <div class="modal-dialog modal-dialog-sm">
+      <div class="modal-header">
+        <h2 id="bulkDiscountTitle" class="modal-title">Giảm Giá Hàng Loạt</h2>
+        <button type="button" id="closeBulkDiscountBtn" class="btn-icon-close" aria-label="Đóng">✕</button>
+      </div>
+      <form id="bulkDiscountForm" class="modal-body" novalidate>
+        <p class="dialog-text">
+          Áp dụng giảm giá cho <strong id="discountItemCount">0</strong> sản phẩm đã chọn:
+        </p>
+        <div class="form-group mt-3">
+          <label for="discountPercentInput" class="form-label">Phần trăm giảm giá (%)</label>
+          <input 
+            type="number" 
+            id="discountPercentInput" 
+            class="form-input" 
+            min="1" 
+            max="90" 
+            value="10" 
+            required 
+            inputmode="numeric"
+          >
+          <small class="field-hint">Giá mới sẽ được làm tròn đến hàng chục nghìn đồng và cập nhật giá gốc.</small>
+        </div>
+        <div class="modal-footer mt-4">
+          <button type="button" id="cancelBulkDiscountBtn" class="btn btn-secondary">Hủy bỏ</button>
+          <button type="submit" id="confirmBulkDiscountBtn" class="btn btn-primary">
+            <span class="btn-text">Áp dụng giảm giá</span>
+            <span class="btn-loader hidden" aria-hidden="true"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 6. TOAST NOTIFICATION CONTAINER                                           -->
+  <!-- ========================================================================= -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- SCRIPT -->
+  <script type="module" src="./admin.js"></script>
+</body>
+</html>

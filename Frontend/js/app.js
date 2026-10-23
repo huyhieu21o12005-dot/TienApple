@@ -6,6 +6,7 @@
 import { CartManager, ProductFilter, BookingValidator } from './store.js';
 import { Phone3DStudio } from './hero3d.js';
 import { WaterRipplesEngine } from './waterRipples.js';
+import { fetchProducts } from './productsApi.js';
 
 // Dữ liệu dự phòng nhúng sẵn (phòng trường hợp người dùng mở trực tiếp file:// mà không qua HTTP server)
 const FALLBACK_PRODUCTS = [
@@ -301,17 +302,22 @@ class App {
   }
 
   async init() {
-    // Thử fetch dữ liệu ngoài nếu có HTTP server
+    // Thử tải dữ liệu từ Supabase trước; nếu chưa cấu hình hoặc lỗi sẽ fallback về data/products.json hoặc dữ liệu dự phòng
     try {
-      let res = await fetch('data/products.json');
-      if (!res.ok) {
-        res = await fetch('../Data/products.json');
-      }
-      if (res.ok) {
-        this.products = await res.json();
+      const remoteProducts = await fetchProducts();
+      if (remoteProducts && Array.isArray(remoteProducts) && remoteProducts.length > 0) {
+        this.products = remoteProducts;
+      } else {
+        let res = await fetch('data/products.json');
+        if (!res.ok) {
+          res = await fetch('../Data/products.json');
+        }
+        if (res.ok) {
+          this.products = await res.json();
+        }
       }
     } catch (e) {
-      console.log('Using bundled fallback products data.');
+      console.log('Using bundled fallback products data.', e);
     }
 
     // Load giỏ hàng từ localStorage nếu có
