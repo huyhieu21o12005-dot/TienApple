@@ -83,12 +83,14 @@ export class WaterRipplesEngine {
       this.centerX = (pRect.left + pRect.width / 2) - sRect.left;
 
       // Khoảng cách từ chân máy tới mặt nước trong stage 1/3 dưới
+      // Tăng thêm khoảng cách 14px (trong dải 5-20px theo yêu cầu) để bố cục thoáng đãng, hài hòa tự nhiên
       const phoneBottomInStage = (pRect.top + pRect.height * 0.74) - sRect.top;
-      const naturalGap = Math.max(28, Math.min(48, this.height * 0.15));
-      this.centerY = Math.max(28, Math.min(this.height * 0.45, phoneBottomInStage + naturalGap));
+      const extraGap = 14; 
+      const naturalGap = Math.max(38, Math.min(58, this.height * 0.16)) + extraGap;
+      this.centerY = Math.max(42, Math.min(this.height * 0.54, phoneBottomInStage + naturalGap));
     } else {
       this.centerX = this.width / 2;
-      this.centerY = this.height * 0.35;
+      this.centerY = this.height * 0.42;
     }
   }
 
@@ -168,7 +170,7 @@ export class WaterRipplesEngine {
     this.dropState.progress += this.dropState.speed;
     const prog = this.dropState.progress;
 
-    const startY = Math.max(4, this.centerY - 56);
+    const startY = Math.max(4, this.centerY - 68);
     const targetY = this.centerY;
     // Gia tốc trọng trường tự nhiên: pow(prog, 1.8)
     const currentY = startY + (targetY - startY) * Math.pow(prog, 1.8);

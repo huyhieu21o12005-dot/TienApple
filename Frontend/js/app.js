@@ -243,9 +243,85 @@ const FALLBACK_PRODUCTS = [
   }
 ];
 
+const ACCESSORIES_DATA = [
+  {
+    "id": "charger-30w",
+    "name": "Củ sạc nhanh Apple 30W USB-C chính hãng",
+    "category": "charger",
+    "badge": "Apple Zin",
+    "price": 650000,
+    "oldPrice": 850000,
+    "rating": 5.0,
+    "reviewCount": 320,
+    "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuBjJ20plbKYzKLiFb8cWsaqo6RrIyPTlD47tS2kbPjqVCJmkKcPMgLPkrqvCTEkJ9XWbJ06yojIDSdzbr2fPudTpPIhVSRy8MBz2Oh-kZ3yVrayY67Dj5mVkGvxE0_4QsBOUhkUM0DMjfpem7LTC7lDv3NuRaTRnV73uyzlQsMaeNQAIluD8DD0W45LK72TwESHO5bIgz_a84tnVku__BphNq8G0CN4gl3YX5I_DTAgNy1pM77VWG4u",
+    "description": "Chuẩn Power Delivery 3.0 • Sạc 50% trong 30 phút • Bảo hành 12 tháng 1 đổi 1."
+  },
+  {
+    "id": "cable-c-to-c",
+    "name": "Cáp sạc dệt dù Apple USB-C 60W (1m) chính hãng",
+    "category": "charger",
+    "badge": "Dệt dù cao cấp",
+    "price": 490000,
+    "oldPrice": 590000,
+    "rating": 4.9,
+    "reviewCount": 215,
+    "image": "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80",
+    "description": "Vỏ sợi dệt dù chống gãy đứt • Hỗ trợ sạc nhanh và truyền dữ liệu tốc độ cao."
+  },
+  {
+    "id": "airpods-pro-2",
+    "name": "Tai nghe AirPods Pro 2 USB-C Like New 99%",
+    "category": "audio",
+    "badge": "Chống ồn 2X",
+    "price": 4290000,
+    "oldPrice": 5990000,
+    "rating": 5.0,
+    "reviewCount": 184,
+    "image": "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600&auto=format&fit=crop&q=80",
+    "description": "Cổng sạc Type-C • Chip H2 chống ồn chủ động gấp đôi • Âm thanh không gian cá nhân hóa."
+  },
+  {
+    "id": "case-magsafe-clear",
+    "name": "Ốp lưng MagSafe trong suốt chính hãng",
+    "category": "case",
+    "badge": "MagSafe Zin",
+    "price": 890000,
+    "oldPrice": 1290000,
+    "rating": 4.8,
+    "reviewCount": 142,
+    "image": "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=600&auto=format&fit=crop&q=80",
+    "description": "Vòng nam châm MagSafe hít cực chặt • Nhựa polycarbonate chống ố vàng cao cấp."
+  },
+  {
+    "id": "glass-kingkong",
+    "name": "Kính cường lực KingKong 9H chống vân tay",
+    "category": "case",
+    "badge": "Dán miễn phí",
+    "price": 180000,
+    "oldPrice": 250000,
+    "rating": 4.9,
+    "reviewCount": 450,
+    "image": "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&auto=format&fit=crop&q=80",
+    "description": "Độ cứng 9H chống trầy xước • Cảm ứng mượt mà • Hỗ trợ dán chuẩn đẹp không bong bóng tại quầy."
+  },
+  {
+    "id": "halora-ring",
+    "name": "Nhẫn thông minh Halora Smart Ring Rose Gold",
+    "category": "smart",
+    "badge": "Siêu phẩm 2025",
+    "price": 7490000,
+    "oldPrice": 8990000,
+    "rating": 5.0,
+    "reviewCount": 98,
+    "image": "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&auto=format&fit=crop&q=80",
+    "description": "Vàng Hồng Rose Gold • Cảm biến nhịp tim, HRV, giấc ngủ 24/7 • Pin 7 ngày • Chống nước chuẩn 5ATM."
+  }
+];
+
 class App {
   constructor() {
     this.products = [...FALLBACK_PRODUCTS];
+    this.accessories = ACCESSORIES_DATA;
     this.cart = new CartManager();
     this.activeCategory = 'all';
     this.activeCondition = 'all';
@@ -285,6 +361,7 @@ class App {
     }
 
     this.renderProducts();
+    this.renderAccessories();
     this.updateCartBadge();
     this.bindEvents();
     this.initHero3DInteraction();
@@ -306,6 +383,21 @@ class App {
 
         this.activeCategory = btn.getAttribute('data-brand') || 'all';
         this.renderProducts();
+      });
+    });
+
+    // 1.2. Accessory Filter Buttons
+    const accButtons = document.querySelectorAll('.accessory-filter-btn');
+    accButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        accButtons.forEach(b => {
+          b.classList.remove('bg-[#1D1D1F]', 'text-white');
+          b.classList.add('bg-[#F5F5F7]', 'text-[#1D1D1F]');
+        });
+        btn.classList.remove('bg-[#F5F5F7]', 'text-[#1D1D1F]');
+        btn.classList.add('bg-[#1D1D1F]', 'text-white');
+        const filter = btn.getAttribute('data-acc-filter') || 'all';
+        this.renderAccessories(filter);
       });
     });
 
@@ -490,11 +582,11 @@ class App {
         if (!layerId) return;
         e.preventDefault();
         const filter = trigger.getAttribute('data-filter');
-        this.switchLayer(layerId, filter);
+        this.switchLayer(layerId, filter, trigger);
       });
     });
 
-    // 2. Hash Change Support (direct URLs like #dienthoai, #suachua, #camket)
+    // 2. Hash Change Support (direct URLs like #dienthoai, #suachua, #phukien, #camket, #lienhe)
     window.addEventListener('hashchange', () => {
       this.handleHashChange();
     });
@@ -511,15 +603,25 @@ class App {
       'trangchu': 'layer-trangchu',
       'dienthoai': 'layer-dienthoai',
       'suachua': 'layer-suachua',
+      'phukien': 'layer-phukien',
       'camket': 'layer-camket',
-      'lienhe': 'layer-camket'
+      'lienhe': 'layer-lienhe'
     };
     if (hashMap[hash]) {
       this.switchLayer(hashMap[hash]);
     }
   }
 
-  switchLayer(layerId, filter = null) {
+  switchLayer(layerId, filter = null, trigger = null) {
+    // Nếu là 'layer-lienhe' -> cuộn mượt xuống chân trang #lienhe
+    if (layerId === 'layer-lienhe') {
+      const footer = document.getElementById('lienhe');
+      if (footer) {
+        footer.scrollIntoView({ behavior: 'smooth' });
+      }
+      return;
+    }
+
     const targetLayer = document.getElementById(layerId);
     if (!targetLayer) return;
 
@@ -534,21 +636,29 @@ class App {
     void targetLayer.offsetWidth; // Force reflow
     targetLayer.classList.add('active');
 
-    // 2. Update Header Navigation Links Active State (Chữ đen khi chọn kèm thanh ngang gạch dưới, chữ xám khi không chọn)
-    const navLinks = document.querySelectorAll('.nav-layer-link');
+    // 2. Cập nhật trạng thái Active trên Top Header:
+    // Đảm bảo "Điện thoại" và "Phụ kiện" tách biệt độc lập 100%, không bị trùng nhau
+    const navLinks = document.querySelectorAll('#mainNav .nav-layer-link');
     navLinks.forEach(link => {
       const linkLayer = link.getAttribute('data-layer');
       const bar = link.querySelector('.nav-active-bar');
-      if (linkLayer === layerId) {
-        link.classList.remove('text-[#6E6E73]', 'font-normal', 'text-[#0071E3]');
+      const isMatch = trigger ? (link === trigger) : (linkLayer === layerId);
+
+      if (isMatch) {
+        link.classList.remove('text-[#6E6E73]', 'font-normal');
         link.classList.add('text-[#1D1D1F]', 'font-semibold', 'active');
         if (bar) bar.classList.remove('hidden');
       } else {
-        link.classList.remove('text-[#1D1D1F]', 'font-semibold', 'active', 'text-[#0071E3]');
+        link.classList.remove('text-[#1D1D1F]', 'font-semibold', 'active');
         link.classList.add('text-[#6E6E73]', 'font-normal');
         if (bar) bar.classList.add('hidden');
       }
     });
+
+    // 3. Nếu là layer Phụ kiện -> render phụ kiện
+    if (layerId === 'layer-phukien') {
+      this.renderAccessories();
+    }
 
     // 4. If filter is specified (e.g., accessories)
     if (filter && layerId === 'layer-dienthoai') {
@@ -566,10 +676,11 @@ class App {
       'layer-trangchu': 'trangchu',
       'layer-dienthoai': 'dienthoai',
       'layer-suachua': 'suachua',
+      'layer-phukien': 'phukien',
       'layer-camket': 'camket'
     };
-    if (reverseHashMap[layerId] && history.pushState) {
-      history.pushState(null, null, `#${reverseHashMap[layerId]}`);
+    if (reverseHashMap[layerId] && history.replaceState) {
+      history.replaceState(null, null, `#${reverseHashMap[layerId]}`);
     }
   }
 
@@ -768,23 +879,85 @@ class App {
     `).join('');
   }
 
+  // Render danh mục Phụ kiện chính hãng riêng biệt
+  renderAccessories(category = 'all') {
+    const grid = document.getElementById('accessoryGrid');
+    if (!grid) return;
+
+    let items = ACCESSORIES_DATA;
+    if (category !== 'all') {
+      items = items.filter(a => a.category === category);
+    }
+
+    grid.innerHTML = items.map(p => `
+      <article class="product-card" data-id="${p.id}">
+        <div>
+          <div class="flex items-center justify-between gap-1 mb-2">
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-white text-[#1D1D1F] border border-[#D2D2D7]/70">Chính hãng</span>
+            <span class="text-[10px] font-medium text-[#0071E3] bg-[#0071E3]/5 px-2 py-0.5 rounded">${p.badge}</span>
+          </div>
+
+          <div class="h-44 w-full flex items-center justify-center p-3 mb-2 bg-[#F5F5F7] rounded-xl cursor-pointer overflow-hidden group" onclick="window.tienApp.openProductModalById('${p.id}')">
+            <img 
+              alt="${p.name}" 
+              class="h-full object-contain group-hover:scale-105 transition-transform duration-300" 
+              src="${p.image}"
+              loading="lazy"
+            />
+          </div>
+
+          <div class="text-[11px] text-[#6E6E73] flex items-center gap-1 mb-1">
+            <span class="text-amber-500 font-semibold">★ ${p.rating.toFixed(1)}</span>
+            <span>(${p.reviewCount} đánh giá)</span>
+          </div>
+
+          <h3 class="text-[16px] font-semibold text-[#1D1D1F] leading-snug line-clamp-1 cursor-pointer hover:text-[#0071E3] transition-colors" onclick="window.tienApp.openProductModalById('${p.id}')">
+            ${p.name}
+          </h3>
+          <p class="text-[12px] text-[#6E6E73] line-clamp-1 mt-0.5">${p.description}</p>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-[#D2D2D7]/50">
+          <div class="flex items-baseline justify-between mb-3">
+            <div>
+              <div class="text-[18px] font-semibold text-[#1D1D1F] leading-tight">${CartManager.formatCurrency(p.price)}</div>
+              ${p.oldPrice ? `<div class="text-[12px] text-[#6E6E73] line-through">${CartManager.formatCurrency(p.oldPrice)}</div>` : ''}
+            </div>
+            ${p.oldPrice ? `<span class="text-[10px] font-medium text-[#0071E3] bg-[#0071E3]/10 px-1.5 py-0.5 rounded">-${Math.round((1 - p.price / p.oldPrice) * 100)}%</span>` : ''}
+          </div>
+
+          <div class="grid grid-cols-2 gap-1.5">
+            <button class="w-full py-2 text-center rounded-full bg-[#F5F5F7] text-[#1D1D1F] text-[12px] font-medium hover:bg-[#EAEAEA] transition-colors cursor-pointer" onclick="window.tienApp.openProductModalById('${p.id}')">
+              Chi tiết
+            </button>
+            <button class="w-full py-2 text-center rounded-full bg-[#1D1D1F] text-white text-[12px] font-medium hover:bg-black transition-colors cursor-pointer" onclick="window.tienApp.quickAddToCart('${p.id}')">
+              + Giỏ hàng
+            </button>
+          </div>
+        </div>
+      </article>
+    `).join('');
+  }
+
   quickAddToCart(productId) {
-    const product = this.products.find(p => p.id === productId);
+    const product = this.products.find(p => p.id === productId) || ACCESSORIES_DATA.find(a => a.id === productId);
     if (!product) return;
 
-    this.cart.addItem(product, 1, product.defaultColor, product.storages ? product.storages[0] : '');
+    const color = product.defaultColor || (product.colors && product.colors[0]?.name) || 'Tiêu chuẩn';
+    const storage = product.storages ? product.storages[0] : 'Chuẩn Zin';
+    this.cart.addItem(product, 1, color, storage);
     this.updateCartBadge();
     this.showToast(`Đã thêm "${product.name}" vào giỏ hàng!`);
     this.openCartDrawer();
   }
 
   openProductModalById(productId) {
-    const product = this.products.find(p => p.id === productId);
+    const product = this.products.find(p => p.id === productId) || ACCESSORIES_DATA.find(a => a.id === productId);
     if (!product) return;
 
     this.selectedProduct = product;
-    this.selectedColor = product.defaultColor;
-    this.selectedStorage = product.storages ? product.storages[0] : '';
+    this.selectedColor = product.defaultColor || (product.colors && product.colors[0]?.name) || 'Tiêu chuẩn';
+    this.selectedStorage = product.storages ? product.storages[0] : 'Chuẩn Zin';
 
     document.getElementById('modalProductTitle').innerText = product.name;
     document.getElementById('modalProductPrice').innerText = CartManager.formatCurrency(product.price);
@@ -793,9 +966,9 @@ class App {
     document.getElementById('modalThumb1').src = product.image;
 
     document.getElementById('modalSpecChip').innerText = product.chip || 'Chuẩn Apple';
-    document.getElementById('modalSpecCam').innerText = product.camera || '48MP Pro';
-    document.getElementById('modalSpecBattery').innerText = product.battery || 'Pin tối ưu';
-    document.getElementById('modalSpecScreen').innerText = product.screen || 'Retina OLED';
+    document.getElementById('modalSpecCam').innerText = product.camera || 'Phụ kiện zin';
+    document.getElementById('modalSpecBattery').innerText = product.battery || 'Tối ưu hiệu năng';
+    document.getElementById('modalSpecScreen').innerText = product.screen || 'Chính hãng';
 
     // Render Color Swatches
     const swatchesContainer = document.getElementById('modal-swatches-container');
@@ -803,7 +976,8 @@ class App {
     colorLabel.innerText = this.selectedColor;
 
     if (swatchesContainer) {
-      swatchesContainer.innerHTML = (product.colors || []).map(c => `
+      const colors = product.colors || [{ name: 'Tiêu chuẩn', hex: '#FFFFFF' }];
+      swatchesContainer.innerHTML = colors.map(c => `
         <button 
           title="${c.name}"
           class="swatch-btn ${c.name === this.selectedColor ? 'active' : ''}" 
@@ -816,7 +990,8 @@ class App {
     // Render Storage Chips
     const storageContainer = document.getElementById('modal-storage-container');
     if (storageContainer) {
-      storageContainer.innerHTML = (product.storages || []).map(s => `
+      const storages = product.storages || ['Chuẩn Zin'];
+      storageContainer.innerHTML = storages.map(s => `
         <button 
           class="storage-chip ${s === this.selectedStorage ? 'active' : ''}"
           onclick="window.tienApp.selectModalStorage('${s}')"
