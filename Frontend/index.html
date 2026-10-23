@@ -82,7 +82,12 @@
     </nav>
 
     <!-- Right Header Actions -->
-    <div class="flex items-center gap-5">
+    <div class="flex items-center gap-3 sm:gap-5">
+      <a href="https://zalo.me/0986455457" target="_blank" rel="noopener noreferrer" class="hidden md:inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#0068FF] hover:text-[#0054cc] transition-colors header-item bg-[#0068FF]/10 px-3 py-1.5 rounded-full no-underline" title="Chat Zalo CSKH: 0986455457">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#0068FF]"></span>
+        <span>Zalo CSKH: 0986 455 457</span>
+      </a>
+
       <button class="cart-open-trigger inline-flex items-center gap-1.5 text-[13px] font-normal text-[#1D1D1F] hover:text-black transition-colors cursor-pointer bg-transparent border-0 p-0 header-item" type="button">
         <span class="material-symbols-outlined text-[19px]">shopping_bag</span>
         <span>Giỏ hàng <span class="text-[#1D1D1F] font-semibold">(<span class="cart-badge-number">2</span>)</span></span>
@@ -610,6 +615,14 @@
       <div>
         <div class="font-semibold text-[#1D1D1F] mb-3.5 text-[14px]">Liên hệ &amp; Showroom</div>
         <p class="mb-2">Hotline: <strong class="text-[#1D1D1F] font-semibold">0986 455 457</strong> &amp; <strong class="text-[#1D1D1F] font-semibold">0933 266 179</strong></p>
+        <p class="mb-2 flex items-center gap-2 flex-wrap">
+          <span>Tư vấn CSKH:</span>
+          <a href="https://zalo.me/0986455457" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0068FF] text-white text-[12px] font-semibold hover:bg-[#0054cc] transition-colors no-underline">
+            <span class="w-4 h-4 rounded-full bg-white text-[#0068FF] font-bold text-[9px] flex items-center justify-center shrink-0">Z</span>
+            <span>Zalo: 0986 455 457</span>
+            <span class="material-symbols-outlined text-[13px]">open_in_new</span>
+          </a>
+        </p>
         <p class="mb-2">Giờ làm việc: <strong class="text-[#1D1D1F] font-semibold">7h – 21h (T2 – CN)</strong></p>
         <p class="leading-[1.5]">Địa chỉ: <span class="text-[#1D1D1F] font-medium">54a8 Ngô Chí Quốc, Tam Bình, Thủ Đức, HCM</span></p>
       </div>
@@ -924,20 +937,35 @@
         </button>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 mb-3">
         <input id="chat-input" type="text" placeholder="Nhập câu hỏi của bạn..." class="flex-1 h-9 px-3 bg-[#F5F5F7] rounded-xl text-[12px] text-[#1D1D1F] border-0 focus:ring-1 focus:ring-[#1D1D1F] outline-none" />
         <button id="chat-send-btn" class="w-9 h-9 rounded-xl bg-[#1D1D1F] text-white flex items-center justify-center hover:bg-black transition-colors border-0 cursor-pointer">
           <span class="material-symbols-outlined text-[16px]">send</span>
         </button>
       </div>
+
+      <!-- Chuyển thẳng qua Zalo CSKH -->
+      <a href="https://zalo.me/0986455457" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 w-full py-2.5 px-3 rounded-xl bg-[#0068FF] text-white text-[12px] font-semibold hover:bg-[#0054cc] transition-colors no-underline">
+        <span class="w-5 h-5 rounded-full bg-white text-[#0068FF] font-bold text-[10px] flex items-center justify-center shrink-0">Z</span>
+        <span>Chat Zalo CSKH: 0986 455 457</span>
+        <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+      </a>
     </div>
 
-    <!-- Toggle Button -->
-    <button id="chat-toggle-btn" aria-label="Tư vấn trực tuyến" class="flex items-center gap-2.5 h-12 px-4 rounded-full bg-[#1D1D1F] text-white shadow-xl hover:bg-black transition-all hover:scale-105 cursor-pointer border-0">
-      <span class="material-symbols-outlined text-[20px]">chat</span>
-      <span class="text-[13px] font-medium hidden sm:inline">Tư vấn trực tuyến</span>
-      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-    </button>
+    <!-- Toggle Buttons Row: Zalo CSKH + Tư vấn CSKH -->
+    <div class="flex items-center gap-2.5">
+      <a href="https://zalo.me/0986455457" target="_blank" rel="noopener noreferrer" id="zalo-cskh-btn" class="flex items-center gap-2 h-12 px-4 rounded-full bg-[#0068FF] text-white shadow-xl hover:bg-[#0054cc] transition-all hover:scale-105 cursor-pointer no-underline border-0 text-[13px] font-semibold" title="Chat Zalo CSKH: 0986455457">
+        <span class="w-6 h-6 rounded-full bg-white text-[#0068FF] font-bold text-[11px] flex items-center justify-center shrink-0">Z</span>
+        <span class="hidden sm:inline">Zalo CSKH:</span>
+        <span>0986 455 457</span>
+      </a>
+
+      <button id="chat-toggle-btn" aria-label="Tư vấn CSKH" class="flex items-center gap-2.5 h-12 px-4 rounded-full bg-[#1D1D1F] text-white shadow-xl hover:bg-black transition-all hover:scale-105 cursor-pointer border-0">
+        <span class="material-symbols-outlined text-[20px]">chat</span>
+        <span class="text-[13px] font-medium hidden sm:inline">Tư vấn CSKH</span>
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+      </button>
+    </div>
   </div>
 
   <!-- Toast Notification Container -->
