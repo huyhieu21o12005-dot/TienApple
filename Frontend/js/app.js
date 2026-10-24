@@ -12,6 +12,7 @@ import { lookupInstallment } from './installmentApi.js';
 import { lookupWarranty } from './warrantyApi.js';
 import { validateTradeIn, buildTradeInBooking } from './tradeIn.js';
 import { calcInstallment, INSTALLMENT_REFERENCE_RATE } from './installment.js';
+import { validateZaloOffer, buildZaloMessage, ZALO_URL } from './zalo.js';
 import { enhanceSelects } from './customSelect.js';
 import { safeUrl, partitionProducts } from './utils.js';
 import {
@@ -651,6 +652,10 @@ class App {
     const quickRepairBarForm = document.getElementById('quick-repair-bar-form');
     if (quickRepairBarForm) {
       quickRepairBarForm.addEventListener('submit', (e) => this.handleQuickRepairBarSubmit(e));
+      document.getElementById('quick-bar-copy')?.addEventListener('click', async () => {
+        const message = document.getElementById('quick-bar-done')?.dataset.message || '';
+        if (message && await this.copyText(message)) this.showToast('Đã sao chép lại thông tin.');
+      });
     }
 
     // 8. Quick View Modal Listeners
@@ -1279,41 +1284,61 @@ class App {
     }
   }
 
+  // Sao chép nội dung vào clipboard; trả về true nếu thành công (có phương án dự phòng cho trình duyệt cũ)
+  async copyText(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (err) { /* thử phương án dự phòng bên dưới */ }
+    try {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand('copy');
+      area.remove();
+      return ok;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  // "Nhận ưu đãi": kiểm tra thông tin, sao chép tin nhắn rồi mở Zalo cửa hàng để khách dán và gửi
   async handleQuickRepairBarSubmit(e) {
     e.preventDefault();
-    if (this._submitting) return;
-    const phone = document.getElementById('quick-bar-phone').value;
-    const device = document.getElementById('quick-bar-device').value;
-    const service = document.getElementById('quick-bar-service').value;
+    const val = (id) => document.getElementById(id)?.value ?? '';
+    const error = document.getElementById('quick-bar-error');
+    const done = document.getElementById('quick-bar-done');
+    error.classList.add('hidden');
+    done.classList.add('hidden');
 
-    const validation = BookingValidator.validateBookingForm({
-      name: 'Khách đặt nhanh',
-      phone,
-      device,
-      service
-    });
-
-    if (!validation.isValid) {
-      alert(validation.errors[0].message);
+    const data = {
+      name: val('quick-bar-name'), phone: val('quick-bar-phone'), device: val('quick-bar-device'),
+      service: val('quick-bar-service'), note: val('quick-bar-note')
+    };
+    const check = validateZaloOffer(data);
+    if (!check.valid) {
+      error.textContent = check.errors[0];
+      error.classList.remove('hidden');
       return;
     }
 
-    this._submitting = true;
-    try {
-      const result = await submitBooking({
-        name: 'Khách đặt nhanh',
-        phone: validation.normalizedPhone || phone,
-        device,
-        service
-      });
-      if (!result.ok) {
-        alert(result.message);
-        return;
-      }
-      alert(`ĐÃ NHẬN YÊU CẦU!\n\nMã lịch: ${result.code}\nSố điện thoại: ${phone}\nThiết bị: ${device}\nDịch vụ: ${service}\n\nCảm ơn bạn! Kỹ thuật viên sẽ liên hệ lại để xác nhận thời gian.`);
-    } finally {
-      this._submitting = false;
-    }
+    const message = buildZaloMessage(data);
+    const zaloWindow = window.open(ZALO_URL, '_blank', 'noopener');
+    const copied = await this.copyText(message);
+
+    document.getElementById('quick-bar-preview').textContent = message;
+    done.querySelector('p').textContent = copied
+      ? 'Đã sao chép thông tin. Dán vào Zalo và bấm gửi cho cửa hàng.'
+      : 'Chưa tự sao chép được. Hãy chọn nội dung bên dưới, sao chép rồi gửi cho cửa hàng qua Zalo.';
+    done.classList.remove('hidden');
+    done.dataset.message = message;
+    if (!zaloWindow) this.showToast('Trình duyệt chặn cửa sổ mới, bấm "Mở Zalo" bên dưới.');
+    if (copied) this.showToast('Đã sao chép thông tin, dán vào Zalo để gửi.');
   }
 
   // Chat Widget
