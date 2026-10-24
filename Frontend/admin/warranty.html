@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Tien Mobile - Quản Trị Bảo Hành</title>
+  <link rel="stylesheet" href="./admin.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+</head>
+<body class="admin-body">
+
+  <main id="gateSection" class="login-section hidden">
+    <div class="login-card">
+      <div class="login-header">
+        <img class="brand-logo" src="../assets/logo.svg" width="56" height="56" alt="Tien Mobile">
+        <h1 class="login-title">Cần đăng nhập</h1>
+        <p id="gateMessage" class="login-subtitle">Vui lòng đăng nhập tài khoản quản trị.</p>
+      </div>
+      <a href="./index.html" class="btn btn-primary btn-block">Đến trang đăng nhập</a>
+    </div>
+  </main>
+
+  <div id="warrantyApp" class="admin-app hidden">
+    <header class="admin-topbar">
+      <div class="topbar-inner ord-topbar">
+        <div class="brand-area">
+          <img class="brand-logo-small" src="../assets/logo.svg" width="28" height="28" alt="">
+          <div class="brand-text-group">
+            <span class="brand-name">Tien Mobile</span>
+            <span class="brand-tag">Bảo hành</span>
+          </div>
+        </div>
+        <nav class="ord-nav" aria-label="Điều hướng quản trị">
+          <a class="btn btn-ghost btn-sm" href="./index.html">Sản phẩm</a>
+          <a class="btn btn-ghost btn-sm" href="./orders.html">Đơn hàng</a>
+          <a class="btn btn-secondary btn-sm" href="./warranty.html" aria-current="page">Bảo hành</a>
+        </nav>
+        <div class="topbar-actions">
+          <button type="button" id="addBtn" class="btn btn-primary btn-sm">+ Thêm phiếu</button>
+          <button type="button" id="logoutBtn" class="btn btn-secondary btn-sm">Đăng xuất</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="ord-main">
+      <div class="ord-toolbar">
+        <input type="search" id="wSearch" class="form-input" placeholder="Tìm theo mã, tên, số điện thoại, máy..." aria-label="Tìm kiếm">
+      </div>
+      <div id="wChips" class="ord-chips" role="group" aria-label="Lọc theo tình trạng"></div>
+      <div id="wError" class="alert-box alert-error hidden" role="alert"></div>
+      <div id="wLoading" class="ord-empty hidden">Đang tải...</div>
+      <section id="wList" class="ord-list" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <dialog id="wDialog" class="w-dialog" aria-labelledby="wDialogTitle">
+    <form id="wForm" method="dialog" novalidate>
+      <h2 id="wDialogTitle" class="login-title">Phiếu bảo hành</h2>
+      <div id="wFormError" class="alert-box alert-error hidden" role="alert"></div>
+
+      <div class="form-group">
+        <label class="form-label" for="fName">Tên khách hàng</label>
+        <input class="form-input" id="fName" maxlength="100" autocomplete="off" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="fPhone">Số điện thoại</label>
+        <input class="form-input" id="fPhone" type="tel" inputmode="numeric" placeholder="0912 345 678" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="fDevice">Máy</label>
+        <input class="form-input" id="fDevice" maxlength="100" placeholder="iPhone 15 Pro Max" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="fService">Nội dung sửa chữa</label>
+        <textarea class="form-textarea" id="fService" rows="3" maxlength="300" placeholder="Thay màn hình OLED, thay pin..." required></textarea>
+      </div>
+      <div class="w-row">
+        <div class="form-group">
+          <label class="form-label" for="fMonths">Bảo hành (tháng)</label>
+          <input class="form-input" id="fMonths" type="number" min="1" max="60" step="1" value="3" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="fStart">Ngày bắt đầu</label>
+          <input class="form-input" id="fStart" type="date" required>
+        </div>
+      </div>
+      <p id="fEnd" class="ord-muted" aria-live="polite"></p>
+      <div class="form-group">
+        <label class="form-label" for="fNote">Ghi chú nội bộ</label>
+        <textarea class="form-textarea" id="fNote" rows="2" maxlength="1000"></textarea>
+      </div>
+
+      <div class="ord-actions">
+        <button type="button" id="wCancel" class="btn btn-secondary">Hủy</button>
+        <button type="submit" id="wSave" class="btn btn-primary">Lưu phiếu</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+  <script type="module" src="./warranty.js"></script>
+</body>
+</html>

@@ -5,6 +5,7 @@
 
 import { CartManager } from './store.js';
 import { escapeHtml, jsArg, safeUrl, safeColor, discountPercent } from './utils.js';
+import { formatDate } from './warranty.js';
 
 export function isOutOfStock(product) {
   return product != null && product.stock !== undefined && product.stock !== null && Number(product.stock) <= 0;
@@ -150,4 +151,45 @@ export function emptyCartHtml() {
           <p class="text-[13px] mt-1">Hãy khám phá các mẫu điện thoại chính hãng và thêm vào giỏ.</p>
         </div>
       `;
+}
+
+/**
+ * Một phiếu bảo hành trả về từ hàm lookup_warranty (tên khách đã được che).
+ */
+export function warrantyRecordHtml(r) {
+  const active = r.is_active === true;
+  const days = Number(r.days_left) || 0;
+  const badge = active
+    ? `<span class="text-[12px] font-semibold px-2.5 py-1 rounded-full bg-[#1D1D1F] text-white">Còn bảo hành</span>`
+    : `<span class="text-[12px] font-semibold px-2.5 py-1 rounded-full bg-[#F5F5F7] text-[#6E6E73] border border-[#D2D2D7]">Hết hạn</span>`;
+  const remain = active
+    ? `Còn ${days} ngày`
+    : 'Đã hết thời hạn bảo hành';
+
+  return `
+        <article class="rounded-2xl border border-[#D2D2D7] bg-white p-5">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <span class="text-[15px] font-semibold text-[#1D1D1F]">Phiếu ${escapeHtml(r.code)}</span>
+            ${badge}
+          </div>
+          <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-[14px]">
+            <div><dt class="text-[12px] text-[#6E6E73]">Khách hàng</dt><dd class="font-medium text-[#1D1D1F]">${escapeHtml(r.customer_name_masked)}</dd></div>
+            <div><dt class="text-[12px] text-[#6E6E73]">Thiết bị</dt><dd class="font-medium text-[#1D1D1F]">${escapeHtml(r.device)}</dd></div>
+            <div class="sm:col-span-2"><dt class="text-[12px] text-[#6E6E73]">Nội dung sửa chữa</dt><dd class="font-medium text-[#1D1D1F]">${escapeHtml(r.service)}</dd></div>
+            <div><dt class="text-[12px] text-[#6E6E73]">Ngày bắt đầu</dt><dd class="font-medium text-[#1D1D1F]">${escapeHtml(formatDate(r.start_date))}</dd></div>
+            <div><dt class="text-[12px] text-[#6E6E73]">Hạn bảo hành (${Number(r.warranty_months) || 0} tháng)</dt><dd class="font-medium text-[#1D1D1F]">${escapeHtml(formatDate(r.end_date))} · ${escapeHtml(remain)}</dd></div>
+          </dl>
+        </article>`;
+}
+
+export function warrantyResultsHtml(records) {
+  const list = Array.isArray(records) ? records.filter(Boolean) : [];
+  if (list.length === 0) {
+    return `
+        <div class="rounded-2xl bg-[#F5F5F7] p-6 text-center text-[#6E6E73]">
+          <p class="text-[15px] font-medium text-[#1D1D1F]">Không tìm thấy phiếu bảo hành</p>
+          <p class="text-[13px] mt-1">Số điện thoại này chưa có phiếu bảo hành tại Tien Mobile. Vui lòng kiểm tra lại số hoặc liên hệ hotline.</p>
+        </div>`;
+  }
+  return list.map(warrantyRecordHtml).join('');
 }

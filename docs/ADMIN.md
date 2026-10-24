@@ -178,3 +178,10 @@ Tạo một tài khoản:
 3. Nhân viên đăng nhập với tên `nhanvien1` và mật khẩu đã đặt.
 
 Tên tài khoản gồm chữ thường, số, `.`, `_`, `-`, dài 3-30 ký tự. Vì không có email thật nên **không có chức năng quên mật khẩu**: chủ shop đặt lại mật khẩu trong **Authentication -> Users** (nút ba chấm, *Send password recovery* không dùng được, hãy chọn đặt mật khẩu mới).
+
+## Bảo hành
+
+- Chạy `supabase/warranty.sql` một lần trong SQL Editor (cần đã chạy `admin_users.sql` trước).
+- Trang quản trị: `admin/warranty.html` (liên kết "Bảo hành" trên thanh điều hướng). Thêm/sửa phiếu gồm tên khách, số điện thoại, máy, nội dung sửa chữa, số tháng bảo hành (1–60), ngày bắt đầu. Hạn bảo hành tự tính.
+- Nhân viên (staff) được thêm và sửa phiếu, chỉ quản lý (owner/admin) được xóa.
+- Khách tra cứu tại mục **Bảo hành** trên website bằng số điện thoại. Hàm `lookup_warranty` chỉ trả thông tin cần thiết (tên khách được che, không trả ghi chú nội bộ), tối đa 20 phiếu và 10 lượt tra/giờ cho mỗi số.

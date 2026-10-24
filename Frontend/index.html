@@ -76,6 +76,10 @@
         <span>Thu cũ &amp; Cam kết</span>
         <span class="nav-active-bar absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#1D1D1F] hidden"></span>
       </a>
+      <a href="#baohanh" class="nav-layer-link h-full flex items-center relative text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-baohanh">
+        <span>Bảo hành</span>
+        <span class="nav-active-bar absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#1D1D1F] hidden"></span>
+      </a>
       <a href="#lienhe" class="nav-layer-link h-full flex items-center relative text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-lienhe">
         <span>Liên hệ</span>
         <span class="nav-active-bar absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#1D1D1F] hidden"></span>
@@ -107,6 +111,7 @@
     <a href="#suachua" class="nav-layer-link mobile-nav-link" data-layer="layer-suachua">Sửa chữa</a>
     <a href="#phukien" class="nav-layer-link mobile-nav-link" data-layer="layer-phukien">Phụ kiện</a>
     <a href="#camket" class="nav-layer-link mobile-nav-link" data-layer="layer-camket">Thu cũ &amp; Cam kết</a>
+    <a href="#baohanh" class="nav-layer-link mobile-nav-link" data-layer="layer-baohanh">Tra cứu bảo hành</a>
     <a href="#lienhe" class="nav-layer-link mobile-nav-link" data-layer="layer-lienhe">Liên hệ</a>
     <button class="booking-trigger mt-6 w-full h-12 rounded-full bg-[#1D1D1F] text-white text-[15px] font-medium cursor-pointer border-0" data-service-context="Đặt lịch sửa tổng quát" type="button">Đặt lịch sửa</button>
   </nav>
@@ -530,6 +535,29 @@
     </div>
 
     <!-- LAYER 4: THU CŨ ĐỔI MỚI & CHÍNH SÁCH CAM KẾT VÀNG -->
+    <!-- LAYER: TRA CỨU BẢO HÀNH THEO SỐ ĐIỆN THOẠI -->
+    <div class="app-layer hidden" id="layer-baohanh">
+      <section class="w-full bg-white py-14 px-6 sm:px-10 lg:px-16" id="baohanh">
+        <div class="max-w-[720px] mx-auto">
+          <div class="mb-8 text-center">
+            <span class="text-[12px] font-semibold text-[#6E6E73] uppercase tracking-widest block mb-1">BẢO HÀNH ĐIỆN TỬ</span>
+            <h2 class="headline-lg text-[#1D1D1F]">Tra cứu bảo hành</h2>
+            <p class="text-[15px] text-[#6E6E73] mt-2">Nhập số điện thoại đã dùng khi sửa chữa hoặc mua máy để xem nội dung sửa và thời hạn bảo hành.</p>
+          </div>
+
+          <form id="warrantyForm" class="flex flex-col sm:flex-row gap-3" novalidate>
+            <label for="warrantyPhone" class="sr-only">Số điện thoại</label>
+            <input id="warrantyPhone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="Nhập số điện thoại, ví dụ 0912 345 678" class="flex-1 min-h-[48px] px-4 rounded-full bg-[#F5F5F7] border border-[#D2D2D7] text-[15px] text-[#1D1D1F] outline-none focus:border-[#0071E3]" required />
+            <button id="warrantySubmit" type="submit" class="min-h-[48px] px-7 rounded-full bg-[#1D1D1F] text-white text-[15px] font-medium cursor-pointer border-0 hover:bg-black disabled:opacity-60">Tra cứu</button>
+          </form>
+
+          <p id="warrantyError" class="hidden mt-3 text-[14px] text-[#C62828]" role="alert"></p>
+          <div id="warrantyResults" class="mt-6 grid gap-4" aria-live="polite"></div>
+          <p class="mt-6 text-[12px] text-[#6E6E73] text-center">Vì bảo mật, tên khách hàng được ẩn một phần. Cần hỗ trợ, gọi hotline 0986 455 457.</p>
+        </div>
+      </section>
+    </div>
+
     <div class="app-layer hidden" id="layer-camket">
       <!-- ======================================================================
            5. TRADE-IN & GOLDEN COMMITMENT POLICIES SECTION
@@ -817,17 +845,17 @@
 
             <div>
               <label class="block text-[12px] font-medium text-[#6E6E73] mb-1" for="cust-name">Họ và tên khách hàng</label>
-              <input id="cust-name" type="text" value="Nguyễn Văn An" required class="w-full px-3.5 py-2.5 rounded-xl bg-[#F5F5F7] border border-[#D2D2D7] text-[#1D1D1F] text-[13px] outline-none" />
+              <input id="cust-name" type="text" placeholder="Họ và tên người nhận" required class="w-full px-3.5 py-2.5 rounded-xl bg-[#F5F5F7] border border-[#D2D2D7] text-[#1D1D1F] text-[13px] outline-none" />
             </div>
 
             <div>
               <label class="block text-[12px] font-medium text-[#6E6E73] mb-1" for="cust-phone">Số điện thoại nhận hàng</label>
-              <input id="cust-phone" type="tel" value="0908 123 456" required class="w-full px-3.5 py-2.5 rounded-xl bg-[#F5F5F7] border border-[#D2D2D7] text-[#1D1D1F] text-[13px] outline-none" />
+              <input id="cust-phone" type="tel" placeholder="0912 345 678" required class="w-full px-3.5 py-2.5 rounded-xl bg-[#F5F5F7] border border-[#D2D2D7] text-[#1D1D1F] text-[13px] outline-none" />
             </div>
 
             <div>
               <label class="block text-[12px] font-medium text-[#6E6E73] mb-1" for="cust-address">Địa chỉ nhận hàng (Giao hỏa tốc 2H)</label>
-              <input id="cust-address" type="text" value="54a8 Ngô Chí Quốc, Tam Bình, Thủ Đức, HCM" required class="w-full px-3.5 py-2.5 rounded-xl bg-[#F5F5F7] border border-[#D2D2D7] text-[#1D1D1F] text-[13px] outline-none" />
+              <input id="cust-address" type="text" placeholder="Số nhà, đường, phường, quận" required class="w-full px-3.5 py-2.5 rounded-xl bg-[#F5F5F7] border border-[#D2D2D7] text-[#1D1D1F] text-[13px] outline-none" />
             </div>
 
             <div class="space-y-2 pt-1">

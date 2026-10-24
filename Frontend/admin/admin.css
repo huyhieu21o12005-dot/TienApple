@@ -1327,3 +1327,19 @@ body[data-role="staff"] .btn-delete-prod,
 body[data-role="staff"] #bulkDeleteBtn {
   display: none !important;
 }
+
+/* Trang bảo hành: hộp thoại thêm/sửa phiếu */
+.w-dialog {
+  width: min(520px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  padding: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: #FFFFFF;
+  color: var(--text-primary);
+  overflow-y: auto;
+}
+.w-dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
+.w-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 420px) { .w-row { grid-template-columns: 1fr; } }
+body[data-role="staff"] [data-action="delete"] { display: none !important; }

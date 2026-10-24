@@ -8,6 +8,7 @@ import { Phone3DStudio } from './hero3d.js';
 import { WaterRipplesEngine } from './waterRipples.js';
 import { fetchProducts } from './productsApi.js';
 import { submitOrder, submitBooking, buildOrderItems } from './ordersApi.js';
+import { lookupWarranty } from './warrantyApi.js';
 import { safeUrl, partitionProducts } from './utils.js';
 import {
   productCardHtml,
@@ -15,7 +16,8 @@ import {
   swatchesHtml,
   storageChipsHtml,
   cartItemHtml,
-  emptyCartHtml
+  emptyCartHtml,
+  warrantyResultsHtml
 } from './templates.js';
 
 // Dữ liệu dự phòng nhúng sẵn (phòng trường hợp người dùng mở trực tiếp file:// mà không qua HTTP server)
@@ -355,6 +357,37 @@ class App {
     this.initHeroMotion();
     this.initLayerNavigation();
     this.initMobileMenu();
+    this.initWarrantyLookup();
+  }
+
+  initWarrantyLookup() {
+    const form = document.getElementById('warrantyForm');
+    if (!form) return;
+    const input = document.getElementById('warrantyPhone');
+    const button = document.getElementById('warrantySubmit');
+    const results = document.getElementById('warrantyResults');
+    const error = document.getElementById('warrantyError');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (button.disabled) return;
+      error.classList.add('hidden');
+      results.innerHTML = '';
+      button.disabled = true;
+      button.textContent = 'Đang tra cứu...';
+      try {
+        const result = await lookupWarranty(input.value);
+        if (!result.ok) {
+          error.textContent = result.message;
+          error.classList.remove('hidden');
+          return;
+        }
+        results.innerHTML = warrantyResultsHtml(result.records);
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Tra cứu';
+      }
+    });
   }
 
   initMobileMenu() {
@@ -654,6 +687,7 @@ class App {
       'suachua': 'layer-suachua',
       'phukien': 'layer-phukien',
       'camket': 'layer-camket',
+      'baohanh': 'layer-baohanh',
       'lienhe': 'layer-lienhe'
     };
     if (hashMap[hash]) {
@@ -726,7 +760,8 @@ class App {
       'layer-dienthoai': 'dienthoai',
       'layer-suachua': 'suachua',
       'layer-phukien': 'phukien',
-      'layer-camket': 'camket'
+      'layer-camket': 'camket',
+      'layer-baohanh': 'baohanh'
     };
     if (reverseHashMap[layerId] && history.replaceState) {
       history.replaceState(null, null, `#${reverseHashMap[layerId]}`);

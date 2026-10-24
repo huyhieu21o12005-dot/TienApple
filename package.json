@@ -8,7 +8,7 @@
     "test": "node --test Tests/**/*.test.js",
     "test:unit": "node --test Tests/unit/*.test.js",
     "test:integration": "node --test Tests/integration/*.test.js",
-    "coverage": "node --test --experimental-test-coverage --test-coverage-include='Frontend/js/{store,utils,templates,productsApi,ordersApi,config,waterRipples}.js' --test-coverage-include='Frontend/admin/{adminHelpers,ordersHelpers}.js' Tests/unit/*.test.js Tests/integration/*.test.js"
+    "coverage": "node --test --experimental-test-coverage --test-coverage-include='Frontend/js/{store,utils,templates,productsApi,ordersApi,warranty,warrantyApi,config,waterRipples}.js' --test-coverage-include='Frontend/admin/{adminHelpers,ordersHelpers}.js' Tests/unit/*.test.js Tests/integration/*.test.js"
   },
   "keywords": [
     "apple",
