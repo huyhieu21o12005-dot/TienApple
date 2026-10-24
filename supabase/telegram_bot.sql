@@ -24,7 +24,7 @@ begin
   if coalesce(v_token, '') = '' then return; end if;
   perform net.http_post(
     url := 'https://api.telegram.org/bot' || v_token || '/' || p_method,
-    body := p_payload,
+    body := jsonb_strip_nulls(p_payload),
     headers := '{"Content-Type": "application/json"}'::jsonb,
     timeout_milliseconds := 15000
   );
@@ -453,6 +453,7 @@ declare
   v_reply text := coalesce(v_msg -> 'reply_to_message' ->> 'text', '');
   v_reply_bot boolean := coalesce((v_msg -> 'reply_to_message' -> 'from' ->> 'is_bot')::boolean, false);
   v_data text;
+  v_thread bigint := (coalesce(v_upd -> 'message', v_cb -> 'message') ->> 'message_thread_id')::bigint;
 begin
   v_hdr := coalesce((coalesce(nullif(current_setting('request.headers', true), ''), '{}')::jsonb) ->> 'x-telegram-bot-api-secret-token', '');
   select value into v_secret from public.notify_settings where key = 'telegram_webhook_secret';
@@ -471,7 +472,7 @@ begin
     v_data := coalesce(v_cb ->> 'data', 'm');
     perform public.tg_call('answerCallbackQuery', jsonb_build_object('callback_query_id', v_cb ->> 'id'));
     if v_data = 'q' or v_data = 'a' then
-      perform public.tg_call('sendMessage', jsonb_build_object(
+      perform public.tg_call('sendMessage', jsonb_build_object('message_thread_id', v_thread,
         'chat_id', v_chat,
         'text', case when v_data = 'q' then public.tg_prompt_search() else public.tg_prompt_add() end,
         'reply_markup', jsonb_build_object('force_reply', true, 'input_field_placeholder',
@@ -501,7 +502,7 @@ begin
   end if;
 
   if v_cmd = '/start' then
-    perform public.tg_call('sendMessage', jsonb_build_object(
+    perform public.tg_call('sendMessage', jsonb_build_object('message_thread_id', v_thread,
       'chat_id', v_chat,
       'text', E'\U0001f44b Ch\u00e0o m\u1eebng \u0111\u1ebfn <b>Tien Mobile \u00b7 Qu\u1ea3n l\u00fd</b>. D\u00f9ng b\u00e0n ph\u00edm b\u00ean d\u01b0\u1edbi ho\u1eb7c g\u00f5 /help.',
       'parse_mode', 'HTML',
@@ -529,7 +530,7 @@ begin
   elsif v_cmd = '/themphieu' and v_arg <> '' then
     v_screen := public.tg_add_warranty(v_arg);
   elsif v_cmd in ('/tim', '/themphieu') then
-    perform public.tg_call('sendMessage', jsonb_build_object(
+    perform public.tg_call('sendMessage', jsonb_build_object('message_thread_id', v_thread,
       'chat_id', v_chat,
       'text', case when v_cmd = '/tim' then public.tg_prompt_search() else public.tg_prompt_add() end,
       'reply_markup', jsonb_build_object('force_reply', true)));
@@ -542,7 +543,7 @@ begin
     return jsonb_build_object('ok', true);
   end if;
 
-  perform public.tg_call('sendMessage', jsonb_build_object(
+  perform public.tg_call('sendMessage', jsonb_build_object('message_thread_id', v_thread,
     'chat_id', v_chat,
     'text', v_screen ->> 'text',
     'parse_mode', 'HTML',

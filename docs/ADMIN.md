@@ -236,4 +236,6 @@ Bot không có lệnh xóa. Chỉ nhóm có chat id đã cấu hình được d�
 
 SQL: `supabase/telegram_bot.sql`. Kích hoạt một lần: `select public.telegram_setup('https://<project>.supabase.co/rest/v1/rpc/telegram_webhook?apikey=<khóa công khai>');`. Telegram gọi webhook kèm mã bí mật (lưu trong `notify_settings`), không có mã đúng thì bị từ chối.
 
+**Chia thông báo theo chủ đề (Topics):** nhóm có 4 chủ đề: 🛒 Đơn hàng, 🔧 Lịch sửa chữa, ♻️ Thu cũ, 🛡️ Bảo hành. Thông báo tự vào đúng chủ đề (lịch có dịch vụ "Thu cũ" vào ♻️ Thu cũ). Bot trả lời ngay trong chủ đề mà bạn gõ lệnh; chủ đề General dùng cho `/start`, `/menu`. Thiết lập một lần bằng `supabase/telegram_topics.sql`: chạy `select public.telegram_make_topics();`, vài giây sau chạy `select public.telegram_save_topics();`. Id chủ đề lưu ở `notify_settings` (khóa `telegram_topic_order`, `_booking`, `_tradein`, `_warranty`); chưa có thì thông báo vào General. Bot cần là quản trị viên có quyền quản lý chủ đề.
+
 **Lưu ý chat id:** nếu bật Chủ đề (Topics) hoặc nâng nhóm lên supergroup, chat id đổi (dạng `-100...`). Cập nhật bằng: `update public.notify_settings set value = 'CHAT_ID_MOI' where key = 'telegram_chat_id';`. Bot trả lời mọi lệnh ở chủ đề General.
