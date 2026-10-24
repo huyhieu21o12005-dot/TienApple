@@ -219,3 +219,17 @@ Lưu ý: nếu Telegram lỗi hoặc chưa cấu hình, đơn của khách vẫn
 Khi cần đổi token (bị lộ hoặc thu hồi): trong BotFather gửi `/revoke`, chọn bot, copy token mới, rồi chạy trong SQL Editor:
 `update public.notify_settings set value = 'TOKEN_MOI' where key = 'telegram_bot_token';`
 Token cũ hết hiệu lực ngay, thông báo sẽ không gửi cho đến khi cập nhật token mới.
+
+## Bot Telegram quản lý bằng nút bấm
+
+Gõ `/menu` (hoặc `/start`) trong nhóm tienmobiletd để mở menu với các nút:
+- **Đơn hàng**: danh sách đơn đang xử lý, bấm một đơn để xem chi tiết và đổi trạng thái (Xác nhận, Đang giao, Hoàn tất, Hủy).
+- **Lịch sửa** và **Thu cũ**: tương tự, trạng thái Xác nhận, Đang sửa, Hoàn tất, Hủy.
+- **Bảo hành**: số phiếu còn hạn và hết hạn, phiếu sắp hết hạn trong 30 ngày, phiếu mới nhất.
+- **Hôm nay**: số đơn, doanh thu (không tính đơn hủy), lịch sửa, thu cũ, phiếu bảo hành mới.
+- **Tra SĐT**: gõ `/tim 0912345678` để xem đơn, lịch và phiếu bảo hành của khách.
+Bot không có lệnh xóa. Chỉ nhóm có chat id đã cấu hình được dùng bot.
+
+SQL: `supabase/telegram_bot.sql`. Kích hoạt một lần: `select public.telegram_setup('https://<project>.supabase.co/rest/v1/rpc/telegram_webhook?apikey=<khóa công khai>');`. Telegram gọi webhook kèm mã bí mật (lưu trong `notify_settings`), không có mã đúng thì bị từ chối.
+
+**Lưu ý chat id:** nếu bật Chủ đề (Topics) hoặc nâng nhóm lên supergroup, chat id đổi (dạng `-100...`). Cập nhật bằng: `update public.notify_settings set value = 'CHAT_ID_MOI' where key = 'telegram_chat_id';`. Bot trả lời mọi lệnh ở chủ đề General.
