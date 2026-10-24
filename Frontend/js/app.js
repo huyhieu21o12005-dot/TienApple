@@ -1344,7 +1344,10 @@ class App {
       done.querySelector('p').textContent = result.ok
         ? `Đã gửi thông tin cho cửa hàng (mã ${result.code}). Cửa hàng sẽ liên hệ lại với bạn sớm nhất. Zalo của cửa hàng đã mở để bạn nhắn thêm.`
         : `Chưa gửi được thông tin tự động. ${result.message} Bạn hãy sao chép nội dung dưới đây và gửi qua Zalo cửa hàng.`;
-      if (!result.ok) await this.copyText(message);
+      const copied = await this.copyText(message);
+      if (result.ok && copied) {
+        done.querySelector('p').textContent += ' Nội dung yêu cầu đã được sao chép, bạn chỉ cần dán vào Zalo và gửi.';
+      }
       done.classList.remove('hidden');
       if (result.ok) document.getElementById('quick-repair-bar-form').reset();
       if (!zaloWindow) this.showToast('Trình duyệt chặn cửa sổ mới, bấm "Mở Zalo" bên dưới.');
