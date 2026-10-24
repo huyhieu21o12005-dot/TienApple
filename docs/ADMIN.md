@@ -206,3 +206,16 @@ SQL đã chạy: `supabase/telegram.sql` (tạo trigger, bảng `notify_settings
 5. Bot phải gửi được tin thử. Từ đó mỗi đơn mới sẽ tự báo. Muốn đổi nhóm hoặc bot, chạy lại câu `insert` với giá trị mới.
 
 Lưu ý: nếu Telegram lỗi hoặc chưa cấu hình, đơn của khách vẫn được lưu bình thường. Bảng `notify_settings` không đọc được từ trình duyệt.
+
+## Dung lượng và dọn dữ liệu tạm
+
+- Mỗi đơn, lịch hẹn hoặc phiếu bảo hành chỉ chiếm khoảng 1 KB, nên gói miễn phí 500 MB của Supabase đủ chứa hàng trăm nghìn dòng. Không cần xóa đơn hàng để tiết kiệm chỗ; đây là dữ liệu kinh doanh.
+- Tin Telegram không lưu gì thêm trong cơ sở dữ liệu. Chỉ có hai loại dữ liệu tạm: nhật ký giới hạn số lần tra cứu bảo hành (`warranty_lookups`) và phản hồi của Telegram (`net._http_response`).
+- `supabase/cleanup.sql` đã lên lịch tự dọn hai loại này mỗi ngày lúc 03:00 UTC (10:00 giờ Việt Nam). Nhóm Telegram nên bật tự xóa tin sau 1 tháng để gọn.
+- Nên xuất đơn hàng cũ (hơn 1-2 năm) ra file rồi lưu riêng nếu muốn nhẹ bảng, nhưng không bắt buộc.
+
+## Đổi token bot Telegram
+
+Khi cần đổi token (bị lộ hoặc thu hồi): trong BotFather gửi `/revoke`, chọn bot, copy token mới, rồi chạy trong SQL Editor:
+`update public.notify_settings set value = 'TOKEN_MOI' where key = 'telegram_bot_token';`
+Token cũ hết hiệu lực ngay, thông báo sẽ không gửi cho đến khi cập nhật token mới.
