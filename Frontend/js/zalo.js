@@ -39,3 +39,18 @@ export function buildZaloMessage(data) {
   lines.push('Mình muốn nhận ưu đãi giảm 10%, shop tư vấn giúp mình nhé.');
   return lines.join('\n');
 }
+
+/**
+ * Tham số gửi lên create_booking khi khách nhận ưu đãi (lưu vào quản trị và báo Telegram).
+ */
+export function buildOfferBooking(data) {
+  const note = ['Ưu đãi sửa chữa giảm 10% (form ưu đãi)'];
+  if (text(data.note)) note.push(`Tình trạng: ${text(data.note)}`);
+  return {
+    name: text(data.name).slice(0, 100),
+    phone: normalizePhone(data.phone),
+    device: text(data.device).slice(0, 100),
+    service: text(data.service).slice(0, 100),
+    note: note.join(' | ').slice(0, 500)
+  };
+}

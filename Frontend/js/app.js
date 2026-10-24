@@ -12,7 +12,7 @@ import { lookupInstallment } from './installmentApi.js';
 import { lookupWarranty } from './warrantyApi.js';
 import { validateTradeIn, buildTradeInBooking } from './tradeIn.js';
 import { calcInstallment, INSTALLMENT_REFERENCE_RATE } from './installment.js';
-import { validateZaloOffer, buildZaloMessage, ZALO_URL } from './zalo.js';
+import { validateZaloOffer, buildZaloMessage, buildOfferBooking, ZALO_URL } from './zalo.js';
 import { enhanceSelects } from './customSelect.js';
 import { safeUrl, partitionProducts } from './utils.js';
 import {
@@ -1235,9 +1235,10 @@ class App {
 
   // Booking Modal
   openBookingModal(context = '') {
-    const input = document.getElementById('repairDeviceInput');
-    if (input && context) {
-      input.value = context;
+    const select = document.getElementById('repairServiceSelect');
+    if (select && context) {
+      const match = [...select.options].find(o => o.value === context);
+      if (match) select.value = match.value;
     }
     const modal = document.getElementById('repairModal');
     if (modal) {
@@ -1307,12 +1308,14 @@ class App {
     }
   }
 
-  // "Nhận ưu đãi": kiểm tra thông tin, sao chép tin nhắn rồi mở Zalo cửa hàng để khách dán và gửi
+  // "Nhận ưu đãi": gửi thông tin về cửa hàng (lưu vào quản trị và báo Telegram) và mở Zalo của chủ cửa hàng
   async handleQuickRepairBarSubmit(e) {
     e.preventDefault();
+    if (this._submitting) return;
     const val = (id) => document.getElementById(id)?.value ?? '';
     const error = document.getElementById('quick-bar-error');
     const done = document.getElementById('quick-bar-done');
+    const button = document.getElementById('quick-bar-submit');
     error.classList.add('hidden');
     done.classList.add('hidden');
 
@@ -1327,18 +1330,29 @@ class App {
       return;
     }
 
-    const message = buildZaloMessage(data);
+    // Mở Zalo ngay trong thao tác bấm để trình duyệt không chặn cửa sổ mới
     const zaloWindow = window.open(ZALO_URL, '_blank', 'noopener');
-    const copied = await this.copyText(message);
-
-    document.getElementById('quick-bar-preview').textContent = message;
-    done.querySelector('p').textContent = copied
-      ? 'Đã sao chép thông tin. Dán vào Zalo và bấm gửi cho cửa hàng.'
-      : 'Chưa tự sao chép được. Hãy chọn nội dung bên dưới, sao chép rồi gửi cho cửa hàng qua Zalo.';
-    done.classList.remove('hidden');
-    done.dataset.message = message;
-    if (!zaloWindow) this.showToast('Trình duyệt chặn cửa sổ mới, bấm "Mở Zalo" bên dưới.');
-    if (copied) this.showToast('Đã sao chép thông tin, dán vào Zalo để gửi.');
+    const message = buildZaloMessage(data);
+    const label = button?.querySelector('span');
+    this._submitting = true;
+    if (button) button.disabled = true;
+    if (label) label.textContent = 'Đang gửi...';
+    try {
+      const result = await submitBooking(buildOfferBooking(data));
+      document.getElementById('quick-bar-preview').textContent = message;
+      done.dataset.message = message;
+      done.querySelector('p').textContent = result.ok
+        ? `Đã gửi thông tin cho cửa hàng (mã ${result.code}). Cửa hàng sẽ liên hệ lại với bạn sớm nhất. Zalo của cửa hàng đã mở để bạn nhắn thêm.`
+        : `Chưa gửi được thông tin tự động. ${result.message} Bạn hãy sao chép nội dung dưới đây và gửi qua Zalo cửa hàng.`;
+      if (!result.ok) await this.copyText(message);
+      done.classList.remove('hidden');
+      if (result.ok) document.getElementById('quick-repair-bar-form').reset();
+      if (!zaloWindow) this.showToast('Trình duyệt chặn cửa sổ mới, bấm "Mở Zalo" bên dưới.');
+    } finally {
+      this._submitting = false;
+      if (button) button.disabled = false;
+      if (label) label.textContent = 'Nhận ưu đãi 10% qua Zalo';
+    }
   }
 
   // Chat Widget

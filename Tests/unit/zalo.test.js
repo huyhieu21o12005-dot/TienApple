@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateZaloOffer, buildZaloMessage, ZALO_URL } from '../../Frontend/js/zalo.js';
+import { validateZaloOffer, buildZaloMessage, buildOfferBooking, ZALO_URL } from '../../Frontend/js/zalo.js';
 
 const valid = { name: 'Nguyễn An', phone: '0912 345 678', device: 'iPhone 13 Pro Max', service: 'Thay pin', note: 'Pin chai' };
 
@@ -36,5 +36,22 @@ describe('zalo offer', () => {
     assert.ok(msg.split('\n')[1].length <= 'Họ tên: '.length + 100);
     assert.match(msg, /SĐT: abc/);
     assert.match(ZALO_URL, /^https:\/\/zalo\.me\/0986455457$/);
+  });
+});
+
+describe('zalo offer - buildOfferBooking', () => {
+  it('tạo lịch hẹn có ghi chú ưu đãi và tình trạng máy', () => {
+    const b = buildOfferBooking(valid);
+    assert.equal(b.phone, '0912345678');
+    assert.equal(b.device, 'iPhone 13 Pro Max');
+    assert.equal(b.service, 'Thay pin');
+    assert.match(b.note, /Ưu đãi sửa chữa giảm 10%/);
+    assert.match(b.note, /Tình trạng: Pin chai/);
+  });
+
+  it('không có tình trạng thì chỉ ghi ưu đãi; cắt độ dài', () => {
+    assert.doesNotMatch(buildOfferBooking({ ...valid, note: '' }).note, /Tình trạng/);
+    const long = buildOfferBooking({ ...valid, name: 'x'.repeat(300), device: 'y'.repeat(300), service: 'z'.repeat(300), note: 'n'.repeat(900) });
+    assert.ok(long.name.length <= 100 && long.device.length <= 100 && long.service.length <= 100 && long.note.length <= 500);
   });
 });
