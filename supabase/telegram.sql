@@ -57,7 +57,8 @@ begin
       'parse_mode', 'HTML',
       'disable_web_page_preview', true
     ),
-    headers := '{"Content-Type": "application/json"}'::jsonb
+    headers := '{"Content-Type": "application/json"}'::jsonb,
+    timeout_milliseconds := 15000
   );
 exception when others then
   null;
