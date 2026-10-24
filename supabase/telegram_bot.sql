@@ -107,6 +107,23 @@ as $$
 $$;
 
 -- Tra theo so dien thoai
+create or replace function public.tg_installment_card(r public.installments)
+returns text
+language sql
+as $$
+  select E'\U0001f4b3 <b>Tr\u1ea3 g\u00f3p ' || r.code || E'</b> \u00b7 ' || case r.status when 'active' then E'\u0110ang g\u00f3p' when 'completed' then E'\u0110\u00e3 t\u1ea5t to\u00e1n' else E'\u0110\u00e3 h\u1ee7y' end
+    || E'\nKh\u00e1ch: ' || public.tg_escape(r.customer_name) || E' \u00b7 ' || r.phone
+    || E'\nM\u00e1y: ' || public.tg_escape(r.product)
+    || E'\nGi\u00e1 g\u1ed1c: ' || public.tg_money(r.original_price) || E' \u00b7 Tr\u1ea3 tr\u01b0\u1edbc: ' || public.tg_money(r.down_payment)
+    || E'\nL\u00e3i: ' || trim(trailing '.' from trim(trailing '0' from r.interest_rate::text)) || E'%/th\u00e1ng \u00b7 ' || r.term_months || E' th\u00e1ng'
+    || E'\nG\u00f3p m\u1ed7i th\u00e1ng: <b>' || public.tg_money(r.monthly_payment) || '</b>'
+    || E'\n\u0110\u00e3 \u0111\u00f3ng: <b>' || r.paid_months || '/' || r.term_months || E'</b> k\u1ef3'
+    || case when r.status = 'active' then E' \u00b7 k\u1ef3 t\u1edbi ' || to_char((r.start_date + make_interval(months => r.paid_months + 1))::date, 'DD/MM/YYYY') else '' end
+    || E'\nH\u00ecnh th\u1ee9c: ' || public.tg_escape(r.pay_method)
+    || E'\n<b>Th\u00e0nh ti\u1ec1n: ' || public.tg_money(r.total_amount) || '</b>'
+    || case when r.documents is not null then E'\nGi\u1ea5y t\u1edd: ' || public.tg_escape(r.documents) else '' end;
+$$;
+
 create or replace function public.tg_search(p_input text)
 returns jsonb
 language plpgsql
@@ -152,6 +169,15 @@ begin
   end loop;
   if v_n = 0 then v_text := v_text || E'\n(kh\u00f4ng c\u00f3)'; end if;
 
+  v_n := 0;
+  v_text := v_text || E'\n\n<b>Tr\u1ea3 g\u00f3p</b>';
+  for r in select code, product, paid_months, term_months, status from public.installments where phone = v_phone order by created_at desc limit 5 loop
+    v_n := v_n + 1;
+    v_text := v_text || E'\n\u2022 ' || r.code || E' \u00b7 ' || public.tg_escape(r.product) || E' \u00b7 ' || r.paid_months || '/' || r.term_months || E' k\u1ef3 \u00b7 '
+      || case r.status when 'active' then E'\u0111ang g\u00f3p' when 'completed' then E'\u0111\u00e3 t\u1ea5t to\u00e1n' else E'\u0111\u00e3 h\u1ee7y' end;
+  end loop;
+  if v_n = 0 then v_text := v_text || E'\n(kh\u00f4ng c\u00f3)'; end if;
+
   return jsonb_build_object('text', v_text,
     'markup', jsonb_build_object('inline_keyboard', jsonb_build_array(jsonb_build_array(public.tg_btn(E'\u2b05 Menu', 'm')))));
 end;
@@ -176,9 +202,10 @@ declare
   v_day timestamptz := date_trunc('day', now() at time zone 'Asia/Ho_Chi_Minh') at time zone 'Asia/Ho_Chi_Minh';
   v_ord public.orders;
   v_bk public.repair_bookings;
+  v_ins public.installments;
   r record;
   v_n int := 0;
-  a int; b int; c int; d bigint; e int; f int;
+  a int; b int; c int; d bigint; e int; f int; g int;
 begin
   -- Doi trang thai truoc, sau do hien lai the chi tiet
   if v_act = 's' and v_kind = 'o' and v_code ~ '^DH[0-9]+$'
@@ -188,6 +215,10 @@ begin
   elsif v_act = 's' and v_kind in ('b', 't') and v_code ~ '^SC[0-9]+$'
      and v_st in ('new', 'confirmed', 'in_progress', 'done', 'cancelled') then
     update public.repair_bookings set status = v_st where code = v_code;
+    v_act := 'v';
+  elsif v_act = 'p' and v_kind = 'g' and v_code ~ '^TG[0-9]+$' then
+    update public.installments set paid_months = paid_months + 1
+      where code = v_code and status = 'active' and paid_months < term_months;
     v_act := 'v';
   end if;
 
@@ -244,6 +275,30 @@ begin
       );
     end if;
 
+  elsif v_kind = 'g' and v_act = 'l' then
+    v_text := E'\U0001f4b3 <b>Tr\u1ea3 g\u00f3p \u0111ang g\u00f3p</b>';
+    for r in select code, customer_name, product, paid_months, term_months from public.installments
+             where status = 'active' order by start_date, created_at limit 8 loop
+      v_n := v_n + 1;
+      v_rows := v_rows || jsonb_build_array(jsonb_build_array(public.tg_btn(
+        r.code || E' \u00b7 ' || left(r.customer_name, 14) || E' \u00b7 ' || left(r.product, 14) || E' \u00b7 ' || r.paid_months || '/' || r.term_months,
+        'g:v:' || r.code)));
+    end loop;
+    if v_n = 0 then v_text := v_text || E'\nKh\u00f4ng c\u00f3 h\u1ed3 s\u01a1 n\u00e0o \u0111ang g\u00f3p.'; end if;
+    v_rows := v_rows || jsonb_build_array(jsonb_build_array(public.tg_btn(E'\U0001f504 L\u00e0m m\u1edbi', 'g:l'), public.tg_btn(E'\u2b05 Menu', 'm')));
+
+  elsif v_kind = 'g' and v_act = 'v' then
+    select * into v_ins from public.installments where code = v_code;
+    if not found then
+      v_text := E'Kh\u00f4ng t\u00ecm th\u1ea5y h\u1ed3 s\u01a1.';
+    else
+      v_text := public.tg_installment_card(v_ins);
+      if v_ins.status = 'active' then
+        v_rows := jsonb_build_array(jsonb_build_array(public.tg_btn(E'\u2705 +1 k\u1ef3 \u0111\u00e3 \u0111\u00f3ng', 'g:p:' || v_code)));
+      end if;
+    end if;
+    v_rows := v_rows || jsonb_build_array(jsonb_build_array(public.tg_btn(E'\u2b05 Danh s\u00e1ch', 'g:l'), public.tg_btn('Menu', 'm')));
+
   elsif v_kind = 'w' then
     select count(*) filter (where (start_date + make_interval(months => warranty_months))::date >= current_date),
            count(*) filter (where (start_date + make_interval(months => warranty_months))::date < current_date)
@@ -292,16 +347,17 @@ begin
       into b, c from public.repair_bookings;
     select count(*) into f from public.warranties
       where (start_date + make_interval(months => warranty_months))::date between current_date and current_date + 30;
+    select count(*) into g from public.installments where status = 'active';
     v_text := E'\U0001f3ea <b>TIEN MOBILE \u00b7 QU\u1ea2N L\u00dd</b>'
       || E'\n\u0110\u01a1n m\u1edbi: <b>' || a || E'</b> \u00b7 L\u1ecbch s\u1eeda m\u1edbi: <b>' || b || E'</b> \u00b7 Thu c\u0169 m\u1edbi: <b>' || c || '</b>'
-      || E'\nB\u1ea3o h\u00e0nh s\u1eafp h\u1ebft h\u1ea1n (30 ng\u00e0y): <b>' || f || '</b>'
+      || E'\nB\u1ea3o h\u00e0nh s\u1eafp h\u1ebft h\u1ea1n (30 ng\u00e0y): <b>' || f || E'</b> \u00b7 Tr\u1ea3 g\u00f3p \u0111ang g\u00f3p: <b>' || g || '</b>'
       || E'\n\nCh\u1ecdn m\u1ee5c b\u00ean d\u01b0\u1edbi:';
     v_rows := jsonb_build_array(
       jsonb_build_array(public.tg_btn(E'\U0001f6d2 \u0110\u01a1n h\u00e0ng (' || a || ')', 'o:l'), public.tg_btn(E'\U0001f527 L\u1ecbch s\u1eeda (' || b || ')', 'b:l')),
       jsonb_build_array(public.tg_btn(E'\u267b\ufe0f Thu c\u0169 (' || c || ')', 't:l'), public.tg_btn(E'\U0001f6e1\ufe0f B\u1ea3o h\u00e0nh', 'w:l')),
-      jsonb_build_array(public.tg_btn(E'\U0001f4ca H\u00f4m nay', 's:t'), public.tg_btn(E'\U0001f50e Tra S\u0110T', 'q')),
-      jsonb_build_array(public.tg_btn(E'\u2795 Th\u00eam phi\u1ebfu BH', 'a'), public.tg_btn(E'\u2753 Tr\u1ee3 gi\u00fap', 'h')),
-      jsonb_build_array(public.tg_btn(E'\U0001f504 L\u00e0m m\u1edbi', 'm'))
+      jsonb_build_array(public.tg_btn(E'\U0001f4b3 Tr\u1ea3 g\u00f3p (' || g || ')', 'g:l'), public.tg_btn(E'\U0001f4ca H\u00f4m nay', 's:t')),
+      jsonb_build_array(public.tg_btn(E'\U0001f50e Tra S\u0110T', 'q'), public.tg_btn(E'\u2795 Th\u00eam phi\u1ebfu BH', 'a')),
+      jsonb_build_array(public.tg_btn(E'\u2753 Tr\u1ee3 gi\u00fap', 'h'), public.tg_btn(E'\U0001f504 L\u00e0m m\u1edbi', 'm'))
     );
   end if;
 
@@ -319,6 +375,7 @@ as $$
     || E'\n\n<b>L\u1ec7nh</b>'
     || E'\n/menu \u00b7 m\u1edf menu qu\u1ea3n l\u00fd (n\u00fat b\u1ea5m)'
     || E'\n/donhang \u00b7 \u0111\u01a1n \u0111ang x\u1eed l\u00fd'
+    || E'\n/tragop \u00b7 h\u1ed3 s\u01a1 tr\u1ea3 g\u00f3p \u0111ang g\u00f3p'
     || E'\n/lichsua \u00b7 l\u1ecbch s\u1eeda ch\u1eefa \u0111ang x\u1eed l\u00fd'
     || E'\n/thucu \u00b7 y\u00eau c\u1ea7u thu c\u0169 \u0111ang x\u1eed l\u00fd'
     || E'\n/baohanh \u00b7 t\u00ecnh tr\u1ea1ng b\u1ea3o h\u00e0nh'
@@ -359,8 +416,9 @@ immutable
 as $$
   select jsonb_build_object('keyboard', jsonb_build_array(
       jsonb_build_array(jsonb_build_object('text', E'\U0001f3e0 Menu'), jsonb_build_object('text', E'\U0001f6d2 \u0110\u01a1n h\u00e0ng'), jsonb_build_object('text', E'\U0001f527 L\u1ecbch s\u1eeda')),
-      jsonb_build_array(jsonb_build_object('text', E'\u267b\ufe0f Thu c\u0169'), jsonb_build_object('text', E'\U0001f6e1\ufe0f B\u1ea3o h\u00e0nh'), jsonb_build_object('text', E'\U0001f4ca H\u00f4m nay')),
-      jsonb_build_array(jsonb_build_object('text', E'\U0001f50e Tra S\u0110T'), jsonb_build_object('text', E'\u2795 Th\u00eam phi\u1ebfu BH'), jsonb_build_object('text', E'\u2753 Tr\u1ee3 gi\u00fap'))),
+      jsonb_build_array(jsonb_build_object('text', E'\u267b\ufe0f Thu c\u0169'), jsonb_build_object('text', E'\U0001f6e1\ufe0f B\u1ea3o h\u00e0nh'), jsonb_build_object('text', E'\U0001f4b3 Tr\u1ea3 g\u00f3p')),
+      jsonb_build_array(jsonb_build_object('text', E'\U0001f4ca H\u00f4m nay'), jsonb_build_object('text', E'\U0001f50e Tra S\u0110T'), jsonb_build_object('text', E'\u2795 Th\u00eam phi\u1ebfu BH')),
+      jsonb_build_array(jsonb_build_object('text', E'\u2753 Tr\u1ee3 gi\u00fap'))),
     'resize_keyboard', true, 'is_persistent', true);
 $$;
 
@@ -374,6 +432,7 @@ as $$
     when lower('Menu') then '/menu'
     when lower(E'\u0110\u01a1n h\u00e0ng') then '/donhang'
     when lower(E'L\u1ecbch s\u1eeda') then '/lichsua'
+    when lower(E'Tr\u1ea3 g\u00f3p') then '/tragop'
     when lower(E'Thu c\u0169') then '/thucu'
     when lower(E'B\u1ea3o h\u00e0nh') then '/baohanh'
     when lower(E'H\u00f4m nay') then '/homnay'
@@ -514,6 +573,8 @@ begin
     v_screen := public.tg_screen('o:l');
   elsif v_cmd = '/lichsua' then
     v_screen := public.tg_screen('b:l');
+  elsif v_cmd = '/tragop' then
+    v_screen := public.tg_screen('g:l');
   elsif v_cmd = '/thucu' then
     v_screen := public.tg_screen('t:l');
   elsif v_cmd = '/baohanh' then
@@ -584,6 +645,7 @@ begin
     jsonb_build_object('command', 'menu', 'description', E'M\u1edf menu qu\u1ea3n l\u00fd'),
     jsonb_build_object('command', 'donhang', 'description', E'\u0110\u01a1n h\u00e0ng \u0111ang x\u1eed l\u00fd'),
     jsonb_build_object('command', 'lichsua', 'description', E'L\u1ecbch s\u1eeda ch\u1eefa'),
+    jsonb_build_object('command', 'tragop', 'description', E'H\u1ed3 s\u01a1 tr\u1ea3 g\u00f3p'),
     jsonb_build_object('command', 'thucu', 'description', E'Y\u00eau c\u1ea7u thu c\u0169'),
     jsonb_build_object('command', 'baohanh', 'description', E'T\u00ecnh tr\u1ea1ng b\u1ea3o h\u00e0nh'),
     jsonb_build_object('command', 'homnay', 'description', E'Th\u1ed1ng k\u00ea h\u00f4m nay'),
