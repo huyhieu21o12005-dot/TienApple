@@ -7,9 +7,10 @@ import { CartManager, ProductFilter, BookingValidator } from './store.js';
 import { Phone3DStudio } from './hero3d.js';
 import { WaterRipplesEngine } from './waterRipples.js';
 import { fetchProducts } from './productsApi.js';
-import { submitOrder, submitBooking, buildOrderItems } from './ordersApi.js';
+import { submitOrder, submitBooking, submitInstallment, buildOrderItems } from './ordersApi.js';
 import { lookupWarranty } from './warrantyApi.js';
 import { validateTradeIn, buildTradeInBooking } from './tradeIn.js';
+import { calcInstallment, validateInstallment, buildInstallmentPayload } from './installment.js';
 import { enhanceSelects } from './customSelect.js';
 import { safeUrl, partitionProducts } from './utils.js';
 import {
@@ -361,6 +362,7 @@ class App {
     this.initMobileMenu();
     this.initWarrantyLookup();
     this.initTradeInForm();
+    this.initInstallmentForm();
     enhanceSelects();
   }
 
@@ -406,6 +408,71 @@ class App {
       } finally {
         button.disabled = false;
         button.textContent = 'Gửi yêu cầu báo giá';
+      }
+    });
+  }
+
+  initInstallmentForm() {
+    const form = document.getElementById('installmentForm');
+    if (!form) return;
+    const val = (id) => document.getElementById(id)?.value ?? '';
+    const button = document.getElementById('installmentSubmit');
+    const error = document.getElementById('installmentError');
+    const done = document.getElementById('installmentDone');
+    const preview = document.getElementById('tgPreview');
+    const money = (n) => CartManager.formatCurrency(n);
+
+    const updatePreview = () => {
+      const calc = calcInstallment({ price: val('tgPrice'), downPayment: val('tgDown'), term: val('tgTerm') });
+      if (!calc.valid) {
+        preview.innerHTML = '<div class="text-[13px] text-[#6E6E73]">Nhập giá máy và chọn kỳ hạn để xem tiền góp ước tính mỗi tháng.</div>';
+        return;
+      }
+      preview.innerHTML = `
+        <div class="text-[13px] text-[#6E6E73]">Số tiền góp ước tính</div>
+        <div class="text-[22px] font-semibold text-[#1D1D1F]">${money(calc.monthly)} <span class="text-[14px] font-normal text-[#6E6E73]">/ tháng × ${Number(val('tgTerm'))} tháng</span></div>
+        <div class="text-[12px] text-[#6E6E73] mt-1">Khoản vay ${money(calc.loan)} sau khi trả trước. Chưa gồm lãi suất và phí của gói tài chính.</div>`;
+    };
+    ['tgPrice', 'tgDown', 'tgTerm'].forEach(id => {
+      document.getElementById(id)?.addEventListener('input', updatePreview);
+      document.getElementById(id)?.addEventListener('change', updatePreview);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (button.disabled) return;
+      error.classList.add('hidden');
+      done.classList.add('hidden');
+
+      const data = {
+        product: val('tgProduct'), price: val('tgPrice'), downPayment: val('tgDown'), term: val('tgTerm'),
+        method: val('tgMethod'), occupation: val('tgOccupation'),
+        documents: [...form.querySelectorAll('input[name="tgDoc"]:checked')].map(el => el.value),
+        name: val('tgName'), phone: val('tgPhone'), note: val('tgNote')
+      };
+      const check = validateInstallment(data);
+      if (!check.valid) {
+        error.textContent = check.errors[0];
+        error.classList.remove('hidden');
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = 'Đang gửi...';
+      try {
+        const result = await submitInstallment(buildInstallmentPayload(data));
+        if (!result.ok) {
+          error.textContent = result.message;
+          error.classList.remove('hidden');
+          return;
+        }
+        form.reset();
+        updatePreview();
+        done.textContent = `Đã nhận hồ sơ ${result.code}. Tiền góp ước tính khoảng ${money(result.monthly)} mỗi tháng. Cửa hàng sẽ gọi lại tư vấn và hướng dẫn hồ sơ sớm nhất.`;
+        done.classList.remove('hidden');
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Gửi đăng ký trả góp';
       }
     });
   }
@@ -737,6 +804,7 @@ class App {
       'suachua': 'layer-suachua',
       'phukien': 'layer-phukien',
       'camket': 'layer-camket',
+      'tragop': 'layer-tragop',
       'baohanh': 'layer-baohanh',
       'lienhe': 'layer-lienhe'
     };
@@ -811,6 +879,7 @@ class App {
       'layer-suachua': 'suachua',
       'layer-phukien': 'phukien',
       'layer-camket': 'camket',
+      'layer-tragop': 'tragop',
       'layer-baohanh': 'baohanh'
     };
     if (reverseHashMap[layerId] && history.replaceState) {

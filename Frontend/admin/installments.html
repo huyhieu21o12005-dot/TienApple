@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Tien Mobile - Quản Trị Trả Góp</title>
+  <link rel="stylesheet" href="./admin.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+</head>
+<body class="admin-body">
+
+  <main id="gateSection" class="login-section hidden">
+    <div class="login-card">
+      <div class="login-header">
+        <img class="brand-logo" src="../assets/logo.svg" width="56" height="56" alt="Tien Mobile">
+        <h1 class="login-title">Cần đăng nhập</h1>
+        <p id="gateMessage" class="login-subtitle">Vui lòng đăng nhập tài khoản quản trị.</p>
+      </div>
+      <a href="./index.html" class="btn btn-primary btn-block">Đến trang đăng nhập</a>
+    </div>
+  </main>
+
+  <div id="iApp" class="admin-app hidden">
+    <header class="admin-topbar">
+      <div class="topbar-inner ord-topbar">
+        <div class="brand-area">
+          <img class="brand-logo-small" src="../assets/logo.svg" width="28" height="28" alt="">
+          <div class="brand-text-group">
+            <span class="brand-name">Tien Mobile</span>
+            <span class="brand-tag">Trả góp</span>
+          </div>
+        </div>
+        <nav class="ord-nav" aria-label="Điều hướng quản trị">
+          <a class="btn btn-ghost btn-sm" href="../index.html" title="Về trang chủ Tiến Mobile">← Trang chủ</a>
+          <a class="btn btn-ghost btn-sm" href="./index.html">Sản phẩm</a>
+          <a class="btn btn-ghost btn-sm" href="./orders.html">Đơn hàng</a>
+          <a class="btn btn-ghost btn-sm" href="./warranty.html">Bảo hành</a>
+          <a class="btn btn-secondary btn-sm" href="./installments.html" aria-current="page">Trả góp</a>
+        </nav>
+        <div class="topbar-actions">
+          <button type="button" id="logoutBtn" class="btn btn-secondary btn-sm">Đăng xuất</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="ord-main">
+      <div class="ord-toolbar">
+        <input type="search" id="iSearch" class="form-input" placeholder="Tìm theo mã, tên, số điện thoại, máy..." aria-label="Tìm kiếm">
+      </div>
+      <div id="iChips" class="ord-chips" role="group" aria-label="Lọc theo trạng thái"></div>
+      <div id="iError" class="alert-box alert-error hidden" role="alert"></div>
+      <div id="iLoading" class="ord-empty hidden">Đang tải...</div>
+      <section id="iList" class="ord-list" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+  <script type="module" src="./installments.js"></script>
+</body>
+</html>

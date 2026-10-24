@@ -18,7 +18,8 @@ begin
     ('order', E'\U0001f6d2 \u0110\u01a1n h\u00e0ng'),
     ('booking', E'\U0001f527 L\u1ecbch s\u1eeda ch\u1eefa'),
     ('tradein', E'\u267b\ufe0f Thu c\u0169'),
-    ('warranty', E'\U0001f6e1\ufe0f B\u1ea3o h\u00e0nh')
+    ('warranty', E'\U0001f6e1\ufe0f B\u1ea3o h\u00e0nh'),
+    ('installment', E'\U0001f4b3 Tr\u1ea3 g\u00f3p')
   ) as t(kind, title)
   loop
     if not exists (select 1 from public.notify_settings where key = 'telegram_topic_' || r.kind) then
@@ -53,6 +54,7 @@ begin
       when v_body -> 'result' ->> 'name' like E'%ch\u1eefa' then 'booking'
       when v_body -> 'result' ->> 'name' like E'%Thu c\u0169' then 'tradein'
       when v_body -> 'result' ->> 'name' like E'%B\u1ea3o h\u00e0nh' then 'warranty'
+      when v_body -> 'result' ->> 'name' like E'%Tr\u1ea3 g\u00f3p' then 'installment'
       else null end;
     if v_kind is null then continue; end if;
     insert into public.notify_settings (key, value) values ('telegram_topic_' || v_kind, v_body -> 'result' ->> 'message_thread_id')

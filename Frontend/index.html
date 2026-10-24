@@ -76,6 +76,10 @@
         <span>Thu cũ &amp; Cam kết</span>
         <span class="nav-active-bar absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#1D1D1F] hidden"></span>
       </a>
+      <a href="#tragop" class="nav-layer-link h-full flex items-center relative text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-tragop">
+        <span>Trả góp</span>
+        <span class="nav-active-bar absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#1D1D1F] hidden"></span>
+      </a>
       <a href="#baohanh" class="nav-layer-link h-full flex items-center relative text-[13px] font-normal text-[#6E6E73] hover:text-[#1D1D1F] transition-colors header-item" data-layer="layer-baohanh">
         <span>Bảo hành</span>
         <span class="nav-active-bar absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#1D1D1F] hidden"></span>
@@ -111,6 +115,7 @@
     <a href="#suachua" class="nav-layer-link mobile-nav-link" data-layer="layer-suachua">Sửa chữa</a>
     <a href="#phukien" class="nav-layer-link mobile-nav-link" data-layer="layer-phukien">Phụ kiện</a>
     <a href="#camket" class="nav-layer-link mobile-nav-link" data-layer="layer-camket">Thu cũ &amp; Cam kết</a>
+    <a href="#tragop" class="nav-layer-link mobile-nav-link" data-layer="layer-tragop">Trả góp</a>
     <a href="#baohanh" class="nav-layer-link mobile-nav-link" data-layer="layer-baohanh">Tra cứu bảo hành</a>
     <a href="#lienhe" class="nav-layer-link mobile-nav-link" data-layer="layer-lienhe">Liên hệ</a>
     <button class="booking-trigger mt-6 w-full h-12 rounded-full bg-[#1D1D1F] text-white text-[15px] font-medium cursor-pointer border-0" data-service-context="Đặt lịch sửa tổng quát" type="button">Đặt lịch sửa</button>
@@ -555,6 +560,59 @@
           <div id="warrantyResults" class="mt-6 grid gap-4" aria-live="polite"></div>
           <p class="mt-6 text-[12px] text-[#6E6E73] text-center">Vì bảo mật, tên khách hàng được ẩn một phần. Cần hỗ trợ, gọi hotline 0986 455 457.</p>
         </div>
+      </section>
+    </div>
+
+    <div class="app-layer hidden" id="layer-tragop">
+      <!-- ======================================================================
+           TRẢ GÓP: ước tính tiền góp + đăng ký hồ sơ
+           ====================================================================== -->
+      <section class="w-full bg-white pt-14 pb-14 px-6 sm:px-10 lg:px-16" id="tragop">
+      <div class="max-w-[760px] mx-auto">
+        <div class="mb-8 text-center">
+          <span class="text-[12px] font-semibold text-[#6E6E73] uppercase tracking-widest block mb-1">TRẢ GÓP DỄ DÀNG</span>
+          <h2 class="headline-lg text-[#1D1D1F]">Đăng ký mua trả góp</h2>
+          <p class="text-[15px] text-[#515154] mt-2">Chọn máy, trả trước một phần, góp phần còn lại theo tháng. Điền thông tin bên dưới, cửa hàng sẽ gọi lại tư vấn gói phù hợp và hướng dẫn hồ sơ.</p>
+        </div>
+
+        <ol class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 text-[13px] text-[#3A3A3C]">
+          <li class="rounded-2xl bg-[#F5F5F7] p-4"><strong class="block text-[#1D1D1F] mb-1">1. Đăng ký online</strong>Điền máy, số tiền trả trước và kỳ hạn mong muốn.</li>
+          <li class="rounded-2xl bg-[#F5F5F7] p-4"><strong class="block text-[#1D1D1F] mb-1">2. Cửa hàng gọi lại</strong>Tư vấn gói trả góp và lãi suất, hướng dẫn chuẩn bị hồ sơ.</li>
+          <li class="rounded-2xl bg-[#F5F5F7] p-4"><strong class="block text-[#1D1D1F] mb-1">3. Duyệt và nhận máy</strong>Mang hồ sơ gốc đến quầy, ký hợp đồng và nhận máy.</li>
+        </ol>
+
+        <form id="installmentForm" class="rounded-2xl bg-[#F5F5F7]/60 border border-[#D2D2D7] p-5 sm:p-7 grid grid-cols-1 sm:grid-cols-2 gap-4" novalidate>
+          <div class="sm:col-span-2"><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tgProduct">Máy muốn mua</label>
+            <input id="tgProduct" class="w-full h-12 px-4 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" maxlength="100" placeholder="Ví dụ: iPhone 15 Pro Max 256GB" autocomplete="off" required></div>
+          <div><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tgPrice">Giá máy dự kiến (₫)</label>
+            <input id="tgPrice" class="w-full h-12 px-4 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" type="text" inputmode="numeric" placeholder="Ví dụ: 30000000" autocomplete="off" required></div>
+          <div><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tgDown">Trả trước (₫) <span class="text-[#6E6E73] font-normal">có thể để trống</span></label>
+            <input id="tgDown" class="w-full h-12 px-4 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" type="text" inputmode="numeric" placeholder="Ví dụ: 10000000" autocomplete="off"></div>
+          <div><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tgTerm">Kỳ hạn góp</label>
+            <select id="tgTerm" class="w-full h-12 px-4 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" required><option value="">Chọn kỳ hạn</option><option value="3">3 tháng</option><option value="6">6 tháng</option><option value="9">9 tháng</option><option value="12">12 tháng</option><option value="18">18 tháng</option><option value="24">24 tháng</option></select></div>
+          <div><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tgMethod">Hình thức trả góp</label>
+            <select id="tgMethod" class="w-full h-12 px-4 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" required><option value="">Chọn hình thức</option><option value="Công ty tài chính">Công ty tài chính</option><option value="Thẻ tín dụng">Thẻ tín dụng</option><option value="Trả góp tại cửa hàng">Trả góp tại cửa hàng</option></select></div>
+          <div class="sm:col-span-2 rounded-xl bg-white border border-[#D2D2D7] p-4" id="tgPreview" aria-live="polite">
+            <div class="text-[13px] text-[#6E6E73]">Nhập giá máy và chọn kỳ hạn để xem tiền góp ước tính mỗi tháng.</div>
+          </div>
+          <div class="sm:col-span-2"><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tgOccupation">Nghề nghiệp</label>
+            <select id="tgOccupation" class="w-full h-12 px-4 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" required><option value="">Chọn nghề nghiệp</option><option value="Nhân viên văn phòng">Nhân viên văn phòng</option><option value="Công nhân">Công nhân</option><option value="Kinh doanh tự do">Kinh doanh tự do</option><option value="Sinh viên">Sinh viên</option><option value="Khác">Khác</option></select></div>
+          <fieldset class="sm:col-span-2">
+            <legend class="block text-[13px] font-medium text-[#1D1D1F] mb-1">Hồ sơ bạn đã có sẵn <span class="text-[#6E6E73] font-normal">chọn để cửa hàng chuẩn bị tư vấn, không cần gửi ảnh giấy tờ qua web</span></legend>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4"><label class="flex items-center gap-3 text-[14px] text-[#1D1D1F] cursor-pointer min-h-[44px]"><input type="checkbox" name="tgDoc" value="CCCD / CMND" class="w-5 h-5 accent-[#1D1D1F]"> CCCD / CMND</label><label class="flex items-center gap-3 text-[14px] text-[#1D1D1F] cursor-pointer min-h-[44px]"><input type="checkbox" name="tgDoc" value="Bằng lái xe" class="w-5 h-5 accent-[#1D1D1F]"> Bằng lái xe</label><label class="flex items-center gap-3 text-[14px] text-[#1D1D1F] cursor-pointer min-h-[44px]"><input type="checkbox" name="tgDoc" value="Sổ hộ khẩu / KT3" class="w-5 h-5 accent-[#1D1D1F]"> Sổ hộ khẩu / KT3</label><label class="flex items-center gap-3 text-[14px] text-[#1D1D1F] cursor-pointer min-h-[44px]"><input type="checkbox" name="tgDoc" value="Hợp đồng lao động / bảng lương" class="w-5 h-5 accent-[#1D1D1F]"> Hợp đồng lao động / bảng lương</label><label class="flex items-center gap-3 text-[14px] text-[#1D1D1F] cursor-pointer min-h-[44px]"><input type="checkbox" name="tgDoc" value="Sao kê ngân hàng" class="w-5 h-5 accent-[#1D1D1F]"> Sao kê ngân hàng</label><label class="flex items-center gap-3 text-[14px] text-[#1D1D1F] cursor-pointer min-h-[44px]"><input type="checkbox" name="tgDoc" value="Hóa đơn điện / nước" class="w-5 h-5 accent-[#1D1D1F]"> Hóa đơn điện / nước</label></div>
+          </fieldset>
+          <div><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tgName">Họ tên</label>
+            <input id="tgName" class="w-full h-12 px-4 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" maxlength="100" autocomplete="name" required></div>
+          <div><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tgPhone">Số điện thoại</label>
+            <input id="tgPhone" class="w-full h-12 px-4 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" type="tel" inputmode="numeric" autocomplete="tel" placeholder="0912 345 678" required></div>
+          <div class="sm:col-span-2"><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tgNote">Ghi chú thêm <span class="text-[#6E6E73] font-normal">không bắt buộc</span></label>
+            <textarea id="tgNote" class="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" rows="2" maxlength="300" placeholder="Khung giờ tiện gọi, máy đang dùng, câu hỏi về lãi suất..."></textarea></div>
+          <p id="installmentError" class="sm:col-span-2 text-[13px] text-red-600 hidden" role="alert"></p>
+          <button id="installmentSubmit" type="submit" class="sm:col-span-2 min-h-[48px] rounded-full bg-[#1D1D1F] text-white text-[15px] font-medium cursor-pointer border-0 hover:bg-black disabled:opacity-60">Gửi đăng ký trả góp</button>
+          <p id="installmentDone" class="sm:col-span-2 text-[14px] text-[#1D1D1F] bg-white rounded-xl p-4 hidden" role="status"></p>
+          <p class="sm:col-span-2 text-[12px] text-[#6E6E73]">Số tiền góp chỉ là ước tính. Lãi suất, phí và việc duyệt hồ sơ do cửa hàng và đối tác tài chính quyết định sau khi tư vấn. Cần hỗ trợ ngay, gọi hotline 0986 455 457.</p>
+        </form>
+      </div>
       </section>
     </div>
 

@@ -17,6 +17,8 @@ const ERROR_MESSAGES = {
   INVALID_QUANTITY: 'Số lượng sản phẩm không hợp lệ.',
   PRODUCT_UNAVAILABLE: 'Có sản phẩm trong giỏ không còn bán. Vui lòng tải lại trang và chọn lại.',
   OUT_OF_STOCK: 'Có sản phẩm không đủ số lượng trong kho. Vui lòng giảm số lượng hoặc liên hệ shop.',
+  INVALID_PRICE: 'Giá máy hoặc số tiền trả trước không hợp lệ.',
+  INVALID_TERM: 'Kỳ hạn trả góp không hợp lệ.',
   INVALID_VOUCHER: 'Mã giảm giá không hợp lệ hoặc đã hết hạn.',
   TOO_MANY_REQUESTS: 'Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau hoặc gọi hotline.'
 };
@@ -105,6 +107,37 @@ export async function submitBooking({ name, phone, device, service, note } = {},
     const row = Array.isArray(data) ? data[0] : data;
     if (!row || !row.booking_code) return { ok: false, reason: 'error', message: GENERIC_ERROR };
     return { ok: true, code: row.booking_code };
+  } catch (err) {
+    return { ok: false, reason: 'network', message: GENERIC_ERROR };
+  }
+}
+
+/**
+ * Gửi hồ sơ đăng ký trả góp (hàm create_installment). Tiền góp ước tính do máy chủ tính lại.
+ * @returns {Promise<{ ok: true, code: string, monthly: number } | { ok: false, reason: string, message: string }>}
+ */
+export async function submitInstallment(data = {}, options = {}) {
+  const client = await resolveClient(options);
+  if (!client) return { ok: false, reason: 'not_configured', message: NOT_CONFIGURED };
+
+  try {
+    const { data: result, error } = await client.rpc('create_installment', {
+      p_name: data.name || '',
+      p_phone: data.phone || '',
+      p_product: data.product || '',
+      p_price: data.price || 0,
+      p_down_payment: data.downPayment || 0,
+      p_term: data.term || 0,
+      p_method: data.method || '',
+      p_occupation: data.occupation || '',
+      p_documents: data.documents || null,
+      p_note: data.note || null
+    });
+    if (error) return { ok: false, reason: 'rejected', message: parseApiError(error) };
+
+    const row = Array.isArray(result) ? result[0] : result;
+    if (!row || !row.installment_code) return { ok: false, reason: 'error', message: GENERIC_ERROR };
+    return { ok: true, code: row.installment_code, monthly: Number(row.monthly_estimate) || 0 };
   } catch (err) {
     return { ok: false, reason: 'network', message: GENERIC_ERROR };
   }
