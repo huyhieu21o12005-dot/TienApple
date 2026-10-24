@@ -6,6 +6,7 @@
 import { CartManager } from './store.js';
 import { escapeHtml, jsArg, safeUrl, safeColor, discountPercent } from './utils.js';
 import { formatDate } from './warranty.js';
+import { installmentStatusLabel } from './installment.js';
 
 export function isOutOfStock(product) {
   return product != null && product.stock !== undefined && product.stock !== null && Number(product.stock) <= 0;
@@ -192,4 +193,50 @@ export function warrantyResultsHtml(records) {
         </div>`;
   }
   return list.map(warrantyRecordHtml).join('');
+}
+
+/**
+ * Kết quả tra cứu hồ sơ trả góp (một hồ sơ, tên khách đã được che).
+ */
+export function installmentResultHtml(r) {
+  if (!r) {
+    return `
+        <div class="rounded-2xl bg-[#F5F5F7] p-6 text-center text-[#6E6E73]">
+          <p class="text-[15px] font-medium text-[#1D1D1F]">Không tìm thấy hồ sơ trả góp</p>
+          <p class="text-[13px] mt-1">Số điện thoại và mã hóa đơn chưa khớp. Vui lòng kiểm tra lại hoặc liên hệ hotline.</p>
+        </div>`;
+  }
+  const money = (n) => CartManager.formatCurrency(Number(n) || 0);
+  const paid = Number(r.paid_months) || 0;
+  const term = Number(r.term_months) || 0;
+  const percent = term > 0 ? Math.min(100, Math.round((paid / term) * 100)) : 0;
+  const active = r.status === 'active';
+  const badge = active
+    ? '<span class="text-[12px] font-semibold px-2.5 py-1 rounded-full bg-[#1D1D1F] text-white">Đang góp</span>'
+    : `<span class="text-[12px] font-semibold px-2.5 py-1 rounded-full bg-[#F5F5F7] text-[#6E6E73] border border-[#D2D2D7]">${escapeHtml(installmentStatusLabel(r.status))}</span>`;
+  return `
+        <article class="rounded-2xl border border-[#D2D2D7] bg-white p-5">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <span class="text-[15px] font-semibold text-[#1D1D1F]">Hồ sơ ${escapeHtml(r.code)}</span>
+            ${badge}
+          </div>
+          <div class="mb-4">
+            <div class="flex justify-between text-[12px] text-[#6E6E73] mb-1"><span>Đã đóng ${paid}/${term} kỳ</span><span>${percent}%</span></div>
+            <div class="h-2 rounded-full bg-[#F5F5F7] overflow-hidden"><div class="h-full bg-[#1D1D1F]" style="width:${percent}%"></div></div>
+          </div>
+          <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-[14px]">
+            <div><dt class="text-[12px] text-[#6E6E73]">Khách hàng</dt><dd class="font-medium text-[#1D1D1F]">${escapeHtml(r.customer_name_masked)}</dd></div>
+            <div><dt class="text-[12px] text-[#6E6E73]">Sản phẩm</dt><dd class="font-medium text-[#1D1D1F]">${escapeHtml(r.product)}</dd></div>
+            <div><dt class="text-[12px] text-[#6E6E73]">Giá gốc</dt><dd class="font-medium text-[#1D1D1F]">${money(r.original_price)}</dd></div>
+            <div><dt class="text-[12px] text-[#6E6E73]">Trả trước</dt><dd class="font-medium text-[#1D1D1F]">${money(r.down_payment)}</dd></div>
+            <div><dt class="text-[12px] text-[#6E6E73]">Lãi suất · kỳ hạn</dt><dd class="font-medium text-[#1D1D1F]">${escapeHtml(String(Number(r.interest_rate) || 0).replace('.', ','))}%/tháng · ${term} tháng</dd></div>
+            <div><dt class="text-[12px] text-[#6E6E73]">Góp mỗi tháng</dt><dd class="font-medium text-[#1D1D1F]">${money(r.monthly_payment)}</dd></div>
+            <div><dt class="text-[12px] text-[#6E6E73]">Hình thức trả</dt><dd class="font-medium text-[#1D1D1F]">${escapeHtml(r.pay_method)}</dd></div>
+            <div><dt class="text-[12px] text-[#6E6E73]">Ngày bắt đầu</dt><dd class="font-medium text-[#1D1D1F]">${escapeHtml(formatDate(r.start_date))}</dd></div>
+            ${active ? `
+            <div><dt class="text-[12px] text-[#6E6E73]">Còn lại</dt><dd class="font-medium text-[#1D1D1F]">${Number(r.remaining_months) || 0} kỳ · ${money(r.remaining_amount)}</dd></div>
+            <div><dt class="text-[12px] text-[#6E6E73]">Kỳ tới</dt><dd class="font-medium text-[#1D1D1F]">${escapeHtml(formatDate(r.next_due_date)) || '-'}</dd></div>` : ''}
+            <div class="sm:col-span-2 rounded-xl bg-[#1D1D1F] text-white p-3"><dt class="text-[12px] opacity-80">Thành tiền</dt><dd class="text-[20px] font-semibold">${money(r.total_amount)}</dd></div>
+          </dl>
+        </article>`;
 }

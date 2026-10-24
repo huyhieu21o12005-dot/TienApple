@@ -94,6 +94,7 @@ function card(r) {
       ${r.note ? `<p class="ord-line ord-muted">Ghi chú: ${escapeHtml(r.note)}</p>` : ''}
       <div class="ord-actions">
         <button type="button" class="btn btn-secondary btn-sm" data-action="edit" data-id="${escapeHtml(r.id)}">Sửa</button>
+        <a class="btn btn-secondary btn-sm" href="./print.html?type=warranty&id=${encodeURIComponent(r.id)}" target="_blank" rel="noopener">In phiếu</a>
         ${canDelete ? `<button type="button" class="btn btn-danger btn-sm" data-action="delete" data-id="${escapeHtml(r.id)}">Xóa</button>` : ''}
         <span class="ord-time">Tạo ${escapeHtml(formatDateTime(r.created_at))}</span>
       </div>

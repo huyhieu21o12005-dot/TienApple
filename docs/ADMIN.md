@@ -242,9 +242,19 @@ SQL: `supabase/telegram_bot.sql`. Kích hoạt một lần: `select public.teleg
 
 ## Trả góp
 
-Trang web có mục **Trả góp** (menu trên cùng): khách nhập máy, giá, số tiền trả trước, kỳ hạn (3 đến 24 tháng), hình thức, nghề nghiệp, tích những hồ sơ đã có (CCCD, bằng lái, hộ khẩu/KT3, hợp đồng lao động/bảng lương, sao kê, hóa đơn điện nước), họ tên và số điện thoại. Web hiện tiền góp ước tính mỗi tháng. Web **không** thu số CCCD hay ảnh giấy tờ: khách mang hồ sơ gốc đến quầy.
+Hồ sơ trả góp do **cửa hàng tự nhập** ở trang quản trị, khách không tự đăng ký online.
 
-- **Xem và xử lý:** trang quản trị `/admin/installments.html` (nút **Trả góp** trên thanh trên cùng). Đổi trạng thái: Mới, Đang xét hồ sơ, Đã duyệt, Từ chối, Đã hủy; nút **Ghi chú** lưu ghi chú nội bộ. Chỉ quản lý mới xóa được.
+- **Nhập hồ sơ:** `/admin/installments.html` (nút **Trả góp** trên thanh trên cùng) rồi **+ Thêm hồ sơ**. Điền tên, số điện thoại, máy, giá gốc, trả trước, **lãi suất (%/tháng, tự nhập)**, kỳ hạn (tháng), hình thức trả (Tiền mặt, Chuyển khoản, Quẹt thẻ, Công ty tài chính), ngày bắt đầu, giấy tờ đi kèm và ghi chú. Thanh đen **Thành tiền** hiện ngay khi nhập.
+- **Công thức:** khoản vay = giá gốc - trả trước; tiền góp mỗi tháng = làm tròn lên nghìn của (khoản vay / số tháng + khoản vay x lãi% ); thành tiền = trả trước + tiền góp x số tháng. Cơ sở dữ liệu tính lại khi lưu nên số liệu luôn khớp.
+- **Theo dõi:** nút **+1 kỳ đã đóng** mỗi lần khách đóng tiền; đóng đủ kỳ thì tự chuyển **Đã tất toán**. **Hủy hồ sơ**, **Sửa**, và chỉ quản lý mới **Xóa**.
+- **Mã hóa đơn:** mỗi hồ sơ có mã `TG1001`, `TG1002`... (in trên hóa đơn).
+- **Ngoài website** (menu **Trả góp**): phần **Tư vấn trả góp** (máy tính ước tính, giấy tờ thường cần, nút gọi/Zalo) và **Tra cứu hồ sơ trả góp**: khách nhập số điện thoại **và mã hóa đơn** để xem tiến độ (tên được che). Tối đa 10 lần tra mỗi số mỗi giờ. Lãi suất điền sẵn ở máy tính tư vấn: sửa `INSTALLMENT_REFERENCE_RATE` trong `Frontend/js/installment.js`.
 - **Thông báo:** hồ sơ mới vào chủ đề 💳 **Trả góp** của nhóm Telegram.
-- **Cài đặt:** chạy `supabase/telegram_topics.sql`, rồi `supabase/installment.sql`, rồi `select public.telegram_make_topics();` và vài giây sau `select public.telegram_save_topics();`.
-- **Lãi suất:** hiện đặt bằng 0 (chỉ chia đều tiền vay) vì lãi suất thực tế do gói tài chính quyết định. Muốn cộng lãi ước tính: đổi `INSTALLMENT_MONTHLY_RATE` trong `Frontend/js/installment.js` và hằng `0` trong hàm `installment_monthly` ở `supabase/installment.sql` cho khớp nhau (ví dụ 0.015 là 1,5% mỗi tháng), rồi chạy lại SQL.
+- **Cài đặt:** chạy `supabase/telegram_topics.sql`, `supabase/installment.sql`, rồi `select public.telegram_make_topics();` và vài giây sau `select public.telegram_save_topics();`. Bảng cũ `installment_requests` (khách tự đăng ký) không còn dùng; xóa khi không cần: `drop table public.installment_requests;`.
+
+## In hóa đơn
+
+Mỗi mục có nút in: **Đơn hàng** (hóa đơn bán hàng), **Lịch sửa chữa** (phiếu tiếp nhận), **Bảo hành** (phiếu bảo hành), **Trả góp** (hóa đơn trả góp). Bấm **In hóa đơn** hoặc **In phiếu** trên thẻ, trang `/admin/print.html` mở ra và tự gọi hộp thoại in.
+- Mặc định khổ **80mm** cho máy in hóa đơn nhiệt; nút **Giấy A5** chuyển sang khổ A5. Trong hộp thoại in chọn đúng máy in, lề **Không (None)**, tỷ lệ 100%.
+- Cần đăng nhập quản trị trong cùng trình duyệt. Thêm `&auto=0` vào đường dẫn nếu chỉ muốn xem trước, không tự bật hộp thoại in.
+- Phiếu sửa chữa có dòng "Chi phí" để điền tay. Thông tin cửa hàng trên đầu hóa đơn sửa trong `SHOP` ở `Frontend/admin/invoiceHelpers.js`.

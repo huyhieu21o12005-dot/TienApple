@@ -1,19 +1,23 @@
 /**
  * Tien Mobile - Admin Installments Controller
- * Xem hồ sơ đăng ký trả góp, đổi trạng thái, ghi chú nội bộ. Chỉ quản lý (manager) được xóa.
+ * Cửa hàng tự nhập hồ sơ trả góp: khách, giá gốc, lãi suất %, kỳ hạn, hình thức trả, giấy tờ đi kèm.
+ * Thành tiền hiển thị ngay khi nhập; cơ sở dữ liệu tính lại khi lưu. Chỉ quản lý (manager) được xóa.
  */
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
 import { escapeHtml } from '../js/utils.js';
-import { CartManager } from '../js/store.js';
-import { INSTALLMENT_STATUSES, installmentStatusLabel, filterInstallments } from '../js/installment.js';
+import {
+  INSTALLMENT_STATUSES, installmentStatusLabel, filterInstallments, calcInstallment,
+  validateInstallmentRecord, buildInstallmentRow, nextDueDate
+} from '../js/installment.js';
+import { formatDate } from '../js/warranty.js';
+import { formatCurrency, canDeleteProducts } from './adminHelpers.js';
 import { telHref, formatDateTime } from './ordersHelpers.js';
-import { canDeleteProducts } from './adminHelpers.js';
 
 let supabase = null;
-const state = { role: null, records: [], status: 'all', query: '' };
+const state = { user: null, role: null, records: [], status: 'all', query: '', editingId: null };
 const $ = (id) => document.getElementById(id);
-const money = (n) => CartManager.formatCurrency(Number(n) || 0);
+const todayIso = () => new Date().toISOString().slice(0, 10);
 
 async function init() {
   bindEvents();
@@ -30,6 +34,7 @@ async function init() {
     if (error || isAdmin !== true) return showGate('Tài khoản này chưa được cấp quyền quản trị.');
 
     const { data: role } = await supabase.rpc('current_admin_role');
+    state.user = session.user;
     state.role = typeof role === 'string' ? role : 'staff';
     document.body.dataset.role = state.role;
     $('gateSection').classList.add('hidden');
@@ -51,7 +56,7 @@ async function load() {
   $('iLoading').classList.remove('hidden');
   $('iError').classList.add('hidden');
   try {
-    const { data, error } = await supabase.from('installment_requests').select('*').order('created_at', { ascending: false }).limit(1000);
+    const { data, error } = await supabase.from('installments').select('*').order('created_at', { ascending: false }).limit(1000);
     if (error) throw error;
     state.records = data || [];
     render();
@@ -73,50 +78,139 @@ function render() {
 
   const rows = filterInstallments(state.records, { query: state.query, status: state.status });
   $('iList').innerHTML = rows.length === 0
-    ? '<div class="ord-empty">Chưa có hồ sơ trả góp phù hợp.</div>'
+    ? '<div class="ord-empty">Chưa có hồ sơ trả góp. Bấm "+ Thêm hồ sơ" để nhập.</div>'
     : rows.map(card).join('');
 }
 
 function card(r) {
   const canDelete = canDeleteProducts(state.role);
-  const buttons = INSTALLMENT_STATUSES.filter(([value]) => value !== r.status)
-    .map(([value, label]) => `<button type="button" class="btn btn-secondary btn-sm" data-action="status" data-status="${value}" data-id="${escapeHtml(r.id)}">${escapeHtml(label)}</button>`).join('');
+  const due = nextDueDate(r.start_date, r.paid_months, r.term_months);
+  const active = r.status === 'active';
   return `
     <article class="ord-card" data-id="${escapeHtml(r.id)}">
       <div class="ord-card-head">
         <span class="ord-code">${escapeHtml(r.code)}</span>
-        <span class="${r.status === 'new' ? 'ord-status-new' : 'ord-muted'}">${escapeHtml(installmentStatusLabel(r.status))}</span>
+        <span class="${active ? 'ord-status-new' : 'ord-muted'}">${escapeHtml(installmentStatusLabel(r.status))}</span>
       </div>
-      <p class="ord-line"><a href="${escapeHtml(telHref(r.phone))}">${escapeHtml(r.phone)}</a> · ${escapeHtml(r.customer_name)} · ${escapeHtml(r.occupation)}</p>
-      <p class="ord-line">${escapeHtml(r.product)}: ${money(r.price)}</p>
-      <p class="ord-line">Trả trước ${money(r.down_payment)} · ${Number(r.term_months)} tháng · khoảng ${money(r.monthly_estimate)}/tháng</p>
-      <p class="ord-line ord-muted">Hình thức: ${escapeHtml(r.method)}</p>
-      ${r.documents ? `<p class="ord-line ord-muted">Hồ sơ có sẵn: ${escapeHtml(r.documents)}</p>` : '<p class="ord-line ord-muted">Chưa chọn hồ sơ nào</p>'}
-      ${r.note ? `<p class="ord-line ord-muted">Khách ghi chú: ${escapeHtml(r.note)}</p>` : ''}
-      ${r.staff_note ? `<p class="ord-line">Ghi chú nội bộ: ${escapeHtml(r.staff_note)}</p>` : ''}
+      <p class="ord-line"><a href="${escapeHtml(telHref(r.phone))}">${escapeHtml(r.phone)}</a> · ${escapeHtml(r.customer_name)}</p>
+      <p class="ord-line">${escapeHtml(r.product)}: giá gốc ${escapeHtml(formatCurrency(r.original_price))}, trả trước ${escapeHtml(formatCurrency(r.down_payment))}</p>
+      <p class="ord-line">Lãi ${escapeHtml(String(Number(r.interest_rate)).replace('.', ','))}%/tháng · ${Number(r.term_months)} tháng · góp ${escapeHtml(formatCurrency(r.monthly_payment))}/tháng</p>
+      <p class="ord-line ord-muted">Hình thức: ${escapeHtml(r.pay_method)} · Đã đóng ${Number(r.paid_months)}/${Number(r.term_months)} kỳ${due ? ` · kỳ tới ${escapeHtml(formatDate(due))}` : ''}</p>
+      <p class="ord-line ord-muted">Giấy tờ: ${r.documents ? escapeHtml(r.documents) : 'chưa ghi'}</p>
+      ${r.note ? `<p class="ord-line ord-muted">Ghi chú: ${escapeHtml(r.note)}</p>` : ''}
+      <div class="ord-total-bar">Thành tiền: ${escapeHtml(formatCurrency(r.total_amount))}</div>
       <div class="ord-actions">
-        ${buttons}
-        <button type="button" class="btn btn-ghost btn-sm" data-action="note" data-id="${escapeHtml(r.id)}">Ghi chú</button>
+        ${active ? `<button type="button" class="btn btn-primary btn-sm" data-action="pay" data-id="${escapeHtml(r.id)}">+1 kỳ đã đóng</button>` : ''}
+        <button type="button" class="btn btn-secondary btn-sm" data-action="edit" data-id="${escapeHtml(r.id)}">Sửa</button>
+        <a class="btn btn-secondary btn-sm" href="./print.html?type=installment&id=${encodeURIComponent(r.id)}" target="_blank" rel="noopener">In hóa đơn</a>
+        ${active ? `<button type="button" class="btn btn-ghost btn-sm" data-action="cancel" data-id="${escapeHtml(r.id)}">Hủy hồ sơ</button>` : ''}
         ${canDelete ? `<button type="button" class="btn btn-danger btn-sm" data-action="delete" data-id="${escapeHtml(r.id)}">Xóa</button>` : ''}
-        <span class="ord-time">Gửi ${escapeHtml(formatDateTime(r.created_at))}</span>
+        <span class="ord-time">Tạo ${escapeHtml(formatDateTime(r.created_at))}</span>
       </div>
     </article>`;
 }
 
-async function update(id, patch, message) {
-  const { error } = await supabase.from('installment_requests').update(patch).eq('id', id);
-  if (error) return toast(error.message || 'Không cập nhật được.', 'error');
+function formData() {
+  return {
+    name: $('fName').value, phone: $('fPhone').value, product: $('fProduct').value,
+    price: $('fPrice').value, downPayment: $('fDown').value, rate: $('fRate').value, term: $('fTerm').value,
+    payMethod: $('fMethod').value, startDate: $('fStart').value, paidMonths: $('fPaid').value,
+    documents: [...document.querySelectorAll('input[name="fDoc"]:checked')].map(el => el.value),
+    note: $('fNote').value
+  };
+}
+
+function updateTotal() {
+  const d = formData();
+  const calc = calcInstallment({ price: d.price, downPayment: d.downPayment, rate: d.rate, term: d.term });
+  if (!calc.valid) {
+    $('iTotalValue').textContent = formatCurrency(0);
+    $('iTotalDetail').textContent = 'Nhập giá gốc, trả trước, lãi suất và kỳ hạn hợp lệ để tính.';
+    return;
+  }
+  $('iTotalValue').textContent = formatCurrency(calc.total);
+  $('iTotalDetail').textContent = `Vay ${formatCurrency(calc.loan)} · lãi ${formatCurrency(calc.interest)} · góp ${formatCurrency(calc.monthly)} x ${Number(d.term)} tháng`;
+}
+
+function openDialog(record = null) {
+  state.editingId = record ? record.id : null;
+  $('iDialogTitle').textContent = record ? `Sửa hồ sơ ${record.code}` : 'Thêm hồ sơ trả góp';
+  $('iFormError').classList.add('hidden');
+  $('fName').value = record?.customer_name || '';
+  $('fPhone').value = record?.phone || '';
+  $('fProduct').value = record?.product || '';
+  $('fPrice').value = record ? String(record.original_price) : '';
+  $('fDown').value = record ? String(record.down_payment) : '';
+  $('fRate').value = record ? String(Number(record.interest_rate)).replace('.', ',') : '';
+  $('fTerm').value = record?.term_months || 6;
+  $('fMethod').value = record?.pay_method || 'Tiền mặt';
+  $('fStart').value = record?.start_date || todayIso();
+  $('fPaid').value = record?.paid_months || 0;
+  $('fNote').value = record?.note || '';
+  const have = String(record?.documents || '').split(', ');
+  document.querySelectorAll('input[name="fDoc"]').forEach(el => { el.checked = have.includes(el.value); });
+  updateTotal();
+  $('iDialog').showModal();
+  $('fName').focus();
+}
+
+async function save(e) {
+  e.preventDefault();
+  const data = formData();
+  const check = validateInstallmentRecord(data);
+  if (!check.valid) {
+    $('iFormError').textContent = check.errors[0];
+    $('iFormError').classList.remove('hidden');
+    return;
+  }
+  const row = buildInstallmentRow(data);
+  if (row.start_date === undefined) delete row.start_date;
+
+  const button = $('iSave');
+  button.disabled = true;
+  try {
+    const query = state.editingId
+      ? supabase.from('installments').update(row).eq('id', state.editingId)
+      : supabase.from('installments').insert({ ...row, created_by: state.user.id });
+    const { error } = await query;
+    if (error) throw error;
+    $('iDialog').close();
+    toast(state.editingId ? 'Đã cập nhật hồ sơ' : 'Đã thêm hồ sơ trả góp');
+    await load();
+  } catch (err) {
+    $('iFormError').textContent = err.message || 'Không lưu được, vui lòng thử lại.';
+    $('iFormError').classList.remove('hidden');
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function payOne(id) {
   const record = state.records.find(r => r.id === id);
-  if (record) Object.assign(record, patch);
-  render();
-  toast(message);
+  if (!record || record.status !== 'active') return;
+  const paid = Number(record.paid_months) + 1;
+  if (paid > Number(record.term_months)) return;
+  if (!confirm(`Ghi nhận khách ${record.customer_name} đã đóng kỳ ${paid}/${record.term_months}?`)) return;
+  const { error } = await supabase.from('installments').update({ paid_months: paid }).eq('id', id);
+  if (error) return toast(error.message || 'Không cập nhật được.', 'error');
+  toast(paid >= Number(record.term_months) ? 'Đã tất toán hồ sơ' : `Đã ghi nhận kỳ ${paid}`);
+  await load();
+}
+
+async function cancel(id) {
+  const record = state.records.find(r => r.id === id);
+  if (!record || !confirm(`Hủy hồ sơ ${record.code} của ${record.customer_name}?`)) return;
+  const { error } = await supabase.from('installments').update({ status: 'cancelled' }).eq('id', id);
+  if (error) return toast(error.message || 'Không cập nhật được.', 'error');
+  toast('Đã hủy hồ sơ');
+  await load();
 }
 
 async function remove(id) {
   if (!canDeleteProducts(state.role)) return toast('Nhân viên không có quyền xóa.', 'error');
   const record = state.records.find(r => r.id === id);
   if (!record || !confirm(`Xóa hồ sơ ${record.code} của ${record.customer_name}?`)) return;
-  const { error } = await supabase.from('installment_requests').delete().eq('id', id);
+  const { error } = await supabase.from('installments').delete().eq('id', id);
   if (error) return toast(error.message || 'Không xóa được.', 'error');
   state.records = state.records.filter(r => r.id !== id);
   render();
@@ -124,6 +218,10 @@ async function remove(id) {
 }
 
 function bindEvents() {
+  $('addBtn').addEventListener('click', () => openDialog());
+  $('iCancel').addEventListener('click', () => $('iDialog').close());
+  $('iForm').addEventListener('submit', save);
+  ['fPrice', 'fDown', 'fRate', 'fTerm'].forEach(id => $(id).addEventListener('input', updateTotal));
   $('iSearch').addEventListener('input', (e) => { state.query = e.target.value; render(); });
   $('iChips').addEventListener('click', (e) => {
     const chip = e.target.closest('[data-status]');
@@ -133,12 +231,9 @@ function bindEvents() {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
     const id = btn.dataset.id;
-    if (btn.dataset.action === 'status') update(id, { status: btn.dataset.status }, `Đã chuyển sang: ${installmentStatusLabel(btn.dataset.status)}`);
-    if (btn.dataset.action === 'note') {
-      const record = state.records.find(r => r.id === id);
-      const text = prompt('Ghi chú nội bộ (không hiển thị cho khách):', record?.staff_note || '');
-      if (text !== null) update(id, { staff_note: text.trim().slice(0, 1000) || null }, 'Đã lưu ghi chú');
-    }
+    if (btn.dataset.action === 'edit') openDialog(state.records.find(r => r.id === id));
+    if (btn.dataset.action === 'pay') payOne(id);
+    if (btn.dataset.action === 'cancel') cancel(id);
     if (btn.dataset.action === 'delete') remove(id);
   });
   $('logoutBtn').addEventListener('click', async () => {

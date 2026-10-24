@@ -39,6 +39,7 @@
           <a class="btn btn-secondary btn-sm" href="./installments.html" aria-current="page">Trả góp</a>
         </nav>
         <div class="topbar-actions">
+          <button type="button" id="addBtn" class="btn btn-primary btn-sm">+ Thêm hồ sơ</button>
           <button type="button" id="logoutBtn" class="btn btn-secondary btn-sm">Đăng xuất</button>
         </div>
       </div>
@@ -54,6 +55,61 @@
       <section id="iList" class="ord-list" aria-live="polite"></section>
     </main>
   </div>
+
+
+  <dialog id="iDialog" class="w-dialog" aria-labelledby="iDialogTitle">
+    <form id="iForm" method="dialog" novalidate>
+      <h2 id="iDialogTitle" class="login-title">Hồ sơ trả góp</h2>
+      <div id="iFormError" class="alert-box alert-error hidden" role="alert"></div>
+
+      <div class="w-row">
+        <div class="form-group"><label class="form-label" for="fName">Tên khách hàng</label>
+          <input class="form-input" id="fName" maxlength="100" autocomplete="off" required></div>
+        <div class="form-group"><label class="form-label" for="fPhone">Số điện thoại</label>
+          <input class="form-input" id="fPhone" type="tel" inputmode="numeric" placeholder="0912 345 678" required></div>
+      </div>
+      <div class="form-group"><label class="form-label" for="fProduct">Máy</label>
+        <input class="form-input" id="fProduct" maxlength="100" placeholder="iPhone 15 Pro Max 256GB" required></div>
+      <div class="w-row">
+        <div class="form-group"><label class="form-label" for="fPrice">Giá gốc (đ)</label>
+          <input class="form-input" id="fPrice" inputmode="numeric" placeholder="30000000" autocomplete="off" required></div>
+        <div class="form-group"><label class="form-label" for="fDown">Trả trước (đ)</label>
+          <input class="form-input" id="fDown" inputmode="numeric" placeholder="0" autocomplete="off"></div>
+      </div>
+      <div class="w-row">
+        <div class="form-group"><label class="form-label" for="fRate">Lãi suất (%/tháng)</label>
+          <input class="form-input" id="fRate" inputmode="decimal" placeholder="1,5" autocomplete="off"></div>
+        <div class="form-group"><label class="form-label" for="fTerm">Kỳ hạn (tháng)</label>
+          <input class="form-input" id="fTerm" type="number" min="1" max="60" step="1" value="6" required></div>
+      </div>
+
+      <div id="iTotalBar" class="i-total" aria-live="polite">
+        <span class="i-total-label">Thành tiền</span>
+        <span id="iTotalValue" class="i-total-value">0đ</span>
+        <span id="iTotalDetail" class="i-total-detail">Nhập giá gốc và kỳ hạn để tính.</span>
+      </div>
+
+      <div class="w-row">
+        <div class="form-group"><label class="form-label" for="fMethod">Hình thức trả</label>
+          <select class="select-input" id="fMethod" required><option value="Tiền mặt">Tiền mặt</option><option value="Chuyển khoản">Chuyển khoản</option><option value="Quẹt thẻ">Quẹt thẻ</option><option value="Công ty tài chính">Công ty tài chính</option></select></div>
+        <div class="form-group"><label class="form-label" for="fStart">Ngày bắt đầu</label>
+          <input class="form-input" id="fStart" type="date" required></div>
+      </div>
+      <div class="form-group"><label class="form-label" for="fPaid">Số kỳ đã đóng</label>
+        <input class="form-input" id="fPaid" type="number" min="0" max="60" step="1" value="0"></div>
+      <fieldset class="form-group i-docs">
+        <legend class="form-label">Giấy tờ đi kèm</legend>
+        <label class="i-check"><input type="checkbox" name="fDoc" value="CCCD / CMND"> CCCD / CMND</label><label class="i-check"><input type="checkbox" name="fDoc" value="Bằng lái xe"> Bằng lái xe</label><label class="i-check"><input type="checkbox" name="fDoc" value="Sổ hộ khẩu / KT3"> Sổ hộ khẩu / KT3</label><label class="i-check"><input type="checkbox" name="fDoc" value="Hợp đồng lao động / bảng lương"> Hợp đồng lao động / bảng lương</label><label class="i-check"><input type="checkbox" name="fDoc" value="Sao kê ngân hàng"> Sao kê ngân hàng</label><label class="i-check"><input type="checkbox" name="fDoc" value="Hóa đơn điện / nước"> Hóa đơn điện / nước</label>
+      </fieldset>
+      <div class="form-group"><label class="form-label" for="fNote">Ghi chú</label>
+        <textarea class="form-textarea" id="fNote" rows="2" maxlength="500"></textarea></div>
+
+      <div class="ord-actions">
+        <button type="button" id="iCancel" class="btn btn-secondary">Hủy</button>
+        <button type="submit" id="iSave" class="btn btn-primary">Lưu hồ sơ</button>
+      </div>
+    </form>
+  </dialog>
 
   <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
   <script type="module" src="./installments.js"></script>

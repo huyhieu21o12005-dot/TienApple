@@ -7,10 +7,11 @@ import { CartManager, ProductFilter, BookingValidator } from './store.js';
 import { Phone3DStudio } from './hero3d.js';
 import { WaterRipplesEngine } from './waterRipples.js';
 import { fetchProducts } from './productsApi.js';
-import { submitOrder, submitBooking, submitInstallment, buildOrderItems } from './ordersApi.js';
+import { submitOrder, submitBooking, buildOrderItems } from './ordersApi.js';
+import { lookupInstallment } from './installmentApi.js';
 import { lookupWarranty } from './warrantyApi.js';
 import { validateTradeIn, buildTradeInBooking } from './tradeIn.js';
-import { calcInstallment, validateInstallment, buildInstallmentPayload } from './installment.js';
+import { calcInstallment, INSTALLMENT_REFERENCE_RATE } from './installment.js';
 import { enhanceSelects } from './customSelect.js';
 import { safeUrl, partitionProducts } from './utils.js';
 import {
@@ -20,7 +21,8 @@ import {
   storageChipsHtml,
   cartItemHtml,
   emptyCartHtml,
-  warrantyResultsHtml
+  warrantyResultsHtml,
+  installmentResultHtml
 } from './templates.js';
 
 // Dữ liệu dự phòng nhúng sẵn (phòng trường hợp người dùng mở trực tiếp file:// mà không qua HTTP server)
@@ -413,66 +415,52 @@ class App {
   }
 
   initInstallmentForm() {
-    const form = document.getElementById('installmentForm');
-    if (!form) return;
-    const val = (id) => document.getElementById(id)?.value ?? '';
-    const button = document.getElementById('installmentSubmit');
-    const error = document.getElementById('installmentError');
-    const done = document.getElementById('installmentDone');
     const preview = document.getElementById('tgPreview');
-    const money = (n) => CartManager.formatCurrency(n);
+    if (preview) {
+      const val = (id) => document.getElementById(id)?.value ?? '';
+      const money = (n) => CartManager.formatCurrency(n);
+      const rateInput = document.getElementById('tgRate');
+      if (rateInput && INSTALLMENT_REFERENCE_RATE > 0) rateInput.value = String(INSTALLMENT_REFERENCE_RATE).replace('.', ',');
+      const update = () => {
+        const calc = calcInstallment({ price: val('tgPrice'), downPayment: val('tgDown'), rate: val('tgRate'), term: val('tgTerm') });
+        if (!calc.valid) {
+          preview.innerHTML = '<div class="text-[13px] opacity-80">Nhập giá máy (và trả trước nếu có) để xem số tiền góp ước tính.</div>';
+          return;
+        }
+        preview.innerHTML = `
+          <div class="text-[13px] opacity-80">Góp mỗi tháng (ước tính)</div>
+          <div class="text-[24px] font-semibold">${money(calc.monthly)} <span class="text-[14px] font-normal opacity-80">x ${Number(val('tgTerm'))} tháng</span></div>
+          <div class="text-[12px] opacity-80 mt-1">Khoản vay ${money(calc.loan)} · tổng phải trả ${money(calc.total)}</div>`;
+      };
+      ['tgPrice', 'tgDown', 'tgRate', 'tgTerm'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', update);
+        document.getElementById(id)?.addEventListener('change', update);
+      });
+    }
 
-    const updatePreview = () => {
-      const calc = calcInstallment({ price: val('tgPrice'), downPayment: val('tgDown'), term: val('tgTerm') });
-      if (!calc.valid) {
-        preview.innerHTML = '<div class="text-[13px] text-[#6E6E73]">Nhập giá máy và chọn kỳ hạn để xem tiền góp ước tính mỗi tháng.</div>';
-        return;
-      }
-      preview.innerHTML = `
-        <div class="text-[13px] text-[#6E6E73]">Số tiền góp ước tính</div>
-        <div class="text-[22px] font-semibold text-[#1D1D1F]">${money(calc.monthly)} <span class="text-[14px] font-normal text-[#6E6E73]">/ tháng × ${Number(val('tgTerm'))} tháng</span></div>
-        <div class="text-[12px] text-[#6E6E73] mt-1">Khoản vay ${money(calc.loan)} sau khi trả trước. Chưa gồm lãi suất và phí của gói tài chính.</div>`;
-    };
-    ['tgPrice', 'tgDown', 'tgTerm'].forEach(id => {
-      document.getElementById(id)?.addEventListener('input', updatePreview);
-      document.getElementById(id)?.addEventListener('change', updatePreview);
-    });
-
+    const form = document.getElementById('installmentLookupForm');
+    if (!form) return;
+    const button = document.getElementById('ilSubmit');
+    const error = document.getElementById('ilError');
+    const results = document.getElementById('ilResults');
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (button.disabled) return;
       error.classList.add('hidden');
-      done.classList.add('hidden');
-
-      const data = {
-        product: val('tgProduct'), price: val('tgPrice'), downPayment: val('tgDown'), term: val('tgTerm'),
-        method: val('tgMethod'), occupation: val('tgOccupation'),
-        documents: [...form.querySelectorAll('input[name="tgDoc"]:checked')].map(el => el.value),
-        name: val('tgName'), phone: val('tgPhone'), note: val('tgNote')
-      };
-      const check = validateInstallment(data);
-      if (!check.valid) {
-        error.textContent = check.errors[0];
-        error.classList.remove('hidden');
-        return;
-      }
-
+      results.innerHTML = '';
       button.disabled = true;
-      button.textContent = 'Đang gửi...';
+      button.textContent = 'Đang tra cứu...';
       try {
-        const result = await submitInstallment(buildInstallmentPayload(data));
+        const result = await lookupInstallment(document.getElementById('ilPhone').value, document.getElementById('ilCode').value);
         if (!result.ok) {
           error.textContent = result.message;
           error.classList.remove('hidden');
           return;
         }
-        form.reset();
-        updatePreview();
-        done.textContent = `Đã nhận hồ sơ ${result.code}. Tiền góp ước tính khoảng ${money(result.monthly)} mỗi tháng. Cửa hàng sẽ gọi lại tư vấn và hướng dẫn hồ sơ sớm nhất.`;
-        done.classList.remove('hidden');
+        results.innerHTML = installmentResultHtml(result.record);
       } finally {
         button.disabled = false;
-        button.textContent = 'Gửi đăng ký trả góp';
+        button.textContent = 'Tra cứu';
       }
     });
   }

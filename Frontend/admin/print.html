@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>In hóa đơn - Tien Mobile</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <style>
+    :root { --paper: 80mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #E8E8ED; color: #000; font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+    .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; padding: 12px; background: #fff; border-bottom: 1px solid #D2D2D7; }
+    .bar button, .bar a { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid #D2D2D7; background: #F5F5F7; font: inherit; font-size: 14px; cursor: pointer; color: #1D1D1F; text-decoration: none; display: inline-flex; align-items: center; }
+    .bar button.primary { background: #1D1D1F; color: #fff; border-color: #1D1D1F; }
+    .bar button.active { outline: 2px solid #0071E3; }
+    #msg { text-align: center; padding: 24px; font-size: 14px; }
+    .sheet { width: var(--paper); margin: 16px auto; padding: 4mm; background: #fff; font-size: 12px; line-height: 1.35; box-shadow: 0 2px 12px rgba(0,0,0,.15); }
+    body.a5 { --paper: 148mm; }
+    body.a5 .sheet { font-size: 14px; padding: 10mm; }
+    .inv-head { text-align: center; margin-bottom: 6px; }
+    .inv-shop { font-size: 18px; font-weight: 800; letter-spacing: .04em; }
+    .inv-small { font-size: 11px; }
+    body.a5 .inv-small { font-size: 12px; }
+    .inv-title { text-align: center; font-weight: 800; font-size: 14px; margin: 8px 0 6px; padding: 4px 0; border-top: 1px dashed #000; border-bottom: 1px dashed #000; }
+    .inv-block { margin: 6px 0; }
+    .inv-h { font-weight: 700; margin-bottom: 2px; text-transform: uppercase; font-size: 11px; }
+    .inv-row { display: flex; justify-content: space-between; gap: 8px; padding: 1px 0; }
+    .inv-k { color: #333; flex: 0 0 auto; }
+    .inv-v { text-align: right; font-weight: 600; overflow-wrap: anywhere; }
+    .inv-code { font-size: 14px; font-weight: 800; }
+    .inv-items { width: 100%; border-collapse: collapse; margin: 6px 0; }
+    .inv-items th { text-align: left; border-bottom: 1px solid #000; font-size: 11px; padding: 2px 0; }
+    .inv-items td { padding: 3px 0; vertical-align: top; border-bottom: 1px dotted #999; }
+    .inv-items small { display: block; font-size: 10px; color: #333; }
+    .inv-r { text-align: right; white-space: nowrap; }
+    .inv-totals { border-top: 1px dashed #000; margin-top: 6px; padding-top: 4px; }
+    .inv-total { display: flex; justify-content: space-between; padding: 1px 0; }
+    .inv-strong { font-size: 15px; font-weight: 800; }
+    .inv-note { margin: 6px 0 0; font-size: 11px; }
+    .inv-signs { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; text-align: center; }
+    .inv-sign { flex: 1; font-size: 11px; min-height: 56px; border-top: 0; }
+    .inv-sign span { display: block; font-weight: 600; }
+    .inv-thanks { text-align: center; margin: 10px 0 0; font-size: 11px; }
+    .inv-empty { text-align: center; padding: 20px; }
+    @page { size: 80mm auto; margin: 0; }
+    @media print {
+      body { background: #fff; }
+      .bar, #msg { display: none !important; }
+      .sheet { width: 100%; margin: 0; padding: 3mm; box-shadow: none; }
+      body.a5 .sheet { padding: 10mm; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bar" id="bar">
+    <button type="button" id="printBtn" class="primary">In hóa đơn</button>
+    <button type="button" id="p80" class="active">Giấy 80mm</button>
+    <button type="button" id="pa5">Giấy A5</button>
+    <a href="javascript:history.back()">← Quay lại</a>
+  </div>
+  <p id="msg">Đang tải...</p>
+  <main class="sheet hidden-until-ready" id="sheet" hidden></main>
+  <script type="module" src="./print.js"></script>
+</body>
+</html>

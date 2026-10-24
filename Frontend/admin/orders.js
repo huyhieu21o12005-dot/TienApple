@@ -136,6 +136,10 @@ function noteBlock(record) {
     </div>`;
 }
 
+function printLink(type, record) {
+  return `<a class="btn btn-secondary btn-sm" href="./print.html?type=${type}&id=${encodeURIComponent(record.id)}" target="_blank" rel="noopener">In hóa đơn</a>`;
+}
+
 function phoneLine(record) {
   const href = telHref(record.phone);
   return `<p class="ord-line"><a href="${escapeHtml(href)}">${escapeHtml(record.phone)}</a> · ${escapeHtml(record.customer_name)}</p>`;
@@ -154,7 +158,7 @@ function orderCard(o) {
       ${o.note ? `<p class="ord-line ord-muted">Khách ghi chú: ${escapeHtml(o.note)}</p>` : ''}
       <p class="ord-line">Tổng: <span class="ord-total">${escapeHtml(formatCurrency(o.total))}</span>
         ${o.voucher ? `<span class="ord-muted"> · mã ${escapeHtml(o.voucher)}</span>` : ''}</p>
-      <div class="ord-actions">${statusSelect(o)}</div>
+      <div class="ord-actions">${statusSelect(o)}${printLink('order', o)}</div>
       ${noteBlock(o)}
     </article>`;
 }
@@ -169,7 +173,7 @@ function bookingCard(b) {
       ${phoneLine(b)}
       <p class="ord-line">${escapeHtml(b.device)} · ${escapeHtml(b.service)}</p>
       ${b.note ? `<p class="ord-line ord-muted">Khách ghi chú: ${escapeHtml(b.note)}</p>` : ''}
-      <div class="ord-actions">${statusSelect(b)}</div>
+      <div class="ord-actions">${statusSelect(b)}${printLink('booking', b)}</div>
       ${noteBlock(b)}
     </article>`;
 }

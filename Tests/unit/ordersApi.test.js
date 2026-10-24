@@ -5,8 +5,7 @@ import {
   parseApiError,
   buildOrderItems,
   submitOrder,
-  submitBooking,
-  submitInstallment
+  submitBooking
 } from '../../Frontend/js/ordersApi.js';
 
 /** Supabase client giả: ghi lại lời gọi rpc và trả kết quả đã cấu hình */
@@ -115,35 +114,5 @@ describe('ordersApi - submitBooking', () => {
     const calls = [];
     await submitBooking(undefined, { client: fakeClient({ data: [{ booking_code: 'SC2' }], error: null }, calls) });
     assert.equal(calls[0].args.p_name, '');
-  });
-});
-
-describe('ordersApi - submitInstallment', () => {
-  const input = { name: 'An', phone: '0912345678', product: 'iPhone 15', price: 20000000, downPayment: 5000000, term: 6, method: 'Thẻ tín dụng', occupation: 'Khác', documents: 'CCCD / CMND' };
-
-  it('báo chưa cấu hình khi không có Supabase', async () => {
-    assert.equal((await submitInstallment(input, { client: null })).reason, 'not_configured');
-  });
-
-  it('gọi create_installment và trả mã hồ sơ cùng tiền góp', async () => {
-    const calls = [];
-    const result = await submitInstallment(input, { client: fakeClient({ data: [{ installment_code: 'TG1001', monthly_estimate: '2500000' }], error: null }, calls) });
-    assert.deepEqual(result, { ok: true, code: 'TG1001', monthly: 2500000 });
-    assert.equal(calls[0].name, 'create_installment');
-    assert.equal(calls[0].args.p_price, 20000000);
-    assert.equal(calls[0].args.p_term, 6);
-    assert.equal(calls[0].args.p_note, null);
-  });
-
-  it('xử lý lỗi máy chủ, thiếu mã, lỗi mạng và đầu vào rỗng', async () => {
-    const rejected = await submitInstallment(input, { client: fakeClient({ data: null, error: { message: 'INVALID_TERM' } }) });
-    assert.equal(rejected.reason, 'rejected');
-    assert.match(rejected.message, /Kỳ hạn/);
-    assert.equal((await submitInstallment(input, { client: fakeClient({ data: [{}], error: null }) })).reason, 'error');
-    assert.equal((await submitInstallment(input, { client: fakeClient(new Error('x')) })).reason, 'network');
-    const calls = [];
-    await submitInstallment(undefined, { client: fakeClient({ data: [{ installment_code: 'TG2' }], error: null }, calls) });
-    assert.equal(calls[0].args.p_name, '');
-    assert.equal(calls[0].args.p_price, 0);
   });
 });

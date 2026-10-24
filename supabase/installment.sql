@@ -1,141 +1,218 @@
 -- ==============================================================================
--- TIEN MOBILE - DANG KY TRA GOP (installment_requests)
+-- TIEN MOBILE - HO SO TRA GOP (installments) do CUA HANG nhap trong trang quan tri
 -- Chay trong Supabase: SQL Editor -> New query -> dan -> Run. Chay lai an toan.
 -- Thu tu: schema.sql -> admin_users.sql -> orders.sql -> telegram.sql -> telegram_bot.sql
 --         -> telegram_topics.sql -> installment.sql
 --
--- * Khach dang ky tren website qua ham create_installment() (khong doc/ghi bang truc tiep).
--- * Chi luu thong tin lien he, may, gia, tra truoc, ky han, nghe nghiep va DANH SACH ho so
---   khach se mang theo. Khong thu so CCCD hay anh giay to qua web.
--- * Admin/nhan vien xem va doi trang thai; chi quan ly (manager) moi xoa.
--- * Moi ho so moi gui thong bao vao chu de "Tra gop" trong nhom Telegram.
+-- * Admin/nhan vien nhap ho so: ten, SDT, may, gia goc, tra truoc, lai suat (%/thang, tu nhap),
+--   ky han, hinh thuc tra, giay to di kem. Tien gop va THANH TIEN do co so du lieu tu tinh:
+--     khoan vay = gia goc - tra truoc
+--     tien gop/thang = lam tron len nghin cua (khoan vay / so thang + khoan vay * lai% / 100)
+--     thanh tien = tra truoc + tien gop/thang * so thang
+-- * Khach tra cuu ngoai website bang SDT + ma hoa don (ma ho so TGxxxx) qua lookup_installment().
+--   Chi tra ve ten da che, may, tien, ky han, so ky da dong; khong tra giay to hay ghi chu.
+-- * Khong con form khach tu dang ky: ham create_installment() va bang installment_requests cu
+--   khong con dung. Bang cu giu nguyen du lieu; xoa neu khong can: drop table public.installment_requests;
 -- ==============================================================================
+
+-- 0. Go phan khach tu dang ky (cu)
+do $$
+begin
+  if to_regclass('public.installment_requests') is not null then
+    drop trigger if exists notify_new_installment on public.installment_requests;
+    revoke all on table public.installment_requests from anon, authenticated;
+  end if;
+end $$;
+drop function if exists public.create_installment(text, text, text, bigint, bigint, int, text, text, text, text);
+drop function if exists public.tg_installment_text(public.installment_requests);
 
 create sequence if not exists public.installment_code_seq start 1001;
 
-create table if not exists public.installment_requests (
+-- 1. BANG HO SO TRA GOP
+create table if not exists public.installments (
   id uuid primary key default gen_random_uuid(),
   code text not null unique default ('TG' || nextval('public.installment_code_seq')),
   customer_name text not null check (char_length(customer_name) between 1 and 100),
   phone text not null check (phone ~ '^0[35789][0-9]{8}$'),
   product text not null check (char_length(product) between 1 and 100),
-  price bigint not null check (price > 0 and price <= 200000000),
+  original_price bigint not null check (original_price > 0 and original_price <= 500000000),
   down_payment bigint not null default 0 check (down_payment >= 0),
-  term_months int not null check (term_months in (3, 6, 9, 12, 18, 24)),
-  monthly_estimate bigint not null default 0,
-  method text not null check (char_length(method) between 1 and 60),
-  occupation text not null check (char_length(occupation) between 1 and 60),
+  interest_rate numeric(5, 2) not null default 0 check (interest_rate >= 0 and interest_rate <= 100),
+  term_months int not null check (term_months between 1 and 60),
+  pay_method text not null check (pay_method in (E'Ti\u1ec1n m\u1eb7t', E'Chuy\u1ec3n kho\u1ea3n', E'Qu\u1eb9t th\u1ebb', E'C\u00f4ng ty t\u00e0i ch\u00ednh')),
   documents text check (documents is null or char_length(documents) <= 300),
   note text check (note is null or char_length(note) <= 500),
-  status text not null default 'new' check (status in ('new', 'reviewing', 'approved', 'rejected', 'cancelled')),
-  staff_note text check (staff_note is null or char_length(staff_note) <= 1000),
+  start_date date not null default current_date,
+  paid_months int not null default 0 check (paid_months >= 0),
+  status text not null default 'active' check (status in ('active', 'completed', 'cancelled')),
+  loan_amount bigint not null default 0,
+  monthly_payment bigint not null default 0,
+  interest_amount bigint not null default 0,
+  total_amount bigint not null default 0,
+  created_by uuid references auth.users (id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  check (down_payment < price)
+  check (down_payment < original_price),
+  check (paid_months <= term_months)
 );
 
-create index if not exists idx_installments_status on public.installment_requests (status, created_at desc);
-create index if not exists idx_installments_phone on public.installment_requests (phone);
+create index if not exists idx_installments_phone on public.installments (phone);
+create index if not exists idx_installments_status on public.installments (status, created_at desc);
 
-drop trigger if exists set_installments_updated_at on public.installment_requests;
-create trigger set_installments_updated_at
-  before update on public.installment_requests
-  for each row execute function public.update_updated_at_column();
-
-alter table public.installment_requests enable row level security;
-
-drop policy if exists "Admins can read installments" on public.installment_requests;
-create policy "Admins can read installments" on public.installment_requests
-  for select to authenticated using (public.is_admin());
-
-drop policy if exists "Admins can update installments" on public.installment_requests;
-create policy "Admins can update installments" on public.installment_requests
-  for update to authenticated using (public.is_admin()) with check (public.is_admin());
-
-drop policy if exists "Managers can delete installments" on public.installment_requests;
-create policy "Managers can delete installments" on public.installment_requests
-  for delete to authenticated using (public.is_manager());
-
--- Tien gop moi thang uoc tinh. Lai suat thang (0 = chi chia deu). Phai trung INSTALLMENT_MONTHLY_RATE trong js/installment.js.
-create or replace function public.installment_monthly(p_loan bigint, p_term int)
-returns bigint
-language sql
-immutable
+-- 2. TU TINH TIEN GOP VA THANH TIEN (khong tin so tinh tu trinh duyet)
+create or replace function public.installments_compute()
+returns trigger
+language plpgsql
 as $$
-  select (ceil((p_loan::numeric / p_term + p_loan::numeric * 0) / 1000) * 1000)::bigint;
+begin
+  new.loan_amount := new.original_price - new.down_payment;
+  new.monthly_payment := (ceil((new.loan_amount::numeric / new.term_months + new.loan_amount::numeric * new.interest_rate / 100) / 1000) * 1000)::bigint;
+  new.total_amount := new.down_payment + new.monthly_payment * new.term_months;
+  new.interest_amount := new.monthly_payment * new.term_months - new.loan_amount;
+  if new.status = 'active' and new.paid_months >= new.term_months then
+    new.status := 'completed';
+  end if;
+  return new;
+end;
 $$;
 
-create or replace function public.create_installment(
-  p_name text,
-  p_phone text,
-  p_product text,
-  p_price bigint,
-  p_down_payment bigint,
-  p_term int,
-  p_method text,
-  p_occupation text,
-  p_documents text default null,
-  p_note text default null
+drop trigger if exists compute_installments on public.installments;
+create trigger compute_installments
+  before insert or update on public.installments
+  for each row execute function public.installments_compute();
+
+drop trigger if exists set_installments_updated_at on public.installments;
+create trigger set_installments_updated_at
+  before update on public.installments
+  for each row execute function public.update_updated_at_column();
+
+-- 3. RLS: admin xem/them/sua; chi manager xoa; khach khong truy cap truc tiep
+alter table public.installments enable row level security;
+
+drop policy if exists "Admins can read installments" on public.installments;
+create policy "Admins can read installments" on public.installments
+  for select to authenticated using (public.is_admin());
+
+drop policy if exists "Admins can insert installments" on public.installments;
+create policy "Admins can insert installments" on public.installments
+  for insert to authenticated with check (public.is_admin());
+
+drop policy if exists "Admins can update installments" on public.installments;
+create policy "Admins can update installments" on public.installments
+  for update to authenticated using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists "Managers can delete installments" on public.installments;
+create policy "Managers can delete installments" on public.installments
+  for delete to authenticated using (public.is_manager());
+
+-- 4. TRA CUU CHO KHACH: can SDT + ma hoa don; moi SDT toi da 10 lan/gio
+create table if not exists public.installment_lookups (
+  id bigint generated always as identity primary key,
+  phone text not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_installment_lookups_phone_time on public.installment_lookups (phone, created_at desc);
+alter table public.installment_lookups enable row level security;
+
+create or replace function public.lookup_installment(p_phone text, p_code text)
+returns table (
+  code text,
+  customer_name_masked text,
+  product text,
+  original_price bigint,
+  down_payment bigint,
+  interest_rate numeric,
+  term_months int,
+  monthly_payment bigint,
+  total_amount bigint,
+  pay_method text,
+  paid_months int,
+  remaining_months int,
+  remaining_amount bigint,
+  status text,
+  start_date date,
+  next_due_date date
 )
-returns table (installment_code text, monthly_estimate bigint)
 language plpgsql
 security definer
 set search_path = public
 as $$
 declare
   v_phone text := regexp_replace(coalesce(p_phone, ''), '[\s.-]', '', 'g');
-  v_name text := left(trim(coalesce(p_name, '')), 100);
-  v_product text := left(trim(coalesce(p_product, '')), 100);
-  v_method text := left(trim(coalesce(p_method, '')), 60);
-  v_occupation text := left(trim(coalesce(p_occupation, '')), 60);
-  v_down bigint := coalesce(p_down_payment, 0);
-  v_code text;
-  v_monthly bigint;
+  v_code text := upper(trim(coalesce(p_code, '')));
 begin
   v_phone := regexp_replace(v_phone, '^\+?84', '0');
   if v_phone !~ '^0[35789][0-9]{8}$' then raise exception 'INVALID_PHONE'; end if;
-  if char_length(v_name) = 0 then raise exception 'INVALID_NAME'; end if;
-  if char_length(v_product) = 0 or char_length(v_method) = 0 or char_length(v_occupation) = 0 then raise exception 'INVALID_ITEMS'; end if;
-  if p_price is null or p_price <= 0 or p_price > 200000000 or v_down < 0 or v_down >= p_price then raise exception 'INVALID_PRICE'; end if;
-  if p_term is null or p_term not in (3, 6, 9, 12, 18, 24) then raise exception 'INVALID_TERM'; end if;
+  if v_code !~ '^TG[0-9]{3,10}$' then raise exception 'INVALID_CODE'; end if;
 
-  if (select count(*) from public.installment_requests
-      where phone = v_phone and created_at > now() - interval '1 hour') >= 3 then
+  if (select count(*) from public.installment_lookups
+      where phone = v_phone and created_at > now() - interval '1 hour') >= 10 then
     raise exception 'TOO_MANY_REQUESTS';
   end if;
+  insert into public.installment_lookups (phone) values (v_phone);
+  delete from public.installment_lookups where created_at < now() - interval '2 days';
 
-  v_monthly := public.installment_monthly(p_price - v_down, p_term);
-
-  insert into public.installment_requests
-    (customer_name, phone, product, price, down_payment, term_months, monthly_estimate, method, occupation, documents, note)
-  values
-    (v_name, v_phone, v_product, p_price, v_down, p_term, v_monthly, v_method, v_occupation,
-     nullif(left(trim(coalesce(p_documents, '')), 300), ''), nullif(left(trim(coalesce(p_note, '')), 500), ''))
-  returning code into v_code;
-
-  return query select v_code, v_monthly;
+  return query
+    select i.code,
+           public.mask_name(i.customer_name),
+           i.product,
+           i.original_price,
+           i.down_payment,
+           i.interest_rate,
+           i.term_months,
+           i.monthly_payment,
+           i.total_amount,
+           i.pay_method,
+           i.paid_months,
+           greatest(0, i.term_months - i.paid_months),
+           greatest(0, i.term_months - i.paid_months)::bigint * i.monthly_payment,
+           i.status,
+           i.start_date,
+           case when i.status = 'active' and i.paid_months < i.term_months
+                then (i.start_date + make_interval(months => i.paid_months + 1))::date end
+    from public.installments i
+    where i.phone = v_phone and i.code = v_code
+    limit 1;
 end;
 $$;
+revoke all on function public.lookup_installment(text, text) from public;
+grant execute on function public.lookup_installment(text, text) to anon, authenticated;
 
-revoke all on function public.create_installment(text, text, text, bigint, bigint, int, text, text, text, text) from public;
-grant execute on function public.create_installment(text, text, text, bigint, bigint, int, text, text, text, text) to anon, authenticated;
+-- 5. DON DEP BANG TAM MOI NGAY (ghi de ham trong cleanup.sql, them bang tra cuu tra gop)
+create or replace function public.purge_temp_data()
+returns void
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+begin
+  delete from public.warranty_lookups where created_at < now() - interval '2 days';
+  delete from public.installment_lookups where created_at < now() - interval '2 days';
+  begin
+    delete from net._http_response where created < now() - interval '1 day';
+  exception when others then
+    null;
+  end;
+end;
+$$;
+revoke all on function public.purge_temp_data() from public, anon, authenticated;
 
--- Thong bao Telegram vao chu de "Tra gop"
-create or replace function public.tg_installment_text(r public.installment_requests)
+-- 6. THONG BAO TELEGRAM vao chu de "Tra gop" khi cua hang tao ho so
+create or replace function public.tg_installment_text(r public.installments)
 returns text
 language sql
 as $$
-  select E'\U0001f4b3 <b>\u0110\u0102NG K\u00dd TR\u1ea2 G\u00d3P ' || public.tg_escape(r.code) || '</b>'
+  select E'\U0001f4b3 <b>H\u1ed2 S\u01a0 TR\u1ea2 G\u00d3P ' || public.tg_escape(r.code) || '</b>'
     || E'\nKh\u00e1ch: ' || public.tg_escape(r.customer_name)
     || E'\nS\u0110T: ' || public.tg_escape(r.phone)
     || E'\nM\u00e1y: ' || public.tg_escape(r.product)
-    || E'\nGi\u00e1 m\u00e1y: ' || public.tg_money(r.price)
+    || E'\nGi\u00e1 g\u1ed1c: ' || public.tg_money(r.original_price)
     || E'\nTr\u1ea3 tr\u01b0\u1edbc: ' || public.tg_money(r.down_payment)
-    || E'\nK\u1ef3 h\u1ea1n: ' || r.term_months || E' th\u00e1ng (\u2248 ' || public.tg_money(r.monthly_estimate) || E'/th\u00e1ng)'
-    || E'\nH\u00ecnh th\u1ee9c: ' || public.tg_escape(r.method)
-    || E'\nNgh\u1ec1 nghi\u1ec7p: ' || public.tg_escape(r.occupation)
-    || case when r.documents is not null then E'\nH\u1ed3 s\u01a1 s\u1eb5n c\u00f3: ' || public.tg_escape(r.documents) else '' end
-    || case when r.note is not null then E'\nGhi ch\u00fa: ' || public.tg_escape(r.note) else '' end;
+    || E'\nL\u00e3i su\u1ea5t: ' || trim(trailing '.' from trim(trailing '0' from r.interest_rate::text)) || E'%/th\u00e1ng, ' || r.term_months || E' th\u00e1ng'
+    || E'\nG\u00f3p m\u1ed7i th\u00e1ng: ' || public.tg_money(r.monthly_payment)
+    || E'\n<b>Th\u00e0nh ti\u1ec1n: ' || public.tg_money(r.total_amount) || '</b>'
+    || E'\nH\u00ecnh th\u1ee9c tr\u1ea3: ' || public.tg_escape(r.pay_method)
+    || case when r.documents is not null then E'\nGi\u1ea5y t\u1edd: ' || public.tg_escape(r.documents) else '' end;
 $$;
 
 create or replace function public.trg_notify_installment()
@@ -152,8 +229,8 @@ exception when others then
 end;
 $$;
 
-drop trigger if exists notify_new_installment on public.installment_requests;
-create trigger notify_new_installment after insert on public.installment_requests
+drop trigger if exists notify_new_installment on public.installments;
+create trigger notify_new_installment after insert on public.installments
   for each row execute function public.trg_notify_installment();
 
 revoke all on function public.trg_notify_installment() from public, anon, authenticated;
