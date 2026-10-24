@@ -10,6 +10,7 @@ import { fetchProducts } from './productsApi.js';
 import { submitOrder, submitBooking, buildOrderItems } from './ordersApi.js';
 import { lookupWarranty } from './warrantyApi.js';
 import { validateTradeIn, buildTradeInBooking } from './tradeIn.js';
+import { enhanceSelects } from './customSelect.js';
 import { safeUrl, partitionProducts } from './utils.js';
 import {
   productCardHtml,
@@ -360,6 +361,7 @@ class App {
     this.initMobileMenu();
     this.initWarrantyLookup();
     this.initTradeInForm();
+    enhanceSelects();
   }
 
   initTradeInForm() {
