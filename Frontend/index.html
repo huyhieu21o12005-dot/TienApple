@@ -177,7 +177,7 @@
         </div>
 
         <!-- Cột giữa: Trọng tâm 18 Pro Max 3D lơ lửng trên mặt nước gợn sóng tinh tế -->
-        <div class="lg:col-span-4 flex justify-center items-center relative py-2 perspective-container h-[520px] sm:h-[560px]" id="phoneContainer3D">
+        <div class="lg:col-span-4 flex justify-center items-center relative py-2 perspective-container h-[340px] sm:h-[460px] lg:h-[560px]" id="phoneContainer3D">
           <!-- Mô hình 3D iPhone 18 Pro Max chính hãng xoay 360° bằng Three.js -->
           <div class="phone-3d-canvas-wrap cursor-grab active:cursor-grabbing w-full h-full flex items-center justify-center relative" id="phone3DCanvasWrap" title="Xoay tương tác iPhone 18 Pro Max">
             <canvas id="phone3DCanvas" class="w-full h-full"></canvas>
@@ -562,6 +562,40 @@
       <!-- ======================================================================
            5. TRADE-IN & GOLDEN COMMITMENT POLICIES SECTION
            ====================================================================== -->
+      <section class="w-full bg-white pt-14 pb-4 px-6 sm:px-10 lg:px-16" id="thucu">
+      <div class="max-w-[760px] mx-auto">
+        <div class="mb-8 text-center">
+          <span class="text-[12px] font-semibold text-[#6E6E73] uppercase tracking-widest block mb-1">THU CŨ ĐỔI MỚI</span>
+          <h2 class="headline-lg text-[#1D1D1F]">Nhận báo giá thu cũ</h2>
+          <p class="text-[15px] text-[#515154] mt-2">Điền thông tin máy của bạn, cửa hàng sẽ gọi lại báo giá. Giá cuối cùng chốt sau khi kiểm tra máy trực tiếp tại quầy.</p>
+        </div>
+        <form id="tradeInForm" class="rounded-2xl bg-[#F5F5F7]/60 border border-[#D2D2D7] p-5 sm:p-7 grid grid-cols-1 sm:grid-cols-2 gap-4" novalidate>
+          <div><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tiBrand">Hãng máy</label>
+            <select id="tiBrand" class="w-full h-12 px-4 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" required><option value="">Chọn hãng</option><option value="Apple">Apple</option><option value="Samsung">Samsung</option><option value="Xiaomi">Xiaomi</option><option value="OPPO">OPPO</option><option value="Khác">Khác</option></select></div>
+          <div><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tiModel">Dòng máy</label>
+            <input id="tiModel" class="w-full h-12 px-4 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" maxlength="80" placeholder="Ví dụ: iPhone 13 Pro" autocomplete="off" required></div>
+          <div><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tiStorage">Dung lượng</label>
+            <select id="tiStorage" class="w-full h-12 px-4 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" required><option value="">Chọn dung lượng</option><option value="32GB">32GB</option><option value="64GB">64GB</option><option value="128GB">128GB</option><option value="256GB">256GB</option><option value="512GB">512GB</option><option value="1TB">1TB</option></select></div>
+          <div><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tiBattery">Sức khỏe pin (%) <span class="text-[#6E6E73] font-normal">không bắt buộc</span></label>
+            <input id="tiBattery" class="w-full h-12 px-4 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" type="number" inputmode="numeric" min="1" max="100" placeholder="Ví dụ: 87"></div>
+          <div class="sm:col-span-2"><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tiCondition">Tình trạng máy</label>
+            <select id="tiCondition" class="w-full h-12 px-4 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" required><option value="">Chọn tình trạng</option><option value="Như mới, không trầy">Như mới, không trầy</option><option value="Trầy xước nhẹ">Trầy xước nhẹ</option><option value="Cấn móp, trầy nhiều">Cấn móp, trầy nhiều</option><option value="Lỗi màn hình">Lỗi màn hình</option><option value="Lỗi khác / không lên nguồn">Lỗi khác / không lên nguồn</option></select></div>
+          <label class="sm:col-span-2 flex items-center gap-3 text-[14px] text-[#1D1D1F] cursor-pointer min-h-[44px]">
+            <input id="tiAccessories" type="checkbox" class="w-5 h-5 accent-[#1D1D1F]"> Còn đủ hộp và phụ kiện
+          </label>
+          <div><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tiName">Họ tên</label>
+            <input id="tiName" class="w-full h-12 px-4 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" maxlength="100" autocomplete="name" required></div>
+          <div><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tiPhone">Số điện thoại</label>
+            <input id="tiPhone" class="w-full h-12 px-4 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" type="tel" inputmode="numeric" autocomplete="tel" placeholder="0912 345 678" required></div>
+          <div class="sm:col-span-2"><label class="block text-[13px] font-medium text-[#1D1D1F] mb-1.5" for="tiNote">Ghi chú thêm <span class="text-[#6E6E73] font-normal">không bắt buộc</span></label>
+            <textarea id="tiNote" class="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl text-[15px] text-[#1D1D1F] border-0 focus:ring-2 focus:ring-[#1D1D1F] outline-none" rows="2" maxlength="300" placeholder="Máy đã sửa chữa gì chưa, muốn lên đời máy nào..."></textarea></div>
+          <p id="tradeInError" class="sm:col-span-2 text-[13px] text-red-600 hidden" role="alert"></p>
+          <button id="tradeInSubmit" type="submit" class="sm:col-span-2 min-h-[48px] rounded-full bg-[#1D1D1F] text-white text-[15px] font-medium cursor-pointer border-0 hover:bg-black disabled:opacity-60">Gửi yêu cầu báo giá</button>
+          <p id="tradeInDone" class="sm:col-span-2 text-[14px] text-[#1D1D1F] bg-white rounded-xl p-4 hidden" role="status"></p>
+        </form>
+      </div>
+      </section>
+
       <section class="w-full bg-white py-14 px-6 sm:px-10 lg:px-16 border-b border-[#D2D2D7]/60" id="camket">
       <div class="max-w-[1380px] mx-auto">
         <div class="mb-10 text-center max-w-2xl mx-auto">
@@ -619,7 +653,7 @@
   <!-- ======================================================================
        6. FOOTER: APPLE STUDIO LIGHT GRAY (Màu xám nhạt thanh lịch chuẩn Apple)
        ====================================================================== -->
-  <footer class="w-full bg-[#F5F5F7] py-14 px-6 sm:px-10 lg:px-16 text-[#6E6E73] text-[13px] border-t border-[#D2D2D7]/70" id="lienhe">
+  <footer class="w-full bg-[#F5F5F7] py-14 px-6 sm:px-10 lg:px-16 text-[#3A3A3C] text-[13px] border-t border-[#D2D2D7]/70" id="lienhe">
     <div class="max-w-[1380px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 pb-10 border-b border-[#D2D2D7]/70">
       <div>
         <div class="flex items-center gap-2 text-[#1D1D1F] font-semibold text-[17px] mb-3.5 tracking-[-0.015em]">
@@ -629,26 +663,26 @@
           </svg>
           <span>Tien Mobile</span>
         </div>
-        <p class="leading-[1.6] text-[#6E6E73]">Hệ thống phân phối điện thoại cao cấp và trung tâm bảo hành, sửa chữa thiết bị di động uy tín hàng đầu tại Việt Nam.</p>
+        <p class="leading-[1.6] text-[#3A3A3C]">Hệ thống phân phối điện thoại cao cấp và trung tâm bảo hành, sửa chữa thiết bị di động uy tín hàng đầu tại Việt Nam.</p>
       </div>
 
       <div>
         <div class="font-semibold text-[#1D1D1F] mb-3.5 text-[14px]">Thiết bị nổi bật</div>
         <div class="flex flex-col gap-2.5">
-          <a href="#dienthoai" class="text-[#6E6E73] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-dienthoai">iPhone 16 Pro Series</a>
-          <a href="#dienthoai" class="text-[#6E6E73] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-dienthoai">iPhone 15 Series</a>
-          <a href="#dienthoai" class="text-[#6E6E73] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-dienthoai">Samsung Galaxy S24 Ultra</a>
-          <a href="#dienthoai" class="text-[#6E6E73] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-dienthoai">Điện thoại Like New 99%</a>
+          <a href="#dienthoai" class="text-[#3A3A3C] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-dienthoai">iPhone 16 Pro Series</a>
+          <a href="#dienthoai" class="text-[#3A3A3C] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-dienthoai">iPhone 15 Series</a>
+          <a href="#dienthoai" class="text-[#3A3A3C] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-dienthoai">Samsung Galaxy S24 Ultra</a>
+          <a href="#dienthoai" class="text-[#3A3A3C] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-dienthoai">Điện thoại Like New 99%</a>
         </div>
       </div>
 
       <div>
         <div class="font-semibold text-[#1D1D1F] mb-3.5 text-[14px]">Dịch vụ sửa chữa</div>
         <div class="flex flex-col gap-2.5">
-          <a href="#suachua" class="text-[#6E6E73] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-suachua">Thay màn hình OLED Retina</a>
-          <a href="#suachua" class="text-[#6E6E73] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-suachua">Thay pin Chuẩn CE châu Âu</a>
-          <a href="#suachua" class="text-[#6E6E73] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-suachua">Ép kính chân không công nghệ cao</a>
-          <a href="#suachua" class="text-[#6E6E73] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-suachua">Sửa FaceID &amp; IC nguồn</a>
+          <a href="#suachua" class="text-[#3A3A3C] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-suachua">Thay màn hình OLED Retina</a>
+          <a href="#suachua" class="text-[#3A3A3C] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-suachua">Thay pin Chuẩn CE châu Âu</a>
+          <a href="#suachua" class="text-[#3A3A3C] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-suachua">Ép kính chân không công nghệ cao</a>
+          <a href="#suachua" class="text-[#3A3A3C] hover:text-[#1D1D1F] transition-colors nav-layer-link" data-layer="layer-suachua">Sửa FaceID &amp; IC nguồn</a>
         </div>
       </div>
 
@@ -668,13 +702,13 @@
       </div>
     </div>
 
-    <div class="max-w-[1380px] mx-auto pt-7 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] text-[#86868B]">
+    <div class="max-w-[1380px] mx-auto pt-7 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] text-[#48484A]">
       <p>© 2026 Tien Mobile. Chuẩn mực công nghệ &amp; dịch vụ minh bạch.</p>
-      <p><a href="admin/" class="text-[#6E6E73] hover:text-[#1D1D1F] underline underline-offset-2" rel="nofollow">Đăng nhập quản trị</a></p>
+      <p><a href="admin/" class="text-[#3A3A3C] hover:text-[#1D1D1F] underline underline-offset-2" rel="nofollow">Đăng nhập quản trị</a></p>
       <div class="flex gap-6">
-        <a href="#" class="text-[#86868B] hover:text-[#1D1D1F] transition-colors">Chính sách bảo hành 12 tháng</a>
-        <a href="#" class="text-[#86868B] hover:text-[#1D1D1F] transition-colors">Quy định đổi trả 30 ngày</a>
-        <a href="#" class="text-[#86868B] hover:text-[#1D1D1F] transition-colors">Bảo mật thông tin khách hàng</a>
+        <a href="#" class="text-[#48484A] hover:text-[#1D1D1F] transition-colors">Chính sách bảo hành 12 tháng</a>
+        <a href="#" class="text-[#48484A] hover:text-[#1D1D1F] transition-colors">Quy định đổi trả 30 ngày</a>
+        <a href="#" class="text-[#48484A] hover:text-[#1D1D1F] transition-colors">Bảo mật thông tin khách hàng</a>
       </div>
     </div>
   </footer>

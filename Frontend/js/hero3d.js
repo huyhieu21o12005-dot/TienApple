@@ -50,7 +50,8 @@ export class Phone3DStudio {
       powerPreference: 'high-performance'
     });
     this.renderer.setSize(this.width, this.height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 2));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     // Tăng tương phản và độ rực rỡ sang trọng của Burgundy Titanium
     this.renderer.toneMappingExposure = 1.35;
@@ -70,7 +71,32 @@ export class Phone3DStudio {
     // 7. Animation Loop
     this.clock = new THREE.Clock();
     this.animate = this.animate.bind(this);
-    requestAnimationFrame(this.animate);
+    this.inView = true;
+    this.tabVisible = !document.hidden;
+    this.rafId = null;
+    this.watchVisibility();
+    this.startLoop();
+  }
+
+  /** Chỉ chạy vòng lặp 3D khi canvas đang hiện trên màn hình và tab đang mở (mượt hơn, đỡ nóng máy). */
+  watchVisibility() {
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([entry]) => {
+        this.inView = entry.isIntersecting;
+        this.startLoop();
+      }, { threshold: 0 }).observe(this.container);
+    }
+    document.addEventListener('visibilitychange', () => {
+      this.tabVisible = !document.hidden;
+      this.startLoop();
+    });
+  }
+
+  startLoop() {
+    if (this.rafId === null && this.inView && this.tabVisible) {
+      this.clock.getDelta();
+      this.rafId = requestAnimationFrame(this.animate);
+    }
   }
 
   setupLighting() {
@@ -689,11 +715,11 @@ export class Phone3DStudio {
       this.velocity = { x: 0, y: 0 };
     };
 
-    const moveInteraction = (clientX, clientY) => {
+    const moveInteraction = (clientX, clientY, horizontalOnly = false) => {
       if (!this.isDragging || !this.phoneGroup) return;
 
       const deltaX = clientX - this.previousPointerPos.x;
-      const deltaY = clientY - this.previousPointerPos.y;
+      const deltaY = horizontalOnly ? 0 : clientY - this.previousPointerPos.y;
 
       // Track velocity for flick momentum
       this.velocity = {
@@ -732,11 +758,13 @@ export class Phone3DStudio {
 
     window.addEventListener('touchmove', (e) => {
       if (this.isDragging && e.touches.length === 1) {
-        moveInteraction(e.touches[0].clientX, e.touches[0].clientY);
+        // Trên cảm ứng chỉ xoay theo chiều ngang, vuốt dọc dành cho cuộn trang
+        moveInteraction(e.touches[0].clientX, e.touches[0].clientY, true);
       }
     }, { passive: true });
 
     window.addEventListener('touchend', endInteraction);
+    window.addEventListener('touchcancel', endInteraction);
 
     // Parallax Tilt when mouse moves over hero section
     const heroSection = document.getElementById('heroSection');
@@ -754,7 +782,11 @@ export class Phone3DStudio {
   }
 
   animate() {
-    requestAnimationFrame(this.animate);
+    if (!this.inView || !this.tabVisible) {
+      this.rafId = null;
+      return;
+    }
+    this.rafId = requestAnimationFrame(this.animate);
 
     const elapsedTime = this.clock.getElapsedTime();
 

@@ -9,6 +9,7 @@ import { WaterRipplesEngine } from './waterRipples.js';
 import { fetchProducts } from './productsApi.js';
 import { submitOrder, submitBooking, buildOrderItems } from './ordersApi.js';
 import { lookupWarranty } from './warrantyApi.js';
+import { validateTradeIn, buildTradeInBooking } from './tradeIn.js';
 import { safeUrl, partitionProducts } from './utils.js';
 import {
   productCardHtml,
@@ -358,6 +359,53 @@ class App {
     this.initLayerNavigation();
     this.initMobileMenu();
     this.initWarrantyLookup();
+    this.initTradeInForm();
+  }
+
+  initTradeInForm() {
+    const form = document.getElementById('tradeInForm');
+    if (!form) return;
+    const val = (id) => document.getElementById(id)?.value ?? '';
+    const button = document.getElementById('tradeInSubmit');
+    const error = document.getElementById('tradeInError');
+    const done = document.getElementById('tradeInDone');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (button.disabled) return;
+      error.classList.add('hidden');
+      done.classList.add('hidden');
+
+      const data = {
+        brand: val('tiBrand'), model: val('tiModel'), storage: val('tiStorage'),
+        condition: val('tiCondition'), battery: val('tiBattery'),
+        accessories: document.getElementById('tiAccessories')?.checked === true,
+        name: val('tiName'), phone: val('tiPhone'), note: val('tiNote')
+      };
+      const check = validateTradeIn(data);
+      if (!check.valid) {
+        error.textContent = check.errors[0];
+        error.classList.remove('hidden');
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = 'Đang gửi...';
+      try {
+        const result = await submitBooking(buildTradeInBooking(data));
+        if (!result.ok) {
+          error.textContent = result.message;
+          error.classList.remove('hidden');
+          return;
+        }
+        form.reset();
+        done.textContent = `Đã nhận yêu cầu ${result.code}. Cửa hàng sẽ gọi lại báo giá cho bạn sớm nhất.`;
+        done.classList.remove('hidden');
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Gửi yêu cầu báo giá';
+      }
+    });
   }
 
   initWarrantyLookup() {

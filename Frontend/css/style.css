@@ -437,8 +437,11 @@ body {
 
 #phoneContainer3D {
   position: relative;
-  min-height: 520px;
+  min-height: 340px;
   width: 100%;
+}
+@media (min-width: 1024px) {
+  #phoneContainer3D { min-height: 520px; }
 }
 
 /* LỚP 1: BÀN TAY XÒE ĐỠ TÁCH LỚP */
@@ -541,7 +544,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  touch-action: none;
+  /* Cho phép cuộn dọc trang khi vuốt lên điện thoại 3D; chỉ vuốt ngang mới xoay máy */
+  touch-action: pan-y;
 }
 
 #phone3DCanvas {
