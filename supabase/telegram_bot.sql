@@ -281,8 +281,8 @@ begin
       || E'\nPhi\u1ebfu b\u1ea3o h\u00e0nh m\u1edbi: <b>' || e || '</b>';
     v_rows := jsonb_build_array(jsonb_build_array(public.tg_btn(E'\U0001f504 L\u00e0m m\u1edbi', 's:t'), public.tg_btn(E'\u2b05 Menu', 'm')));
 
-  elsif v_kind = 'q' then
-    v_text := E'\U0001f50e <b>Tra theo s\u1ed1 \u0111i\u1ec7n tho\u1ea1i</b>' || E'\nG\u1eedi l\u1ec7nh k\u00e8m s\u1ed1 \u0111i\u1ec7n tho\u1ea1i kh\u00e1ch, v\u00ed d\u1ee5:' || E'\n<code>/tim 0912345678</code>';
+  elsif v_kind = 'h' then
+    v_text := public.tg_help_text();
     v_rows := jsonb_build_array(jsonb_build_array(public.tg_btn(E'\u2b05 Menu', 'm')));
 
   else
@@ -300,11 +300,134 @@ begin
       jsonb_build_array(public.tg_btn(E'\U0001f6d2 \u0110\u01a1n h\u00e0ng (' || a || ')', 'o:l'), public.tg_btn(E'\U0001f527 L\u1ecbch s\u1eeda (' || b || ')', 'b:l')),
       jsonb_build_array(public.tg_btn(E'\u267b\ufe0f Thu c\u0169 (' || c || ')', 't:l'), public.tg_btn(E'\U0001f6e1\ufe0f B\u1ea3o h\u00e0nh', 'w:l')),
       jsonb_build_array(public.tg_btn(E'\U0001f4ca H\u00f4m nay', 's:t'), public.tg_btn(E'\U0001f50e Tra S\u0110T', 'q')),
+      jsonb_build_array(public.tg_btn(E'\u2795 Th\u00eam phi\u1ebfu BH', 'a'), public.tg_btn(E'\u2753 Tr\u1ee3 gi\u00fap', 'h')),
       jsonb_build_array(public.tg_btn(E'\U0001f504 L\u00e0m m\u1edbi', 'm'))
     );
   end if;
 
   return jsonb_build_object('text', left(v_text, 3800), 'markup', jsonb_build_object('inline_keyboard', v_rows));
+end;
+$$;
+
+-- Noi dung huong dan va cac loi nhac nhap lieu
+create or replace function public.tg_help_text()
+returns text
+language sql
+immutable
+as $$
+  select E'\u2753 <b>H\u01b0\u1edbng d\u1eabn d\u00f9ng bot</b>'
+    || E'\n\n<b>L\u1ec7nh</b>'
+    || E'\n/menu \u00b7 m\u1edf menu qu\u1ea3n l\u00fd (n\u00fat b\u1ea5m)'
+    || E'\n/donhang \u00b7 \u0111\u01a1n \u0111ang x\u1eed l\u00fd'
+    || E'\n/lichsua \u00b7 l\u1ecbch s\u1eeda ch\u1eefa \u0111ang x\u1eed l\u00fd'
+    || E'\n/thucu \u00b7 y\u00eau c\u1ea7u thu c\u0169 \u0111ang x\u1eed l\u00fd'
+    || E'\n/baohanh \u00b7 t\u00ecnh tr\u1ea1ng b\u1ea3o h\u00e0nh'
+    || E'\n/homnay \u00b7 th\u1ed1ng k\u00ea h\u00f4m nay'
+    || E'\n/tim 0912345678 \u00b7 tra theo s\u1ed1 \u0111i\u1ec7n tho\u1ea1i'
+    || E'\n/themphieu \u00b7 th\u00eam phi\u1ebfu b\u1ea3o h\u00e0nh'
+    || E'\n/huy \u00b7 h\u1ee7y thao t\u00e1c \u0111ang nh\u1eadp'
+    || E'\n/start \u00b7 hi\u1ec7n b\u00e0n ph\u00edm n\u00fat b\u1ea5m'
+    || E'\n\n<b>Th\u00eam phi\u1ebfu b\u1ea3o h\u00e0nh</b> (m\u1ed9t tin, ng\u0103n c\u00e1ch b\u1eb1ng d\u1ea5u ;)'
+    || E'\n<code>T\u00ean kh\u00e1ch; S\u0110T; M\u00e1y; N\u1ed9i dung s\u1eeda; S\u1ed1 th\u00e1ng</code>'
+    || E'\nV\u00ed d\u1ee5: <code>Nguy\u1ec5n An; 0912345678; iPhone 15; Thay pin; 6</code>'
+    || E'\nB\u1ecf tr\u1ed1ng s\u1ed1 th\u00e1ng th\u00ec m\u1eb7c \u0111\u1ecbnh 3 th\u00e1ng.'
+    || E'\n\nTrong danh s\u00e1ch, b\u1ea5m v\u00e0o m\u1ed9t m\u1ee5c \u0111\u1ec3 xem chi ti\u1ebft v\u00e0 \u0111\u1ed5i tr\u1ea1ng th\u00e1i. N\u00fat \u2b05 \u0111\u1ec3 quay l\u1ea1i.';
+$$;
+
+create or replace function public.tg_prompt_search()
+returns text
+language sql
+immutable
+as $$ select E'\U0001f50e Nh\u1eadp s\u1ed1 \u0111i\u1ec7n tho\u1ea1i kh\u00e1ch c\u1ea7n tra (tr\u1ea3 l\u1eddi tin n\u00e0y):'; $$;
+
+create or replace function public.tg_prompt_add()
+returns text
+language sql
+immutable
+as $$
+  select E'\u2795 Nh\u1eadp phi\u1ebfu b\u1ea3o h\u00e0nh m\u1edbi (tr\u1ea3 l\u1eddi tin n\u00e0y) theo m\u1eabu:'
+    || E'\nT\u00ean kh\u00e1ch; S\u0110T; M\u00e1y; N\u1ed9i dung s\u1eeda; S\u1ed1 th\u00e1ng'
+    || E'\nV\u00ed d\u1ee5: Nguy\u1ec5n An; 0912345678; iPhone 15; Thay pin; 6'
+    || E'\n(g\u1eedi /huy \u0111\u1ec3 h\u1ee7y)';
+$$;
+
+-- Ban phim co dinh o duoi o chat
+create or replace function public.tg_keyboard()
+returns jsonb
+language sql
+immutable
+as $$
+  select jsonb_build_object('keyboard', jsonb_build_array(
+      jsonb_build_array(jsonb_build_object('text', E'\U0001f3e0 Menu'), jsonb_build_object('text', E'\U0001f6d2 \u0110\u01a1n h\u00e0ng'), jsonb_build_object('text', E'\U0001f527 L\u1ecbch s\u1eeda')),
+      jsonb_build_array(jsonb_build_object('text', E'\u267b\ufe0f Thu c\u0169'), jsonb_build_object('text', E'\U0001f6e1\ufe0f B\u1ea3o h\u00e0nh'), jsonb_build_object('text', E'\U0001f4ca H\u00f4m nay')),
+      jsonb_build_array(jsonb_build_object('text', E'\U0001f50e Tra S\u0110T'), jsonb_build_object('text', E'\u2795 Th\u00eam phi\u1ebfu BH'), jsonb_build_object('text', E'\u2753 Tr\u1ee3 gi\u00fap'))),
+    'resize_keyboard', true, 'is_persistent', true);
+$$;
+
+-- Doi chu tren nut ban phim thanh lenh (bo emoji dau chu)
+create or replace function public.tg_label_cmd(p_text text)
+returns text
+language sql
+immutable
+as $$
+  select case lower(btrim(regexp_replace(coalesce(p_text, ''), E'^[^A-Za-z\u00c0-\u1ef9]+', '')))
+    when lower('Menu') then '/menu'
+    when lower(E'\u0110\u01a1n h\u00e0ng') then '/donhang'
+    when lower(E'L\u1ecbch s\u1eeda') then '/lichsua'
+    when lower(E'Thu c\u0169') then '/thucu'
+    when lower(E'B\u1ea3o h\u00e0nh') then '/baohanh'
+    when lower(E'H\u00f4m nay') then '/homnay'
+    when lower(E'Tra S\u0110T') then '/tim'
+    when lower(E'Th\u00eam phi\u1ebfu BH') then '/themphieu'
+    when lower(E'Tr\u1ee3 gi\u00fap') then '/help'
+    else '' end;
+$$;
+
+-- Tao phieu bao hanh tu tin nhan: Ten; SDT; May; Noi dung sua; So thang
+create or replace function public.tg_add_warranty(p_input text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  v_parts text[] := regexp_split_to_array(btrim(coalesce(p_input, '')), '\s*[;|]\s*|\s*\n\s*');
+  v_phone text;
+  v_months int := 3;
+  v_code text;
+  v_end date;
+  v_menu jsonb := jsonb_build_object('inline_keyboard', jsonb_build_array(jsonb_build_array(public.tg_btn(E'\u2b05 Menu', 'm'))));
+begin
+  if array_length(v_parts, 1) is null or array_length(v_parts, 1) < 4 then
+    return jsonb_build_object('text', E'\u26a0\ufe0f Thi\u1ebfu th\u00f4ng tin. M\u1eabu: <code>T\u00ean kh\u00e1ch; S\u0110T; M\u00e1y; N\u1ed9i dung s\u1eeda; S\u1ed1 th\u00e1ng</code>', 'markup', v_menu);
+  end if;
+
+  v_phone := regexp_replace(v_parts[2], '[\s.-]', '', 'g');
+  v_phone := regexp_replace(v_phone, '^\+?84', '0');
+  if v_phone !~ '^0[35789][0-9]{8}$' then
+    return jsonb_build_object('text', E'\u26a0\ufe0f S\u1ed1 \u0111i\u1ec7n tho\u1ea1i kh\u00f4ng h\u1ee3p l\u1ec7 (c\u1ea7n 10 ch\u1eef s\u1ed1).', 'markup', v_menu);
+  end if;
+
+  if array_length(v_parts, 1) >= 5 and btrim(v_parts[5]) <> '' then
+    if btrim(v_parts[5]) !~ '^[0-9]{1,2}$' or btrim(v_parts[5])::int not between 1 and 60 then
+      return jsonb_build_object('text', E'\u26a0\ufe0f S\u1ed1 th\u00e1ng b\u1ea3o h\u00e0nh ph\u1ea3i t\u1eeb 1 \u0111\u1ebfn 60.', 'markup', v_menu);
+    end if;
+    v_months := btrim(v_parts[5])::int;
+  end if;
+
+  if btrim(v_parts[1]) = '' or btrim(v_parts[3]) = '' or btrim(v_parts[4]) = '' then
+    return jsonb_build_object('text', E'\u26a0\ufe0f T\u00ean, m\u00e1y v\u00e0 n\u1ed9i dung s\u1eeda kh\u00f4ng \u0111\u01b0\u1ee3c \u0111\u1ec3 tr\u1ed1ng.', 'markup', v_menu);
+  end if;
+
+  insert into public.warranties (customer_name, phone, device, service, warranty_months)
+  values (left(btrim(v_parts[1]), 100), v_phone, left(btrim(v_parts[3]), 100), left(btrim(v_parts[4]), 300), v_months)
+  returning code, (start_date + make_interval(months => warranty_months))::date into v_code, v_end;
+
+  return jsonb_build_object(
+    'text', E'\u2705 \u0110\u00e3 t\u1ea1o phi\u1ebfu <b>' || v_code || E'</b> \u00b7 b\u1ea3o h\u00e0nh ' || v_months || E' th\u00e1ng, \u0111\u1ebfn ' || to_char(v_end, 'DD/MM/YYYY'),
+    'markup', v_menu);
+exception when others then
+  return jsonb_build_object('text', E'\u26a0\ufe0f Kh\u00f4ng t\u1ea1o \u0111\u01b0\u1ee3c phi\u1ebfu, ki\u1ec3m tra l\u1ea1i th\u00f4ng tin.', 'markup', v_menu);
 end;
 $$;
 
@@ -324,8 +447,12 @@ declare
   v_msg jsonb := coalesce(v_upd -> 'message', v_cb -> 'message');
   v_chat bigint;
   v_screen jsonb;
-  v_text text := coalesce(v_msg ->> 'text', '');
+  v_text text := btrim(coalesce(v_msg ->> 'text', ''));
+  v_arg text;
   v_cmd text;
+  v_reply text := coalesce(v_msg -> 'reply_to_message' ->> 'text', '');
+  v_reply_bot boolean := coalesce((v_msg -> 'reply_to_message' -> 'from' ->> 'is_bot')::boolean, false);
+  v_data text;
 begin
   v_hdr := coalesce((coalesce(nullif(current_setting('request.headers', true), ''), '{}')::jsonb) ->> 'x-telegram-bot-api-secret-token', '');
   select value into v_secret from public.notify_settings where key = 'telegram_webhook_secret';
@@ -339,35 +466,88 @@ begin
     return jsonb_build_object('ok', true);
   end if;
 
+  -- Bam nut tren tin nhan
   if v_cb is not null then
-    v_screen := public.tg_screen(v_cb ->> 'data');
+    v_data := coalesce(v_cb ->> 'data', 'm');
     perform public.tg_call('answerCallbackQuery', jsonb_build_object('callback_query_id', v_cb ->> 'id'));
-    perform public.tg_call('editMessageText', jsonb_build_object(
-      'chat_id', v_chat,
-      'message_id', (v_msg ->> 'message_id')::bigint,
-      'text', v_screen ->> 'text',
-      'parse_mode', 'HTML',
-      'disable_web_page_preview', true,
-      'reply_markup', v_screen -> 'markup'));
-  else
-    v_cmd := lower(split_part(split_part(v_text, ' ', 1), '@', 1));
-    if v_cmd in ('/start', '/menu', '/homnay', '/tim') then
-      if v_cmd = '/homnay' then
-        v_screen := public.tg_screen('s:t');
-      elsif v_cmd = '/tim' then
-        v_screen := public.tg_search(trim(substr(v_text, length(split_part(v_text, ' ', 1)) + 1)));
-      else
-        v_screen := public.tg_screen('m');
-      end if;
+    if v_data = 'q' or v_data = 'a' then
       perform public.tg_call('sendMessage', jsonb_build_object(
         'chat_id', v_chat,
+        'text', case when v_data = 'q' then public.tg_prompt_search() else public.tg_prompt_add() end,
+        'reply_markup', jsonb_build_object('force_reply', true, 'input_field_placeholder',
+          case when v_data = 'q' then '0912345678' else E'T\u00ean; S\u0110T; M\u00e1y; N\u1ed9i dung s\u1eeda; S\u1ed1 th\u00e1ng' end)));
+    else
+      v_screen := public.tg_screen(v_data);
+      perform public.tg_call('editMessageText', jsonb_build_object(
+        'chat_id', v_chat,
+        'message_id', (v_msg ->> 'message_id')::bigint,
         'text', v_screen ->> 'text',
         'parse_mode', 'HTML',
         'disable_web_page_preview', true,
         'reply_markup', v_screen -> 'markup'));
     end if;
+    return jsonb_build_object('ok', true);
   end if;
 
+  if v_text = '' then return jsonb_build_object('ok', true); end if;
+
+  -- Lenh go tay hoac nut ban phim
+  if left(v_text, 1) = '/' then
+    v_cmd := lower(split_part(split_part(v_text, ' ', 1), '@', 1));
+    v_arg := btrim(substr(v_text, length(split_part(v_text, ' ', 1)) + 1));
+  else
+    v_cmd := public.tg_label_cmd(v_text);
+    v_arg := '';
+  end if;
+
+  if v_cmd = '/start' then
+    perform public.tg_call('sendMessage', jsonb_build_object(
+      'chat_id', v_chat,
+      'text', E'\U0001f44b Ch\u00e0o m\u1eebng \u0111\u1ebfn <b>Tien Mobile \u00b7 Qu\u1ea3n l\u00fd</b>. D\u00f9ng b\u00e0n ph\u00edm b\u00ean d\u01b0\u1edbi ho\u1eb7c g\u00f5 /help.',
+      'parse_mode', 'HTML',
+      'reply_markup', public.tg_keyboard()));
+    v_screen := public.tg_screen('m');
+  elsif v_cmd in ('/menu', '/back') then
+    v_screen := public.tg_screen('m');
+  elsif v_cmd = '/donhang' then
+    v_screen := public.tg_screen('o:l');
+  elsif v_cmd = '/lichsua' then
+    v_screen := public.tg_screen('b:l');
+  elsif v_cmd = '/thucu' then
+    v_screen := public.tg_screen('t:l');
+  elsif v_cmd = '/baohanh' then
+    v_screen := public.tg_screen('w:l');
+  elsif v_cmd = '/homnay' then
+    v_screen := public.tg_screen('s:t');
+  elsif v_cmd = '/help' then
+    v_screen := public.tg_screen('h');
+  elsif v_cmd = '/huy' then
+    v_screen := public.tg_screen('m');
+    v_screen := jsonb_set(v_screen, '{text}', to_jsonb(E'\u0110\u00e3 h\u1ee7y thao t\u00e1c.' || E'\n\n' || (v_screen ->> 'text')));
+  elsif v_cmd = '/tim' and v_arg <> '' then
+    v_screen := public.tg_search(v_arg);
+  elsif v_cmd = '/themphieu' and v_arg <> '' then
+    v_screen := public.tg_add_warranty(v_arg);
+  elsif v_cmd in ('/tim', '/themphieu') then
+    perform public.tg_call('sendMessage', jsonb_build_object(
+      'chat_id', v_chat,
+      'text', case when v_cmd = '/tim' then public.tg_prompt_search() else public.tg_prompt_add() end,
+      'reply_markup', jsonb_build_object('force_reply', true)));
+    return jsonb_build_object('ok', true);
+  elsif v_reply_bot and v_reply like public.tg_prompt_search() || '%' then
+    v_screen := public.tg_search(v_text);
+  elsif v_reply_bot and v_reply like left(public.tg_prompt_add(), 40) || '%' then
+    v_screen := public.tg_add_warranty(v_text);
+  else
+    return jsonb_build_object('ok', true);
+  end if;
+
+  perform public.tg_call('sendMessage', jsonb_build_object(
+    'chat_id', v_chat,
+    'text', v_screen ->> 'text',
+    'parse_mode', 'HTML',
+    'disable_web_page_preview', true,
+    'reply_markup', v_screen -> 'markup'));
   return jsonb_build_object('ok', true);
 exception when others then
   return jsonb_build_object('ok', true);
@@ -399,9 +579,17 @@ begin
     'drop_pending_updates', true));
 
   perform public.tg_call('setMyCommands', jsonb_build_object('commands', jsonb_build_array(
+    jsonb_build_object('command', 'start', 'description', E'Hi\u1ec7n b\u00e0n ph\u00edm n\u00fat b\u1ea5m'),
     jsonb_build_object('command', 'menu', 'description', E'M\u1edf menu qu\u1ea3n l\u00fd'),
+    jsonb_build_object('command', 'donhang', 'description', E'\u0110\u01a1n h\u00e0ng \u0111ang x\u1eed l\u00fd'),
+    jsonb_build_object('command', 'lichsua', 'description', E'L\u1ecbch s\u1eeda ch\u1eefa'),
+    jsonb_build_object('command', 'thucu', 'description', E'Y\u00eau c\u1ea7u thu c\u0169'),
+    jsonb_build_object('command', 'baohanh', 'description', E'T\u00ecnh tr\u1ea1ng b\u1ea3o h\u00e0nh'),
     jsonb_build_object('command', 'homnay', 'description', E'Th\u1ed1ng k\u00ea h\u00f4m nay'),
-    jsonb_build_object('command', 'tim', 'description', E'Tra theo s\u1ed1 \u0111i\u1ec7n tho\u1ea1i'))));
+    jsonb_build_object('command', 'tim', 'description', E'Tra theo s\u1ed1 \u0111i\u1ec7n tho\u1ea1i'),
+    jsonb_build_object('command', 'themphieu', 'description', E'Th\u00eam phi\u1ebfu b\u1ea3o h\u00e0nh'),
+    jsonb_build_object('command', 'help', 'description', E'H\u01b0\u1edbng d\u1eabn'),
+    jsonb_build_object('command', 'huy', 'description', E'H\u1ee7y thao t\u00e1c'))));
 end;
 $$;
 
@@ -409,5 +597,6 @@ revoke all on function public.tg_call(text, jsonb) from public, anon, authentica
 revoke all on function public.tg_screen(text) from public, anon, authenticated;
 revoke all on function public.tg_search(text) from public, anon, authenticated;
 revoke all on function public.telegram_setup(text) from public, anon, authenticated;
+revoke all on function public.tg_add_warranty(text) from public, anon, authenticated;
 revoke all on function public.telegram_webhook(jsonb) from public;
 grant execute on function public.telegram_webhook(jsonb) to anon, authenticated;

@@ -227,7 +227,11 @@ Gõ `/menu` (hoặc `/start`) trong nhóm tienmobiletd để mở menu với cá
 - **Lịch sửa** và **Thu cũ**: tương tự, trạng thái Xác nhận, Đang sửa, Hoàn tất, Hủy.
 - **Bảo hành**: số phiếu còn hạn và hết hạn, phiếu sắp hết hạn trong 30 ngày, phiếu mới nhất.
 - **Hôm nay**: số đơn, doanh thu (không tính đơn hủy), lịch sửa, thu cũ, phiếu bảo hành mới.
-- **Tra SĐT**: gõ `/tim 0912345678` để xem đơn, lịch và phiếu bảo hành của khách.
+- **Tra SĐT**: gõ `/tim 0912345678`, hoặc bấm nút rồi trả lời tin bot hỏi, để xem đơn, lịch và phiếu bảo hành của khách.
+- **Thêm phiếu BH**: bấm nút (hoặc `/themphieu`) rồi trả lời một tin theo mẫu `Tên; SĐT; Máy; Nội dung sửa; Số tháng` (bỏ trống số tháng thì mặc định 3). Phiếu được lưu và bot báo vào nhóm như khi tạo trên web.
+- **Trợ giúp**: `/help`. Nút ⬅ Menu có ở mọi màn hình để quay lại.
+
+`/start` hiện bàn phím nút bấm cố định dưới ô chat (Menu, Đơn hàng, Lịch sửa, Thu cũ, Bảo hành, Hôm nay, Tra SĐT, Thêm phiếu BH, Trợ giúp). Lệnh tắt: `/donhang`, `/lichsua`, `/thucu`, `/baohanh`, `/homnay`, `/huy` (hủy thao tác đang nhập). Bot cần là quản trị viên của nhóm để nhận tin nhắn thường từ bàn phím.
 Bot không có lệnh xóa. Chỉ nhóm có chat id đã cấu hình được dùng bot.
 
 SQL: `supabase/telegram_bot.sql`. Kích hoạt một lần: `select public.telegram_setup('https://<project>.supabase.co/rest/v1/rpc/telegram_webhook?apikey=<khóa công khai>');`. Telegram gọi webhook kèm mã bí mật (lưu trong `notify_settings`), không có mã đúng thì bị từ chối.
