@@ -74,21 +74,21 @@ declare
   v_item jsonb;
 begin
   for v_item in select * from jsonb_array_elements(o.items) loop
-    v_lines := v_lines || E'\n• ' || public.tg_escape(v_item ->> 'name')
+    v_lines := v_lines || E'\n\u2022 ' || public.tg_escape(v_item ->> 'name')
       || case when coalesce(v_item ->> 'color', '') <> '' or coalesce(v_item ->> 'storage', '') <> ''
               then ' (' || public.tg_escape(concat_ws(', ', nullif(v_item ->> 'color', ''), nullif(v_item ->> 'storage', ''))) || ')'
               else '' end
       || ' x' || coalesce(v_item ->> 'quantity', '1');
   end loop;
 
-  return '🛒 <b>ĐƠN HÀNG MỚI ' || public.tg_escape(o.code) || '</b>'
-    || E'\nKhách: ' || public.tg_escape(o.customer_name)
-    || E'\nSĐT: ' || public.tg_escape(o.phone)
-    || E'\nĐịa chỉ: ' || public.tg_escape(o.address)
-    || E'\nSản phẩm:' || v_lines
-    || E'\nTổng: <b>' || to_char(o.total, 'FM999G999G999G999') || ' ₫</b>'
+  return E'\U0001f6d2 <b>\u0110\u01a0N H\u00c0NG M\u1edaI ' || public.tg_escape(o.code) || '</b>'
+    || E'\nKh\u00e1ch: ' || public.tg_escape(o.customer_name)
+    || E'\nS\u0110T: ' || public.tg_escape(o.phone)
+    || E'\n\u0110\u1ecba ch\u1ec9: ' || public.tg_escape(o.address)
+    || E'\nS\u1ea3n ph\u1ea9m:' || v_lines
+    || E'\nT\u1ed5ng: <b>' || to_char(o.total, 'FM999G999G999G999') || E' \u20ab</b>'
     || case when o.voucher is not null then E'\nVoucher: ' || public.tg_escape(o.voucher) else '' end
-    || case when o.note is not null then E'\nGhi chú: ' || public.tg_escape(o.note) else '' end;
+    || case when o.note is not null then E'\nGhi ch\u00fa: ' || public.tg_escape(o.note) else '' end;
 end;
 $$;
 
@@ -96,14 +96,14 @@ create or replace function public.tg_booking_text(b public.repair_bookings)
 returns text
 language sql
 as $$
-  select case when b.service like 'Thu cũ%'
-              then '♻️ <b>YÊU CẦU BÁO GIÁ THU CŨ ' else '🔧 <b>LỊCH SỬA CHỮA MỚI ' end
+  select case when b.service like E'Thu c\u0169%'
+              then E'\u267b\ufe0f <b>Y\u00caU C\u1ea6U B\u00c1O GI\u00c1 THU C\u0168 ' else E'\U0001f527 <b>L\u1ecaCH S\u1eecA CH\u1eeeA M\u1edaI ' end
     || public.tg_escape(b.code) || '</b>'
-    || E'\nKhách: ' || public.tg_escape(b.customer_name)
-    || E'\nSĐT: ' || public.tg_escape(b.phone)
-    || E'\nMáy: ' || public.tg_escape(b.device)
-    || E'\nDịch vụ: ' || public.tg_escape(b.service)
-    || case when b.note is not null then E'\nMô tả: ' || public.tg_escape(b.note) else '' end;
+    || E'\nKh\u00e1ch: ' || public.tg_escape(b.customer_name)
+    || E'\nS\u0110T: ' || public.tg_escape(b.phone)
+    || E'\nM\u00e1y: ' || public.tg_escape(b.device)
+    || E'\nD\u1ecbch v\u1ee5: ' || public.tg_escape(b.service)
+    || case when b.note is not null then E'\nM\u00f4 t\u1ea3: ' || public.tg_escape(b.note) else '' end;
 $$;
 
 create or replace function public.trg_notify_order()
