@@ -974,3 +974,15 @@ body.menu-open {
   border: 1px solid #D2D2D7; opacity: .55; transition: opacity .2s ease, background-color .2s ease, color .2s ease;
 }
 .admin-login-dot:hover, .admin-login-dot:focus-visible { opacity: 1; background: #1D1D1F; color: #FFFFFF; border-color: #1D1D1F; outline: none; }
+
+/* Nút liên hệ nhanh (gọi, Zalo, Google Maps) */
+.contact-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 9999px; color: #FFFFFF; text-decoration: none;
+  transition: transform .15s ease, filter .15s ease;
+}
+.contact-icon:hover { transform: translateY(-2px); filter: brightness(1.08); }
+.contact-icon:focus-visible { outline: 2px solid #1D1D1F; outline-offset: 2px; }
+.contact-icon-call { background: #1D1D1F; }
+.contact-icon-zalo { background: #0068FF; }
+.contact-icon-map { background: #EA4335; }

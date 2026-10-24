@@ -688,7 +688,21 @@
 
       <div>
         <div class="font-semibold text-[#1D1D1F] mb-3.5 text-[14px]">Liên hệ &amp; Showroom</div>
-        <p class="mb-2">Hotline: <strong class="text-[#1D1D1F] font-semibold">0986 455 457</strong> &amp; <strong class="text-[#1D1D1F] font-semibold">0933 266 179</strong></p>
+        <div class="flex items-center gap-2.5 mb-4" id="contactIcons">
+          <a href="tel:0986455457" class="contact-icon contact-icon-call" aria-label="Gọi ngay 0986 455 457" title="Gọi ngay">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.6a1 1 0 0 1-.25 1z"/></svg>
+          </a>
+          <a href="https://zalo.me/0986455457" target="_blank" rel="noopener noreferrer" class="contact-icon contact-icon-zalo" aria-label="Chat Zalo 0986 455 457" title="Chat Zalo">
+            <span class="font-bold text-[15px] leading-none">Z</span>
+          </a>
+          <a href="https://maps.app.goo.gl/ZL5rv8RMJCSpziQQ8" target="_blank" rel="noopener noreferrer" class="contact-icon contact-icon-map" aria-label="Chỉ đường Google Maps" title="Chỉ đường Google Maps">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+          </a>
+        </div>
+        <p class="mb-2">Hotline:
+          <a href="tel:0986455457" class="text-[#1D1D1F] font-semibold hover:underline">0986 455 457</a> &amp;
+          <a href="tel:0933266179" class="text-[#1D1D1F] font-semibold hover:underline">0933 266 179</a>
+        </p>
         <p class="mb-2 flex items-center gap-2 flex-wrap">
           <span>Tư vấn CSKH:</span>
           <a href="https://zalo.me/0986455457" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0068FF] text-white text-[12px] font-semibold hover:bg-[#0054cc] transition-colors no-underline">
@@ -698,7 +712,12 @@
           </a>
         </p>
         <p class="mb-2">Giờ làm việc: <strong class="text-[#1D1D1F] font-semibold">7h – 21h (T2 – CN)</strong></p>
-        <p class="leading-[1.5]">Địa chỉ: <span class="text-[#1D1D1F] font-medium">54a8 Ngô Chí Quốc, Tam Bình, Thủ Đức, HCM</span></p>
+        <p class="leading-[1.5] flex items-start gap-2">
+          <a href="https://maps.app.goo.gl/ZL5rv8RMJCSpziQQ8" target="_blank" rel="noopener noreferrer" class="mt-0.5 inline-flex w-6 h-6 shrink-0 items-center justify-center rounded-full bg-white border border-[#D2D2D7] text-[#EA4335] hover:bg-[#EA4335] hover:text-white transition-colors" aria-label="Mở Google Maps" title="Mở Google Maps">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+          </a>
+          <span>Địa chỉ: <a href="https://maps.app.goo.gl/ZL5rv8RMJCSpziQQ8" target="_blank" rel="noopener noreferrer" class="text-[#1D1D1F] font-medium hover:underline">54a8 Ngô Chí Quốc, Tam Bình, Thủ Đức, HCM</a></span>
+        </p>
       </div>
     </div>
 
@@ -984,7 +1003,10 @@
   </div>
 
   <!-- Nút Zalo CSKH nổi ở góc dưới cùng bên phải -->
-  <div class="fixed bottom-6 right-6 z-40">
+  <div class="fixed bottom-6 right-6 z-40 flex flex-col items-center gap-3">
+    <a href="tel:0986455457" id="call-now-btn" class="w-12 h-12 rounded-full bg-[#1D1D1F] hover:bg-black text-white shadow-xl hover:scale-110 transition-all flex items-center justify-center no-underline shrink-0" title="Gọi ngay: 0986 455 457" aria-label="Gọi ngay 0986 455 457">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.6a1 1 0 0 1-.25 1z"/></svg>
+    </a>
     <a href="https://zalo.me/0986455457" target="_blank" rel="noopener noreferrer" id="zalo-cskh-btn" class="w-12 h-12 rounded-full bg-[#0068FF] hover:bg-[#0054cc] text-white shadow-xl hover:scale-110 transition-all cursor-pointer flex items-center justify-center border-0 no-underline shrink-0 p-2" title="Chat Zalo CSKH: 0986455457" aria-label="Zalo CSKH">
       <svg class="w-full h-full" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M7.779 43.5892C10.1019 43.846 13.0061 43.1836 15.0682 42.1825C24.0225 47.1318 38.0197 46.8954 46.4923 41.4732C46.8209 40.9803 47.1279 40.4677 47.4128 39.9363C49.1062 36.7779 50.0004 33.22 50.0004 27.1316V22.7175C50.0004 16.629 49.1062 13.0711 47.4128 9.91273C45.7385 6.75436 43.2461 4.28093 40.0877 2.58758C36.9293 0.894239 33.3714 0 27.283 0H22.8499C17.6644 0 14.2982 0.652754 11.4699 1.89893C11.3153 2.03737 11.1636 2.17818 11.0151 2.32135C2.71734 10.3203 2.08658 27.6593 9.12279 37.0782C9.13064 37.0921 9.13933 37.1061 9.14889 37.1203C10.2334 38.7185 9.18694 41.5154 7.55068 43.1516C7.28431 43.399 7.37944 43.5512 7.779 43.5892Z" fill="white"/>

@@ -185,3 +185,24 @@ Tên tài khoản gồm chữ thường, số, `.`, `_`, `-`, dài 3-30 ký tự
 - Trang quản trị: `admin/warranty.html` (liên kết "Bảo hành" trên thanh điều hướng). Thêm/sửa phiếu gồm tên khách, số điện thoại, máy, nội dung sửa chữa, số tháng bảo hành (1–60), ngày bắt đầu. Hạn bảo hành tự tính.
 - Nhân viên (staff) được thêm và sửa phiếu, chỉ quản lý (owner/admin) được xóa.
 - Khách tra cứu tại mục **Bảo hành** trên website bằng số điện thoại. Hàm `lookup_warranty` chỉ trả thông tin cần thiết (tên khách được che, không trả ghi chú nội bộ), tối đa 20 phiếu và 10 lượt tra/giờ cho mỗi số.
+
+## Thông báo Telegram (đơn hàng, lịch sửa chữa, thu cũ)
+
+Mỗi khi khách đặt hàng, đặt lịch sửa hoặc gửi yêu cầu báo giá thu cũ, bot Telegram tự gửi tin (mã, tên, số điện thoại, nội dung, mô tả) vào nhóm hoặc tài khoản chính của chủ shop.
+
+SQL đã chạy: `supabase/telegram.sql` (tạo trigger, bảng `notify_settings`). Bước còn lại là cấu hình bot, làm một lần:
+
+1. Trên Telegram mở **@BotFather**, gửi `/newbot`, đặt tên, nhận **token** (dạng `123456:ABC...`). Token là mật khẩu của bot, không gửi cho ai và không đưa vào code hay GitHub.
+2. Muốn nhận trong nhóm: tạo nhóm, thêm bot vào nhóm, gửi một tin bất kỳ trong nhóm. Muốn nhận cá nhân: mở bot và bấm Start.
+3. Lấy **chat id**: mở `https://api.telegram.org/bot<TOKEN>/getUpdates` trên trình duyệt, tìm `"chat":{"id":...}`. Id của nhóm thường bắt đầu bằng dấu `-`.
+4. Vào Supabase → SQL Editor, chạy (thay giá trị thật):
+   ```sql
+   insert into public.notify_settings (key, value) values
+     ('telegram_bot_token', 'TOKEN_CUA_BAN'),
+     ('telegram_chat_id',   'CHAT_ID_CUA_BAN')
+   on conflict (key) do update set value = excluded.value;
+   select public.notify_telegram('Thử thông báo Tien Mobile');
+   ```
+5. Bot phải gửi được tin thử. Từ đó mỗi đơn mới sẽ tự báo. Muốn đổi nhóm hoặc bot, chạy lại câu `insert` với giá trị mới.
+
+Lưu ý: nếu Telegram lỗi hoặc chưa cấu hình, đơn của khách vẫn được lưu bình thường. Bảng `notify_settings` không đọc được từ trình duyệt.
