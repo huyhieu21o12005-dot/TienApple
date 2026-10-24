@@ -10,7 +10,13 @@ import {
   applyBulkDiscount,
   mapDbToProduct,
   mapProductToDb,
-  resizeImage
+  resizeImage,
+  canDeleteProducts,
+  roleLabel,
+  LOGIN_EMAIL_DOMAIN,
+  isValidUsername,
+  usernameToEmail,
+  emailToUsername
 } from '../../Frontend/admin/adminHelpers.js';
 
 const valid = { id: 'ip-16', name: 'iPhone 16', kind: 'phone', price: 1000000 };
@@ -199,5 +205,58 @@ describe('adminHelpers - resizeImage', () => {
   it('từ chối khi ảnh không đọc được', async () => {
     installBrowser({ blob: null, failImage: true });
     await assert.rejects(() => resizeImage({ type: 'image/jpeg' }));
+  });
+});
+
+describe('adminHelpers - phân quyền theo vai trò', () => {
+  it('chỉ owner và admin được xóa sản phẩm, nhân viên và vai trò lạ thì không', () => {
+    assert.equal(canDeleteProducts('owner'), true);
+    assert.equal(canDeleteProducts('admin'), true);
+    assert.equal(canDeleteProducts('staff'), false);
+    assert.equal(canDeleteProducts('khach'), false);
+    assert.equal(canDeleteProducts(null), false);
+    assert.equal(canDeleteProducts(undefined), false);
+  });
+
+  it('roleLabel trả nhãn tiếng Việt', () => {
+    assert.equal(roleLabel('owner'), 'Chủ shop');
+    assert.equal(roleLabel('admin'), 'Quản trị');
+    assert.equal(roleLabel('staff'), 'Nhân viên');
+    assert.equal(roleLabel(undefined), 'Quản trị');
+  });
+});
+
+describe('adminHelpers - đăng nhập bằng tên tài khoản', () => {
+  it('isValidUsername chỉ nhận chữ thường, số, . _ - dài 3-30 ký tự', () => {
+    assert.equal(isValidUsername('nhanvien1'), true);
+    assert.equal(isValidUsername('a.b-c_d'), true);
+    assert.equal(isValidUsername('ab'), false);
+    assert.equal(isValidUsername('a'.repeat(31)), false);
+    assert.equal(isValidUsername('Nhan Vien'), false);
+    assert.equal(isValidUsername('-abc'), false);
+    assert.equal(isValidUsername('nv@x'), false);
+    assert.equal(isValidUsername(null), false);
+  });
+
+  it('usernameToEmail ghép tên miền nội bộ, bỏ khoảng trắng và đổi chữ thường', () => {
+    assert.equal(usernameToEmail('  NhanVien1 '), `nhanvien1@${LOGIN_EMAIL_DOMAIN}`);
+    assert.equal(usernameToEmail('admin'), `admin@${LOGIN_EMAIL_DOMAIN}`);
+  });
+
+  it('usernameToEmail giữ nguyên email hợp lệ và từ chối đầu vào sai', () => {
+    assert.equal(usernameToEmail('Chu@Shop.com'), 'chu@shop.com');
+    assert.equal(usernameToEmail('khong hop le@'), '');
+    assert.equal(usernameToEmail('ab'), '');
+    assert.equal(usernameToEmail('a b c'), '');
+    assert.equal(usernameToEmail(''), '');
+    assert.equal(usernameToEmail(undefined), '');
+  });
+
+  it('emailToUsername chỉ bỏ tên miền nội bộ', () => {
+    assert.equal(emailToUsername(`nv1@${LOGIN_EMAIL_DOMAIN}`), 'nv1');
+    assert.equal(emailToUsername(`NV1@${LOGIN_EMAIL_DOMAIN.toUpperCase()}`), 'nv1');
+    assert.equal(emailToUsername('chu@gmail.com'), 'chu@gmail.com');
+    assert.equal(emailToUsername(''), '');
+    assert.equal(emailToUsername(null), '');
   });
 });

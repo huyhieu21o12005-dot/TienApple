@@ -314,3 +314,65 @@ export async function resizeImage(file, maxWidth = 1200, quality = 0.8) {
     reader.readAsDataURL(file);
   });
 }
+
+
+/**
+ * Vai trò được xóa sản phẩm. Nhân viên (staff) chỉ xem, thêm và sửa.
+ * Đây chỉ để ẩn nút trên giao diện; việc chặn thật nằm ở quy tắc bảo mật của Supabase.
+ * @param {string|null|undefined} role
+ * @returns {boolean}
+ */
+export function canDeleteProducts(role) {
+  return role === 'owner' || role === 'admin';
+}
+
+/**
+ * Nhãn vai trò hiển thị cạnh email.
+ * @param {string|null|undefined} role
+ * @returns {string}
+ */
+export function roleLabel(role) {
+  return { owner: 'Chủ shop', admin: 'Quản trị', staff: 'Nhân viên' }[role] || 'Quản trị';
+}
+
+
+/**
+ * Supabase Auth bắt buộc dùng email, nên tên đăng nhập được ghép thêm một tên miền nội bộ.
+ * Không có thư nào được gửi đến địa chỉ này; tài khoản được tạo sẵn và tự xác nhận.
+ */
+export const LOGIN_EMAIL_DOMAIN = 'tienmobile.vn';
+
+/**
+ * Tên đăng nhập hợp lệ: 3-30 ký tự gồm chữ thường, số, dấu chấm, gạch dưới, gạch nối.
+ * @param {string} username
+ * @returns {boolean}
+ */
+export function isValidUsername(username) {
+  return typeof username === 'string' && /^[a-z0-9][a-z0-9._-]{2,29}$/.test(username);
+}
+
+/**
+ * Đổi nội dung ô đăng nhập thành email gửi cho Supabase.
+ * - "nhanvien1" hoặc "NhanVien1 " -> "nhanvien1@tienmobile.vn"
+ * - Nếu người dùng gõ sẵn email thì giữ nguyên (tương thích tài khoản cũ).
+ * @param {string} input
+ * @returns {string} email, hoặc chuỗi rỗng nếu không hợp lệ
+ */
+export function usernameToEmail(input) {
+  const value = typeof input === 'string' ? input.trim().toLowerCase() : '';
+  if (!value) return '';
+  if (value.includes('@')) return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? value : '';
+  return isValidUsername(value) ? `${value}@${LOGIN_EMAIL_DOMAIN}` : '';
+}
+
+/**
+ * Hiển thị tên đăng nhập thay vì email nội bộ.
+ * @param {string} email
+ * @returns {string}
+ */
+export function emailToUsername(email) {
+  if (typeof email !== 'string' || !email) return '';
+  const suffix = `@${LOGIN_EMAIL_DOMAIN}`;
+  const lower = email.toLowerCase();
+  return lower.endsWith(suffix) ? lower.slice(0, -suffix.length) : email;
+}

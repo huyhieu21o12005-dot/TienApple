@@ -43,7 +43,7 @@ export async function getSupabase() {
  * @returns {Promise<Array<object>|null>}
  */
 export async function fetchProducts(options = {}) {
-  if (!options.client && !isSupabaseConfigured()) {
+  if ('client' in options ? !options.client : !isSupabaseConfigured()) {
     console.info('[productsApi] Supabase chưa được cấu hình trong js/config.js. Dùng dữ liệu fallback.');
     return null;
   }

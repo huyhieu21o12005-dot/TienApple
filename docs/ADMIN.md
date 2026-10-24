@@ -120,3 +120,61 @@ Bạn có thể đối chiếu các tình huống thực tế sau đây để đ
 | 7 | **Xóa sản phẩm** | Nhấn nút "Xóa", xác nhận hộp thoại ghi rõ tên sản phẩm | Sản phẩm bị xóa khỏi danh sách và file ảnh tương ứng trong bucket `product-images` tự động được dọn dẹp. |
 | 8 | **Trang chủ tự cập nhật** | Mở lại trang chủ `/` | Các thay đổi về giá, ảnh và sản phẩm mới hiển thị ngay lập tức; hiệu ứng nước và 3D hero vẫn hoạt động mượt mà. |
 | 9 | **Dự phòng khi mất mạng / chưa điền key** | Giả lập mất mạng hoặc để placeholder `YOUR_SUPABASE_URL` | Trang chủ `/` tự động chuyển sang đọc `data/products.json`, hiển thị đầy đủ danh mục không bị lỗi giao diện. |
+
+
+---
+
+## Phân quyền quản trị viên (bảng `admin_users`)
+
+Mặc định `schema.sql` cho **mọi tài khoản đã đăng nhập** quyền sửa sản phẩm. Để chỉ những người được chỉ định mới sửa được, chạy thêm `supabase/admin_users.sql`.
+
+1. Vào **SQL Editor** -> **New query**, dán toàn bộ `supabase/admin_users.sql` rồi **Run** (chạy sau `schema.sql`, chạy lại nhiều lần vẫn an toàn).
+2. Tạo user trong **Authentication -> Users** (tick *Auto Confirm User*) nếu chưa có.
+3. Mở lại file SQL, ở mục **6. TẠO CHỦ SHOP ĐẦU TIÊN** đổi email, bỏ dấu `--` ở các dòng `insert ...`, rồi chạy để cấp quyền `owner`.
+4. Đăng nhập `/admin/`. Tài khoản không có trong bảng sẽ bị đăng xuất kèm thông báo "chưa được cấp quyền quản trị".
+
+| Vai trò | Xem | Thêm, sửa, tải ảnh | Xóa sản phẩm/ảnh | Quản lý danh sách tài khoản |
+|---|---|---|---|---|
+| `owner` (chủ shop) | Có | Có | Có | Có |
+| `admin` (quản trị) | Có | Có | Có | Không |
+| `staff` (nhân viên) | Có | Có | **Không** | Không |
+
+Nhân viên không thấy nút "Xóa" trên trang quản trị, và nếu cố gọi trực tiếp thì Supabase từ chối vì policy xóa chỉ cho `owner`/`admin` (hàm `is_manager()`).
+
+Thêm nhân viên: tạo user trong **Authentication -> Users**, rồi chạy
+`insert into public.admin_users (user_id, email, display_name, role) select id, email, 'Tên NV', 'staff' from auth.users where email = '...';`
+
+Khóa tạm một nhân viên: `update public.admin_users set is_active = false where email = '...';`
+
+Lưu ý: kiểm tra trong trang `/admin/` chỉ để báo lỗi thân thiện. Việc chặn thật nằm ở quy tắc bảo mật (RLS) trên Supabase.
+
+---
+
+## Đơn hàng và lịch sửa chữa (`orders.sql`)
+
+Trước đây nút đặt hàng chỉ hiện thông báo, shop không nhận được đơn. Giờ đơn và lịch hẹn được lưu vào Supabase.
+
+1. Chạy theo thứ tự: `schema.sql` -> `admin_users.sql` -> **`orders.sql`** (SQL Editor, dán, Run).
+2. Khách đặt hàng trên website: hệ thống gọi hàm `create_order()`, **tự tính lại giá và kiểm tra tồn kho từ bảng `products`**, nên khách không sửa giá được từ trình duyệt. Mỗi số điện thoại tối đa 5 yêu cầu mỗi giờ để chống spam.
+3. Xem và xử lý tại `/admin/orders.html` (nút **Đơn hàng** trên trang sản phẩm): đổi trạng thái, ghi chú nội bộ, gọi điện bằng một chạm, tự làm mới mỗi 60 giây.
+4. Chỉ `owner` mới xóa được đơn. Khách không đọc được đơn của người khác.
+
+Lưu ý:
+- Tồn kho **không tự trừ** khi có đơn, chủ shop chỉnh số lượng ở trang sản phẩm. Hàm chỉ từ chối khi số lượng đặt lớn hơn tồn kho.
+- Khi Supabase chưa cấu hình hoặc đang tạm dừng, website báo khách gọi hotline thay vì giả vờ đặt thành công.
+- Chưa có thông báo tự động (Zalo, email) khi có đơn mới, hiện phải mở trang `/admin/orders.html`.
+
+
+---
+
+## Đăng nhập bằng tên tài khoản (không cần email thật)
+
+Ô đăng nhập ở `/admin/` nhận **tên tài khoản** như `chushop` hoặc `nhanvien1`. Supabase Auth bắt buộc có email, nên trang tự ghép thành `ten@tienmobile.vn` (hằng số `LOGIN_EMAIL_DOMAIN` trong `adminHelpers.js`). Không có thư nào được gửi tới địa chỉ này.
+
+Tạo một tài khoản:
+1. **Authentication -> Users -> Add user -> Create new user**: Email = `nhanvien1@tienmobile.vn`, nhập mật khẩu, **tick Auto Confirm User**.
+2. Cấp vai trò bằng SQL (đổi `staff` thành `admin` hoặc `owner` nếu cần):
+   `insert into public.admin_users (user_id, email, display_name, role) select id, email, 'Nhân viên 1', 'staff' from auth.users where email = 'nhanvien1@tienmobile.vn';`
+3. Nhân viên đăng nhập với tên `nhanvien1` và mật khẩu đã đặt.
+
+Tên tài khoản gồm chữ thường, số, `.`, `_`, `-`, dài 3-30 ký tự. Vì không có email thật nên **không có chức năng quên mật khẩu**: chủ shop đặt lại mật khẩu trong **Authentication -> Users** (nút ba chấm, *Send password recovery* không dùng được, hãy chọn đặt mật khẩu mới).

@@ -7,6 +7,7 @@ import { CartManager, ProductFilter, BookingValidator } from './store.js';
 import { Phone3DStudio } from './hero3d.js';
 import { WaterRipplesEngine } from './waterRipples.js';
 import { fetchProducts } from './productsApi.js';
+import { submitOrder, submitBooking, buildOrderItems } from './ordersApi.js';
 import { safeUrl, partitionProducts } from './utils.js';
 import {
   productCardHtml,
@@ -1039,8 +1040,9 @@ class App {
     });
   }
 
-  handleCheckout(e) {
+  async handleCheckout(e) {
     e.preventDefault();
+    if (this._submitting) return;
     if (this.cart.getItemCount() === 0) {
       this.showToast('Giỏ hàng trống. Vui lòng chọn sản phẩm trước khi thanh toán.');
       return;
@@ -1050,24 +1052,38 @@ class App {
     const phone = document.getElementById('cust-phone')?.value || '';
     const address = document.getElementById('cust-address')?.value || '';
 
-    const validation = BookingValidator.validateOrderForm({
-      name,
-      phone,
-      address
-    });
-
+    const validation = BookingValidator.validateOrderForm({ name, phone, address });
     if (!validation.isValid) {
       alert(validation.errors[0].message);
       return;
     }
 
-    const totalStr = CartManager.formatCurrency(this.cart.getTotal());
-    const formattedPhone = validation.normalizedPhone || phone;
-    this.cart.clearCart();
-    this.updateCartBadge();
-    this.closeCartDrawer();
+    this._submitting = true;
+    const submitBtn = e.target.querySelector('[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
 
-    alert(`🎉 ĐẶT HÀNG THÀNH CÔNG!\n\nCảm ơn bạn ${name} (${formattedPhone}).\nTổng thanh toán: ${totalStr}\nĐịa chỉ nhận: ${address}\n\nNhân viên Tien Mobile sẽ gọi xác nhận đơn và giao hàng siêu tốc trong 2 giờ.`);
+    try {
+      const result = await submitOrder({
+        name,
+        phone: validation.normalizedPhone || phone,
+        address,
+        items: buildOrderItems(this.cart.getItems()),
+        voucher: this.cart.appliedVoucher
+      });
+
+      if (!result.ok) {
+        alert(result.message);
+        return;
+      }
+
+      this.cart.clearCart();
+      this.updateCartBadge();
+      this.closeCartDrawer();
+      alert(`ĐẶT HÀNG THÀNH CÔNG!\n\nMã đơn: ${result.code}\nCảm ơn bạn ${name} (${validation.normalizedPhone || phone}).\nTổng thanh toán: ${CartManager.formatCurrency(result.total)}\nĐịa chỉ nhận: ${address}\n\nNhân viên Tien Mobile sẽ gọi xác nhận đơn trong thời gian sớm nhất.`);
+    } finally {
+      this._submitting = false;
+      if (submitBtn) submitBtn.disabled = false;
+    }
   }
 
   // Booking Modal
@@ -1093,8 +1109,9 @@ class App {
     }
   }
 
-  handleRepairSubmit(e) {
+  async handleRepairSubmit(e) {
     e.preventDefault();
+    if (this._submitting) return;
     const name = document.getElementById('repairCustName')?.value || 'Khách hàng';
     const phone = document.getElementById('repairCustPhone')?.value;
     const device = document.getElementById('repairDeviceInput')?.value;
@@ -1106,18 +1123,29 @@ class App {
       return;
     }
 
-    this.closeBookingModal();
-    alert(`✅ ĐÃ ĐẶT LỊCH HẸN ƯU TIÊN!\n\nTien Mobile đã ghi nhận thông tin:\n- Khách hàng: ${name} (${phone})\n- Máy: ${device}\n- Dịch vụ: ${service}\n\nKỹ thuật viên sẽ gọi xác nhận trong 5 phút và chuẩn bị sẵn linh kiện zin để phục vụ bạn ngay khi tới shop.`);
+    this._submitting = true;
+    try {
+      const result = await submitBooking({ name, phone: validation.normalizedPhone || phone, device, service });
+      if (!result.ok) {
+        alert(result.message);
+        return;
+      }
+      this.closeBookingModal();
+      alert(`ĐÃ ĐẶT LỊCH HẸN!\n\nMã lịch: ${result.code}\n- Khách hàng: ${name} (${phone})\n- Máy: ${device}\n- Dịch vụ: ${service}\n\nKỹ thuật viên sẽ gọi xác nhận trong thời gian sớm nhất.`);
+    } finally {
+      this._submitting = false;
+    }
   }
 
-  handleQuickRepairBarSubmit(e) {
+  async handleQuickRepairBarSubmit(e) {
     e.preventDefault();
+    if (this._submitting) return;
     const phone = document.getElementById('quick-bar-phone').value;
     const device = document.getElementById('quick-bar-device').value;
     const service = document.getElementById('quick-bar-service').value;
 
     const validation = BookingValidator.validateBookingForm({
-      name: 'Khách hàng đặt nhanh',
+      name: 'Khách đặt nhanh',
       phone,
       device,
       service
@@ -1128,7 +1156,22 @@ class App {
       return;
     }
 
-    alert(`✅ ĐÃ LƯU ƯU ĐÃI GIẢM 10%!\n\nSố điện thoại: ${phone}\nThiết bị: ${device}\nDịch vụ: ${service}\n\nCảm ơn bạn! Kỹ thuật viên sẽ liên hệ lại ngay để xác nhận thời gian.`);
+    this._submitting = true;
+    try {
+      const result = await submitBooking({
+        name: 'Khách đặt nhanh',
+        phone: validation.normalizedPhone || phone,
+        device,
+        service
+      });
+      if (!result.ok) {
+        alert(result.message);
+        return;
+      }
+      alert(`ĐÃ NHẬN YÊU CẦU!\n\nMã lịch: ${result.code}\nSố điện thoại: ${phone}\nThiết bị: ${device}\nDịch vụ: ${service}\n\nCảm ơn bạn! Kỹ thuật viên sẽ liên hệ lại để xác nhận thời gian.`);
+    } finally {
+      this._submitting = false;
+    }
   }
 
   // Chat Widget

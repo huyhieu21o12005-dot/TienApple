@@ -13,7 +13,11 @@ import {
   applyBulkDiscount,
   mapDbToProduct,
   mapProductToDb,
-  resizeImage
+  resizeImage,
+  canDeleteProducts,
+  roleLabel,
+  usernameToEmail,
+  emailToUsername
 } from './adminHelpers.js';
 
 // CDN Supabase Client pinned version
@@ -22,6 +26,7 @@ let supabase = null;
 // Application State
 const state = {
   user: null,
+  role: null,
   products: [],
   selectedIds: new Set(),
   activeFilter: 'all', // all, phone, accessory, visible, hidden, outofstock
@@ -57,8 +62,9 @@ async function init() {
     });
 
     // Lắng nghe thay đổi trạng thái xác thực
+    // Hoãn sang tick sau: không gọi Supabase bên trong callback để tránh nghẽn khóa auth
     supabase.auth.onAuthStateChange((event, session) => {
-      handleAuthChange(session);
+      setTimeout(() => handleAuthChange(session), 0);
     });
 
     // Kiểm tra session hiện tại
@@ -70,16 +76,50 @@ async function init() {
   }
 }
 
-function handleAuthChange(session) {
+/**
+ * Kiểm tra tài khoản đang đăng nhập có nằm trong bảng admin_users (hàm is_admin() trên Supabase).
+ * @returns {Promise<{ ok: boolean, message?: string }>}
+ */
+async function checkIsAdmin() {
+  const { data, error } = await supabase.rpc('is_admin');
+  if (error) {
+    console.warn('[Admin] Không kiểm tra được quyền quản trị:', error.message);
+    return {
+      ok: false,
+      message: 'Chưa thiết lập phân quyền quản trị trên Supabase. Hãy chạy supabase/admin_users.sql (xem docs/ADMIN.md).'
+    };
+  }
+  if (data !== true) {
+    return { ok: false, message: 'Tài khoản này chưa được cấp quyền quản trị. Vui lòng liên hệ chủ shop.' };
+  }
+  const { data: role } = await supabase.rpc('current_admin_role');
+  return { ok: true, role: typeof role === 'string' ? role : 'staff' };
+}
+
+async function handleAuthChange(session) {
   if (session && session.user) {
+    const access = await checkIsAdmin();
+    if (!access.ok) {
+      await supabase.auth.signOut();
+      document.getElementById('adminApp').classList.add('hidden');
+      document.getElementById('loginSection').classList.remove('hidden');
+      showLoginError(access.message);
+      return;
+    }
+
     state.user = session.user;
+    state.role = access.role;
+    document.body.dataset.role = access.role;
     document.getElementById('loginSection').classList.add('hidden');
     document.getElementById('adminApp').classList.remove('hidden');
-    document.getElementById('userEmailBadge').innerText = session.user.email || 'Admin';
-    document.getElementById('userEmailBadge').title = session.user.email || 'Admin';
+    const who = `${emailToUsername(session.user.email) || 'Admin'} · ${roleLabel(access.role)}`;
+    document.getElementById('userEmailBadge').innerText = who;
+    document.getElementById('userEmailBadge').title = who;
     loadProducts();
   } else {
     state.user = null;
+    state.role = null;
+    delete document.body.dataset.role;
     state.products = [];
     state.selectedIds.clear();
     document.getElementById('adminApp').classList.add('hidden');
@@ -620,6 +660,10 @@ async function executeBulkDiscount(percent) {
 }
 
 async function executeBulkDelete() {
+  if (!canDeleteProducts(state.role)) {
+    showToast('Nhân viên không có quyền xóa sản phẩm.', 'error');
+    return;
+  }
   const ids = Array.from(state.selectedIds);
   if (ids.length === 0) return;
 
@@ -666,6 +710,10 @@ async function executeBulkDelete() {
 // 7. DELETE SINGLE PRODUCT (WITH IMAGE CLEANUP)
 // ==============================================================================
 function openDeleteModal(prod) {
+  if (!canDeleteProducts(state.role)) {
+    showToast('Nhân viên không có quyền xóa sản phẩm.', 'error');
+    return;
+  }
   state.deleteTargetProduct = prod;
   document.getElementById('deleteProductName').innerText = `«${prod.name}»`;
   document.getElementById('deleteModal').classList.remove('hidden');
@@ -986,15 +1034,20 @@ function bindGlobalEvents() {
   // Login Form
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('loginEmail').value.trim();
+    const username = document.getElementById('loginEmail').value.trim();
+    const email = usernameToEmail(username);
     const password = document.getElementById('loginPassword').value;
     const btn = document.getElementById('loginBtn');
     const alert = document.getElementById('loginAlert');
 
     alert.classList.add('hidden');
 
-    if (!email || !password) {
-      showLoginError('Vui lòng nhập đầy đủ email và mật khẩu.');
+    if (!username || !password) {
+      showLoginError('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.');
+      return;
+    }
+    if (!email) {
+      showLoginError('Tên đăng nhập chỉ gồm chữ thường, số, dấu chấm, gạch dưới hoặc gạch nối (3-30 ký tự).');
       return;
     }
 
@@ -1007,9 +1060,9 @@ function bindGlobalEvents() {
       console.error('[Admin] Lỗi đăng nhập:', err);
       let msg = 'Đăng nhập không thành công. Vui lòng kiểm tra lại.';
       if (err.message.includes('Invalid login credentials')) {
-        msg = 'Sai email hoặc mật khẩu quản trị.';
+        msg = 'Sai tên đăng nhập hoặc mật khẩu.';
       } else if (err.message.includes('Email not confirmed')) {
-        msg = 'Email tài khoản chưa được xác nhận trên Supabase.';
+        msg = 'Tài khoản chưa được xác nhận trên Supabase (cần tick Auto Confirm khi tạo).';
       }
       showLoginError(msg);
     } finally {

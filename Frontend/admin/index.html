@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Tiến Mobile - Quản Trị Sản Phẩm</title>
   <link rel="stylesheet" href="./admin.css">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 170'><path fill='%231D1D1F' d='M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.6-7.8-11.71-14.28-5.66-8.91-10.1-18.73-13.32-29.47-3.21-10.74-4.82-20.93-4.82-30.56 0-14.78 3.82-27.18 11.46-37.19 7.64-10.01 17.2-15.08 28.69-15.22 4.12 0 8.94 1.14 14.46 3.42 5.52 2.28 9.38 3.47 11.59 3.56 1.84 0 5.86-1.22 12.06-3.67 6.2-2.44 11.16-3.52 14.88-3.23 11.52.88 20.73 5.37 27.63 13.48-10.02 6.07-14.92 14.63-14.7 25.68.22 8.7 3.48 15.98 9.79 21.84 6.31 5.86 13.9 9.17 22.77 9.93-2.39 7.39-5.43 14.99-9.12 22.81zM119.22 33.15c0-7.39 2.65-14.18 7.95-20.37 5.3-6.19 11.83-9.98 19.59-11.38.22 1.3.33 2.5.33 3.59 0 7.39-2.76 14.29-8.28 20.7-5.52 6.41-12.08 10.15-19.68 11.22-.11-1.09-.17-2.19-.17-3.3v-.46z'/></svg>">
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
 </head>
 <body class="admin-body">
 
@@ -16,26 +16,27 @@
   <main id="loginSection" class="login-section">
     <div class="login-card">
       <div class="login-header">
-        <svg class="brand-logo" viewBox="0 0 170 170" width="36" height="36" aria-hidden="true">
-          <path fill="#1D1D1F" d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.6-7.8-11.71-14.28-5.66-8.91-10.1-18.73-13.32-29.47-3.21-10.74-4.82-20.93-4.82-30.56 0-14.78 3.82-27.18 11.46-37.19 7.64-10.01 17.2-15.08 28.69-15.22 4.12 0 8.94 1.14 14.46 3.42 5.52 2.28 9.38 3.47 11.59 3.56 1.84 0 5.86-1.22 12.06-3.67 6.2-2.44 11.16-3.52 14.88-3.23 11.52.88 20.73 5.37 27.63 13.48-10.02 6.07-14.92 14.63-14.7 25.68.22 8.7 3.48 15.98 9.79 21.84 6.31 5.86 13.9 9.17 22.77 9.93-2.39 7.39-5.43 14.99-9.12 22.81zM119.22 33.15c0-7.39 2.65-14.18 7.95-20.37 5.3-6.19 11.83-9.98 19.59-11.38.22 1.3.33 2.5.33 3.59 0 7.39-2.76 14.29-8.28 20.7-5.52 6.41-12.08 10.15-19.68 11.22-.11-1.09-.17-2.19-.17-3.3v-.46z"/>
-        </svg>
+        <img class="brand-logo" src="../assets/logo.svg" width="56" height="56" alt="Tien Mobile">
         <h1 class="login-title">Đăng Nhập Quản Trị</h1>
-        <p class="login-subtitle">Hệ thống quản lý sản phẩm Tiến Mobile</p>
+        <p class="login-subtitle">Hệ thống quản lý Tiến Mobile</p>
       </div>
 
       <div id="loginAlert" class="alert-box alert-error hidden" role="alert"></div>
 
       <form id="loginForm" class="login-form" novalidate>
         <div class="form-group">
-          <label for="loginEmail" class="form-label">Email quản trị</label>
+          <label for="loginEmail" class="form-label">Tên đăng nhập</label>
           <input 
-            type="email" 
+            type="text" 
             id="loginEmail" 
-            name="email" 
+            name="username" 
             class="form-input" 
-            placeholder="admin@tienmobile.vn" 
+            placeholder="vd: nhanvien1" 
             required 
             autocomplete="username"
+            autocapitalize="none"
+            autocorrect="off"
+            spellcheck="false"
           >
         </div>
 
@@ -74,9 +75,7 @@
       <div class="topbar-inner">
         <!-- Logo & Shop Title -->
         <div class="brand-area">
-          <svg class="brand-logo-small" viewBox="0 0 170 170" width="22" height="22" aria-hidden="true">
-            <path fill="#1D1D1F" d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.6-7.8-11.71-14.28-5.66-8.91-10.1-18.73-13.32-29.47-3.21-10.74-4.82-20.93-4.82-30.56 0-14.78 3.82-27.18 11.46-37.19 7.64-10.01 17.2-15.08 28.69-15.22 4.12 0 8.94 1.14 14.46 3.42 5.52 2.28 9.38 3.47 11.59 3.56 1.84 0 5.86-1.22 12.06-3.67 6.2-2.44 11.16-3.52 14.88-3.23 11.52.88 20.73 5.37 27.63 13.48-10.02 6.07-14.92 14.63-14.7 25.68.22 8.7 3.48 15.98 9.79 21.84 6.31 5.86 13.9 9.17 22.77 9.93-2.39 7.39-5.43 14.99-9.12 22.81zM119.22 33.15c0-7.39 2.65-14.18 7.95-20.37 5.3-6.19 11.83-9.98 19.59-11.38.22 1.3.33 2.5.33 3.59 0 7.39-2.76 14.29-8.28 20.7-5.52 6.41-12.08 10.15-19.68 11.22-.11-1.09-.17-2.19-.17-3.3v-.46z"/>
-          </svg>
+          <img class="brand-logo-small" src="../assets/logo.svg" width="28" height="28" alt="">
           <div class="brand-text-group">
             <span class="brand-name">Tiến Mobile</span>
             <span class="brand-tag">Quản Trị</span>
@@ -101,6 +100,7 @@
 
         <!-- Action Buttons -->
         <div class="topbar-actions">
+          <a class="btn btn-secondary" href="./orders.html">Đơn hàng</a>
           <button type="button" id="addProductBtn" class="btn btn-primary">
             <span class="btn-icon">+</span>
             <span>Thêm sản phẩm</span>

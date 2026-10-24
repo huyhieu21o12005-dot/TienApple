@@ -9,8 +9,9 @@
  * - TUYỆT ĐỐI KHÔNG dùng Service Role Key trên Client / Frontend.
  */
 
-export const SUPABASE_URL = "YOUR_SUPABASE_URL";
-export const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+export const SUPABASE_URL = "https://kyyfafnkhbcgpedgllag.supabase.co";
+// Publishable key: được phép công khai trong mã trình duyệt, bảo mật dựa vào RLS.
+export const SUPABASE_ANON_KEY = "sb_publishable_KgFVQG_8I_w3kOwwhimO4g_R6WJ1Ssn";
 
 /**
  * Kiểm tra xem cấu hình Supabase đã được điền hợp lệ hay chưa

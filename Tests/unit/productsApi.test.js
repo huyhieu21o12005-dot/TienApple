@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { fetchProducts, getSupabase } from '../../Frontend/js/productsApi.js';
+import { fetchProducts } from '../../Frontend/js/productsApi.js';
 import { isSupabaseConfigured, SUPABASE_URL, SUPABASE_ANON_KEY } from '../../Frontend/js/config.js';
 
 /** Supabase client giả: mọi hàm trả lại chính nó, await sẽ trả kết quả đã cấu hình */
@@ -25,10 +25,11 @@ const quiet = async (fn) => {
 };
 
 describe('config - isSupabaseConfigured', () => {
-  it('mặc định chưa cấu hình (giá trị placeholder)', () => {
-    assert.equal(SUPABASE_URL, 'YOUR_SUPABASE_URL');
-    assert.equal(SUPABASE_ANON_KEY, 'YOUR_SUPABASE_ANON_KEY');
-    assert.equal(isSupabaseConfigured(), false);
+  it('đã cấu hình project và chỉ dùng khóa công khai (publishable/anon)', () => {
+    assert.equal(isSupabaseConfigured(), true);
+    assert.match(SUPABASE_URL, /^https:\/\/[a-z0-9]+\.supabase\.co$/);
+    assert.ok(/^sb_publishable_/.test(SUPABASE_ANON_KEY) || SUPABASE_ANON_KEY.split('.').length === 3);
+    assert.ok(!/^sb_secret_/.test(SUPABASE_ANON_KEY), 'không được dùng secret key trong trình duyệt');
   });
 
   it('không có service_role key trong cấu hình', async () => {
@@ -39,9 +40,8 @@ describe('config - isSupabaseConfigured', () => {
 });
 
 describe('productsApi - fetchProducts', () => {
-  it('trả null khi chưa cấu hình và không có client', async () => {
-    assert.equal(await quiet(() => fetchProducts()), null);
-    assert.equal(await quiet(() => getSupabase()), null);
+  it('trả null khi không có client (coi như chưa cấu hình)', async () => {
+    assert.equal(await quiet(() => fetchProducts({ client: null })), null);
   });
 
   it('chỉ lấy sản phẩm đang hiện, sắp xếp đúng và map sang camelCase', async () => {

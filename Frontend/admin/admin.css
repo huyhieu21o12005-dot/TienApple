@@ -1245,3 +1245,85 @@ body.admin-body {
     justify-content: center;
   }
 }
+
+/* ==========================================================================
+   Trang quản trị đơn hàng (orders.html)
+   ========================================================================== */
+.ord-topbar { gap: 12px; flex-wrap: wrap; }
+.ord-nav { display: flex; gap: 6px; }
+.ord-main { max-width: 960px; margin: 0 auto; padding: 16px; }
+
+.ord-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.ord-tab {
+  flex: 1;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ord-tab.active { background: var(--text-primary); color: #FFFFFF; border-color: var(--text-primary); }
+.ord-tab:focus-visible, .ord-chip:focus-visible { outline: 2px solid #0071E3; outline-offset: 2px; }
+.ord-badge {
+  display: inline-block;
+  min-width: 22px;
+  padding: 0 7px;
+  margin-left: 4px;
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: var(--text-primary);
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.ord-toolbar { margin-bottom: 12px; }
+.ord-chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 8px; }
+.ord-chip {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 6px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ord-chip.active { background: var(--text-primary); color: #FFFFFF; border-color: var(--text-primary); }
+
+.ord-list { display: grid; gap: 12px; }
+.ord-empty { padding: 40px 0; text-align: center; color: var(--text-secondary); }
+
+.ord-card {
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: #FFFFFF;
+  padding: 16px;
+  min-width: 0;
+}
+.ord-card-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; }
+.ord-code { font-weight: 700; font-size: 17px; }
+.ord-time { color: var(--text-secondary); font-size: 13px; }
+.ord-line { margin: 6px 0 0; font-size: 14px; overflow-wrap: anywhere; }
+.ord-muted { color: var(--text-secondary); }
+.ord-total { font-weight: 700; font-size: 17px; }
+.ord-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+.ord-actions .select-input { width: auto; min-width: 160px; flex: 1 1 160px; }
+.ord-note { margin-top: 12px; }
+.ord-status-new { font-weight: 700; color: #0071E3; }
+
+@media (min-width: 640px) {
+  .ord-main { padding: 24px; }
+}
+
+/* Nhân viên (staff) không thấy nút xóa; quyền thật được chặn bởi Supabase RLS */
+body[data-role="staff"] .btn-delete-prod,
+body[data-role="staff"] #bulkDeleteBtn {
+  display: none !important;
+}

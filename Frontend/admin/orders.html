@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Tien Mobile - Quản Trị Đơn Hàng</title>
+  <link rel="stylesheet" href="./admin.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+</head>
+<body class="admin-body">
+
+  <!-- Chặn truy cập: hiện khi chưa đăng nhập hoặc không có quyền -->
+  <main id="gateSection" class="login-section hidden">
+    <div class="login-card">
+      <div class="login-header">
+        <img class="brand-logo" src="../assets/logo.svg" width="56" height="56" alt="Tien Mobile">
+        <h1 class="login-title">Cần đăng nhập</h1>
+        <p id="gateMessage" class="login-subtitle">Vui lòng đăng nhập tài khoản quản trị.</p>
+      </div>
+      <a href="./index.html" class="btn btn-primary btn-block">Đến trang đăng nhập</a>
+    </div>
+  </main>
+
+  <div id="ordersApp" class="admin-app hidden">
+    <header class="admin-topbar">
+      <div class="topbar-inner ord-topbar">
+        <div class="brand-area">
+          <img class="brand-logo-small" src="../assets/logo.svg" width="28" height="28" alt="">
+          <div class="brand-text-group">
+            <span class="brand-name">Tien Mobile</span>
+            <span class="brand-tag">Đơn hàng</span>
+          </div>
+        </div>
+        <nav class="ord-nav" aria-label="Điều hướng quản trị">
+          <a class="btn btn-ghost btn-sm" href="./index.html">Sản phẩm</a>
+          <a class="btn btn-secondary btn-sm" href="./orders.html" aria-current="page">Đơn hàng</a>
+        </nav>
+        <div class="topbar-actions">
+          <button type="button" id="refreshBtn" class="btn btn-secondary btn-sm">Làm mới</button>
+          <button type="button" id="logoutBtn" class="btn btn-secondary btn-sm">Đăng xuất</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="ord-main">
+      <div class="ord-tabs" role="tablist" aria-label="Loại yêu cầu">
+        <button type="button" role="tab" class="ord-tab active" data-kind="orders" aria-selected="true">
+          Đơn hàng <span class="ord-badge" id="badgeOrders">0</span>
+        </button>
+        <button type="button" role="tab" class="ord-tab" data-kind="bookings" aria-selected="false">
+          Lịch sửa chữa <span class="ord-badge" id="badgeBookings">0</span>
+        </button>
+      </div>
+
+      <div class="ord-toolbar">
+        <input type="search" id="ordSearch" class="form-input" placeholder="Tìm theo mã, tên, số điện thoại..." aria-label="Tìm kiếm">
+      </div>
+
+      <div id="ordChips" class="ord-chips" role="group" aria-label="Lọc theo trạng thái"></div>
+
+      <div id="ordError" class="alert-box alert-error hidden" role="alert"></div>
+      <div id="ordLoading" class="ord-empty hidden">Đang tải...</div>
+      <section id="ordList" class="ord-list" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script type="module" src="./orders.js"></script>
+</body>
+</html>
