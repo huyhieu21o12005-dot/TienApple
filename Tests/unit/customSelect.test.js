@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { moveIndex } from '../../Frontend/js/customSelect.js';
@@ -25,5 +26,15 @@ describe('customSelect.moveIndex', () => {
     assert.equal(moveIndex(1, 'End', none), 3);
     assert.equal(moveIndex(0, 'ArrowDown', []), -1);
     assert.equal(moveIndex(-1, 'ArrowDown', none), 0);
+  });
+});
+
+describe('customSelect - bố cục', () => {
+  it('lớp đang hiển thị không dùng transform (tránh lệch danh sách position:fixed khi cuộn trang)', () => {
+    const css = fs.readFileSync(new URL('../../Frontend/css/style.css', import.meta.url), 'utf-8');
+    const rule = /\.app-layer\.active\s*\{([^}]*)\}/.exec(css);
+    assert.ok(rule, 'thiếu quy tắc .app-layer.active');
+    const transform = /transform:\s*([^;]+);/.exec(rule[1]);
+    assert.ok(!transform || transform[1].trim() === 'none');
   });
 });

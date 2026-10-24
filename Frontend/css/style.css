@@ -513,7 +513,9 @@ body {
 .app-layer.active {
   display: block;
   opacity: 1;
-  transform: translateY(0);
+  /* Phải là none: bất kỳ transform nào (kể cả translateY(0)) biến lớp thành khối chứa của phần tử position:fixed,
+     làm danh sách chọn tùy biến (.cs-list) bị lệch khi trang đã cuộn. */
+  transform: none;
 }
 
 .layer-tab-btn {
