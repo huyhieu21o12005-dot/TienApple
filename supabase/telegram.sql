@@ -146,3 +146,38 @@ create trigger notify_new_booking after insert on public.repair_bookings
 revoke all on function public.notify_telegram(text) from public, anon, authenticated;
 revoke all on function public.trg_notify_order() from public, anon, authenticated;
 revoke all on function public.trg_notify_booking() from public, anon, authenticated;
+
+-- Thong bao khi admin/nhan vien luu phieu bao hanh moi
+create or replace function public.tg_warranty_text(w public.warranties)
+returns text
+language sql
+as $$
+  select E'\U0001f6e1\ufe0f <b>PHI\u1ebeU B\u1ea2O H\u00c0NH M\u1edaI ' || public.tg_escape(w.code) || '</b>'
+    || E'\nKh\u00e1ch: ' || public.tg_escape(w.customer_name)
+    || E'\nS\u0110T: ' || public.tg_escape(w.phone)
+    || E'\nM\u00e1y: ' || public.tg_escape(w.device)
+    || E'\nS\u1eeda ch\u1eefa: ' || public.tg_escape(w.service)
+    || E'\nB\u1ea3o h\u00e0nh: ' || w.warranty_months || E' th\u00e1ng (\u0111\u1ebfn '
+    || to_char((w.start_date + make_interval(months => w.warranty_months))::date, 'DD/MM/YYYY') || ')'
+    || case when w.note is not null then E'\nGhi ch\u00fa: ' || public.tg_escape(w.note) else '' end;
+$$;
+
+create or replace function public.trg_notify_warranty()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+begin
+  perform public.notify_telegram(public.tg_warranty_text(new));
+  return new;
+exception when others then
+  return new;
+end;
+$$;
+
+drop trigger if exists notify_new_warranty on public.warranties;
+create trigger notify_new_warranty after insert on public.warranties
+  for each row execute function public.trg_notify_warranty();
+
+revoke all on function public.trg_notify_warranty() from public, anon, authenticated;
