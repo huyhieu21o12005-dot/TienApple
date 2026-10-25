@@ -325,3 +325,8 @@ Khi thêm máy từ Sheet (mới hoặc cũ) có ô tích **Chỉ thêm máy có
 - Giỏ hàng là **popup giữa màn hình** (có nút "Quay lại"/✕, Esc và bấm nền để đóng).
 - Bấm vào sản phẩm mở **trang chi tiết riêng** `product.html?id=<mã>` (ảnh, giá, màu, dung lượng, thông số, mô tả, Đặt mua ngay / + Giỏ hàng). Nút **Quay lại** về đúng trang trước; mở trực tiếp thì về danh sách điện thoại. "Đặt mua ngay" mở trang chủ kèm popup giỏ hàng (`index.html?cart=1`).
 - Các mục ở trang chủ (Điện thoại, Sửa chữa, Phụ kiện, Cam kết, Trả góp, Bảo hành) có nút **← Quay lại** ở đầu mục; chuyển mục được lưu vào lịch sử nên nút Quay lại của trình duyệt cũng về đúng mục trước.
+
+### Trang khách: số lượng trên thẻ lọc và hiển thị
+
+- Thẻ hãng (Tất cả, Apple, Samsung...) và thẻ phụ kiện được dựng **từ sản phẩm thật** đang hiện trên web, kèm số máy đúng theo tình trạng, khoảng giá và tìm kiếm đang chọn. Hãng không còn máy thì tự biến mất.
+- Tên máy dài xuống 2 dòng thay vì bị cắt "…"; ảnh nền trắng hòa vào khung xám; nút Gọi/Zalo nhỏ lại trên điện thoại để không che nút "Giỏ hàng"; giỏ hàng và trang chi tiết đã chỉnh cho màn hình nhỏ (thanh nút mua cố định ở đáy).

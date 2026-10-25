@@ -155,12 +155,12 @@
               <span>CHÍNH HÃNG, BẢO HÀNH 12 THÁNG</span>
             </div>
 
-            <div class="overflow-hidden mb-1">
+            <div class="overflow-hidden pb-2">
               <h1 class="display-hero hero-line-mask" id="heroLine1">
                 Điện thoại mới.
               </h1>
             </div>
-            <div class="overflow-hidden mb-5">
+            <div class="overflow-hidden pb-2 mb-3">
               <div class="display-hero hero-line-mask" id="heroLine2">
                 Sửa xong trong ngày.
               </div>
@@ -258,11 +258,7 @@
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
           <!-- Nhóm pills thương hiệu -->
           <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1" id="brandFilterPills">
-            <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#1D1D1F] text-white transition-colors cursor-pointer shrink-0" data-brand="all">Tất cả (48)</button>
-            <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#EAEAEA] transition-colors cursor-pointer shrink-0" data-brand="apple">Apple iPhone (24)</button>
-            <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#EAEAEA] transition-colors cursor-pointer shrink-0" data-brand="samsung">Samsung Galaxy (14)</button>
-            <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#EAEAEA] transition-colors cursor-pointer shrink-0" data-brand="xiaomi">Xiaomi (6)</button>
-            <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#EAEAEA] transition-colors cursor-pointer shrink-0" data-brand="oppo">OPPO (4)</button>
+            <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#1D1D1F] text-white transition-colors cursor-pointer shrink-0" data-brand="all">Tất cả</button>
           </div>
 
           <!-- Ô tìm kiếm trực tiếp -->
@@ -327,9 +323,6 @@
         <!-- Filter pills for accessories -->
         <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 mb-8" id="accessoryFilterPills">
           <button class="accessory-filter-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#1D1D1F] text-white transition-colors cursor-pointer shrink-0" data-acc-filter="all">Tất cả phụ kiện</button>
-          <button class="accessory-filter-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#EAEAEA] transition-colors cursor-pointer shrink-0" data-acc-filter="charger">Củ sạc &amp; Cáp nhanh</button>
-          <button class="accessory-filter-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#EAEAEA] transition-colors cursor-pointer shrink-0" data-acc-filter="audio">Tai nghe AirPods</button>
-          <button class="accessory-filter-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#EAEAEA] transition-colors cursor-pointer shrink-0" data-acc-filter="case">Ốp lưng &amp; Cường lực</button>
         </div>
 
         <!-- Accessory Products Grid (5 Cột Desktop, 2 Cột Mobile) -->
@@ -917,11 +910,11 @@
         <!-- Cột trái: Ảnh to + Thumbnail -->
         <div class="flex flex-col items-center">
           <div class="w-full bg-[#F5F5F7] rounded-2xl p-8 flex items-center justify-center min-h-[300px]">
-            <img id="modalProductImg" src="" alt="Sản phẩm" class="max-h-[280px] object-contain transition-transform duration-300 hover:scale-105" />
+            <img id="modalProductImg" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Sản phẩm" class="max-h-[280px] object-contain transition-transform duration-300 hover:scale-105" />
           </div>
           <div class="flex items-center gap-2 mt-3">
             <button class="w-12 h-12 rounded-lg bg-[#F5F5F7] border border-[#1D1D1F] p-1 flex items-center justify-center">
-              <img id="modalThumb1" src="" alt="Thumbnail" class="h-full object-contain" />
+              <img id="modalThumb1" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Thumbnail" class="h-full object-contain" />
             </button>
             <button class="w-12 h-12 rounded-lg bg-[#F5F5F7] border border-[#D2D2D7] p-1 flex items-center justify-center opacity-70 hover:opacity-100">
               <span class="material-symbols-outlined text-[20px] text-[#6E6E73]">smartphone</span>
@@ -998,12 +991,12 @@
       <div id="cart-drawer-panel" class="pointer-events-auto w-full max-w-[560px] max-h-[92vh] bg-white shadow-2xl flex flex-col rounded-[22px] border border-[#D2D2D7] overflow-hidden drawer-panel">
         
         <!-- Header -->
-        <div class="px-6 py-5 border-b border-[#D2D2D7] flex items-center justify-between bg-white sticky top-0 z-10">
+        <div class="px-4 sm:px-6 py-4 sm:py-5 border-b border-[#D2D2D7] flex items-center justify-between gap-2 bg-white sticky top-0 z-10">
           <div class="flex items-center gap-2.5">
-            <button id="cart-back-btn" type="button" aria-label="Quay lại" class="inline-flex items-center gap-1 h-8 px-3 rounded-full bg-[#F5F5F7] hover:bg-[#E5E5EA] text-[12px] font-medium text-[#1D1D1F] cursor-pointer border-0">
+            <button id="cart-back-btn" type="button" aria-label="Quay lại" class="inline-flex items-center gap-1 h-8 px-3 rounded-full whitespace-nowrap shrink-0 bg-[#F5F5F7] hover:bg-[#E5E5EA] text-[12px] font-medium text-[#1D1D1F] cursor-pointer border-0">
               <span class="material-symbols-outlined text-[16px]">arrow_back</span> Quay lại
             </button>
-            <h3 class="headline-sm text-[20px] text-[#1D1D1F]">Giỏ hàng của bạn (<span class="cart-count-display">2</span>)</h3>
+            <h3 class="headline-sm text-[16px] sm:text-[20px] whitespace-nowrap text-[#1D1D1F]">Giỏ hàng của bạn (<span class="cart-count-display">2</span>)</h3>
           </div>
           <button id="close-drawer-btn" aria-label="Đóng giỏ hàng" class="w-8 h-8 rounded-full bg-[#F5F5F7] hover:bg-[#E5E5EA] flex items-center justify-center text-[#6E6E73] hover:text-[#1D1D1F] transition-colors border-0 cursor-pointer">
             <span class="material-symbols-outlined text-[20px]">close</span>
@@ -1011,7 +1004,7 @@
         </div>
 
         <!-- Scrollable Body -->
-        <div class="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+        <div class="flex-1 overflow-y-auto px-4 sm:px-6 py-5 space-y-6">
           
           <!-- Danh sách sản phẩm -->
           <div class="space-y-4">

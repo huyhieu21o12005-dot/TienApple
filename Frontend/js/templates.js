@@ -51,10 +51,10 @@ export function productCardHtml(p, opts = {}) {
             <span>(${Number(p.reviewCount) || 0} đánh giá)</span>
           </div>
 
-          <h3 class="text-[16px] font-semibold text-[#1D1D1F] leading-snug line-clamp-1 cursor-pointer hover:text-[#0071E3] transition-colors" onclick="window.tienApp.openProductModalById(${idArg})">
+          <h3 class="text-[16px] font-semibold text-[#1D1D1F] leading-snug line-clamp-2 min-h-[2.75em] cursor-pointer hover:text-[#0071E3] transition-colors" onclick="window.tienApp.openProductModalById(${idArg})">
             ${escapeHtml(p.name)}
           </h3>
-          <p class="text-[12px] text-[#6E6E73] line-clamp-1 mt-0.5">${escapeHtml(p.description)}</p>
+          <p class="text-[12px] leading-snug text-[#6E6E73] line-clamp-2 mt-0.5">${escapeHtml(p.description)}</p>
         </div>
 
         <div class="mt-4 pt-3 border-t border-[#D2D2D7]/50">
@@ -127,20 +127,20 @@ export function cartItemHtml(item, index) {
           <div class="flex-1 min-w-0 flex flex-col justify-between">
             <div>
               <div class="flex items-start justify-between gap-1">
-                <h4 class="text-[14px] font-semibold text-[#1D1D1F] truncate leading-tight">${escapeHtml(product.name)}</h4>
+                <h4 class="text-[14px] font-semibold text-[#1D1D1F] line-clamp-2 break-words leading-snug">${escapeHtml(product.name)}</h4>
                 <button class="text-[#6E6E73] hover:text-red-600 transition-colors cursor-pointer p-2" onclick="window.tienApp.removeCartItem(${index | 0})" title="Xóa" aria-label="Xóa khỏi giỏ hàng">
                   <span class="material-symbols-outlined text-[17px]">delete</span>
                 </button>
               </div>
-              <p class="text-[11px] text-[#6E6E73] mt-0.5">${escapeHtml(item.color)} • ${escapeHtml(item.storage)}</p>
+              <p class="text-[11px] text-[#6E6E73] mt-0.5">${[item.color, item.storage].filter(v => String(v ?? '').trim()).map(escapeHtml).join(' • ')}</p>
             </div>
-            <div class="flex items-center justify-between mt-2 pt-2 border-t border-[#D2D2D7]/60">
+            <div class="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 mt-2 pt-2 border-t border-[#D2D2D7]/60">
               <div class="flex items-center rounded-full bg-white px-2 py-0.5 gap-2 border border-[#D2D2D7]">
                 <button class="text-[#6E6E73] hover:text-[#1D1D1F] font-bold text-sm w-8 h-8 flex items-center justify-center cursor-pointer" aria-label="Giảm số lượng" onclick="window.tienApp.updateCartQty(${index | 0}, ${qty - 1})">-</button>
                 <span class="text-xs font-semibold text-[#1D1D1F] px-1">${qty}</span>
                 <button class="text-[#6E6E73] hover:text-[#1D1D1F] font-bold text-sm w-8 h-8 flex items-center justify-center cursor-pointer" aria-label="Tăng số lượng" onclick="window.tienApp.updateCartQty(${index | 0}, ${qty + 1})">+</button>
               </div>
-              <span class="text-[15px] font-semibold text-[#1D1D1F]">${CartManager.formatCurrency((Number(product.price) || 0) * qty)}</span>
+              <span class="text-[15px] font-semibold text-[#1D1D1F] whitespace-nowrap">${CartManager.formatCurrency((Number(product.price) || 0) * qty)}</span>
             </div>
           </div>
         </div>

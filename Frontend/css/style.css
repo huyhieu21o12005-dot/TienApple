@@ -997,3 +997,19 @@ body.menu-open {
   .brand-two-lines .brand-l1, .brand-two-lines .brand-l2 { display: block; }
   .brand-two-lines { font-size: 15px; line-height: 1.1; }
 }
+
+/* ===== Sửa lỗi hiển thị nhỏ (ảnh, chữ bị cắt, nút nổi trên điện thoại) ===== */
+/* Ảnh sản phẩm nền trắng hòa vào nền xám của khung thay vì lộ hình chữ nhật trắng */
+#productGrid img, #accessoryGrid img, #cart-items-list img, .tm-product-img { mix-blend-mode: multiply; }
+/* Chữ một dòng không bị cắt chân chữ (g, y, ặ...) */
+.truncate, .line-clamp-1, .line-clamp-2 { padding-bottom: 0.08em; }
+/* Khối chữ lớn dùng mặt nạ cuộn lên: chừa chỗ cho chân chữ */
+.hero-line-mask { padding-bottom: 0.06em; }
+@media (max-width: 640px) {
+  /* Nút Gọi / Zalo nổi nhỏ lại để không che nút "Giỏ hàng" của thẻ sản phẩm */
+  .fixed.bottom-6.right-6 { bottom: 14px; right: 10px; gap: 8px; }
+  .fixed.bottom-6.right-6 > * { transform: scale(0.8); transform-origin: bottom right; }
+  #productGrid, #accessoryGrid { padding-bottom: 72px; }
+  #cart-drawer-panel { max-height: 94vh; border-radius: 18px; }
+  #cart-drawer-panel img { max-width: 100%; }
+}

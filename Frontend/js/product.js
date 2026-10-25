@@ -59,7 +59,7 @@ function render(p) {
   const specs = [['Màn hình', p.screen], ['Vi xử lý', p.chip], ['Camera', p.camera], ['Pin', p.battery]].filter(([, v]) => v);
   $('detail').innerHTML = `
     <div class="bg-[#F5F5F7] rounded-3xl p-8 flex items-center justify-center min-h-[320px]">
-      <img src="${escapeHtml(safeUrl(p.image) || NO_IMAGE)}" alt="${escapeHtml(p.name)}" class="max-h-[360px] object-contain" onerror="this.onerror=null;this.src='${NO_IMAGE}'" />
+      <img src="${escapeHtml(safeUrl(p.image) || NO_IMAGE)}" alt="${escapeHtml(p.name)}" class="max-h-[300px] max-w-full object-contain tm-product-img" onerror="this.onerror=null;this.src='${NO_IMAGE}'" />
     </div>
     <div>
       <div class="flex flex-wrap items-center gap-2 mb-2">
@@ -80,7 +80,7 @@ function render(p) {
       ${specs.length ? `<div class="grid grid-cols-2 gap-2.5 text-[12px] p-3.5 bg-[#F5F5F7] rounded-xl mb-5">${specs.map(([k, v]) => `<div><span class="text-[#6E6E73]">${k}:</span> <strong>${escapeHtml(v)}</strong></div>`).join('')}</div>` : ''}
       ${p.description ? `<p class="text-[14px] leading-relaxed text-[#424245] mb-5 whitespace-pre-line">${escapeHtml(p.description)}</p>` : ''}
       <div class="flex items-center gap-2 text-[12px] text-[#6E6E73] mb-5"><span class="material-symbols-outlined text-[16px] text-emerald-600">verified</span> Bảo hành theo chính sách cửa hàng • Kiểm tra máy trước khi thanh toán</div>
-      <div class="flex flex-wrap gap-2.5">
+      <div class="flex gap-2.5 sticky bottom-0 -mx-4 px-4 py-3 sm:static sm:m-0 sm:p-0 bg-white/95 backdrop-blur border-t border-[#D2D2D7]/60 sm:border-0">
         <button id="buyNow" type="button" ${soldOut ? 'disabled' : ''} class="flex-1 min-w-[160px] h-12 rounded-full bg-[#1D1D1F] text-white text-[14px] font-semibold cursor-pointer border-0 disabled:opacity-40">${soldOut ? 'Tạm hết hàng' : 'Đặt mua ngay'}</button>
         <button id="addCart" type="button" ${soldOut ? 'disabled' : ''} class="h-12 px-5 rounded-full border border-[#D2D2D7] text-[14px] font-medium cursor-pointer bg-white disabled:opacity-40">+ Giỏ hàng</button>
       </div>

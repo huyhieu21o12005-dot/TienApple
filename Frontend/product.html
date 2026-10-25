@@ -15,13 +15,13 @@
 <body class="min-h-screen bg-white text-[#1D1D1F] font-sans antialiased" style="font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
 
   <header class="w-full h-16 bg-white/95 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between px-4 sm:px-10 lg:px-16 border-b border-[#D2D2D7]/60">
-    <button id="backBtn" type="button" class="inline-flex items-center gap-1.5 h-10 px-4 rounded-full bg-[#F5F5F7] hover:bg-[#E5E5EA] text-[13px] font-medium text-[#1D1D1F] cursor-pointer border-0">
+    <button id="backBtn" type="button" class="inline-flex items-center gap-1.5 h-10 px-4 rounded-full whitespace-nowrap shrink-0 bg-[#F5F5F7] hover:bg-[#E5E5EA] text-[13px] font-medium text-[#1D1D1F] cursor-pointer border-0">
       <span class="material-symbols-outlined text-[18px]">arrow_back</span> Quay lại
     </button>
-    <a href="index.html#trangchu" class="text-[16px] font-semibold text-[#1D1D1F] no-underline">Tien Mobile Thu Duc</a>
-    <a href="index.html?cart=1" class="inline-flex items-center gap-1.5 text-[13px] text-[#1D1D1F] no-underline" aria-label="Giỏ hàng">
+    <a href="index.html#trangchu" class="hidden sm:block text-[16px] font-semibold text-[#1D1D1F] no-underline whitespace-nowrap">Tien Mobile Thu Duc</a>
+    <a href="index.html?cart=1" class="inline-flex items-center gap-1.5 text-[13px] text-[#1D1D1F] no-underline whitespace-nowrap shrink-0" aria-label="Giỏ hàng">
       <span class="material-symbols-outlined text-[22px]">shopping_bag</span>
-      <span>Giỏ hàng (<span id="cartCount">0</span>)</span>
+      <span><span class="hidden sm:inline">Giỏ hàng </span>(<span id="cartCount">0</span>)</span>
     </a>
   </header>
 

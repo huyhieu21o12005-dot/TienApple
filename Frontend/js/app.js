@@ -15,7 +15,7 @@ import { validateTradeIn, buildTradeInBooking } from './tradeIn.js';
 import { calcInstallment, INSTALLMENT_REFERENCE_RATE } from './installment.js';
 import { validateZaloOffer, buildZaloMessage, buildOfferBooking, ZALO_URL } from './zalo.js';
 import { enhanceSelects } from './customSelect.js';
-import { safeUrl, partitionProducts } from './utils.js';
+import { safeUrl, partitionProducts, escapeHtml } from './utils.js';
 import {
   productCardHtml,
   emptyCatalogHtml,
@@ -536,36 +536,26 @@ class App {
   }
 
   bindEvents() {
-    // 1. Brand Filter Buttons
-    const brandButtons = document.querySelectorAll('.brand-btn');
-    brandButtons.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        brandButtons.forEach(b => {
-          b.classList.remove('bg-[#1D1D1F]', 'text-white');
-          b.classList.add('bg-[#F5F5F7]', 'text-[#1D1D1F]');
-        });
-        btn.classList.remove('bg-[#F5F5F7]', 'text-[#1D1D1F]');
-        btn.classList.add('bg-[#1D1D1F]', 'text-white');
-
+    // 1. Brand Filter Buttons (nút được dựng động theo sản phẩm thật, nên dùng ủy quyền sự kiện)
+    const brandPills = document.getElementById('brandFilterPills');
+    if (brandPills) {
+      brandPills.addEventListener('click', (e) => {
+        const btn = e.target.closest('.brand-btn');
+        if (!btn) return;
         this.activeCategory = btn.getAttribute('data-brand') || 'all';
         this.renderProducts();
       });
-    });
+    }
 
-    // 1.2. Accessory Filter Buttons
-    const accButtons = document.querySelectorAll('.accessory-filter-btn');
-    accButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        accButtons.forEach(b => {
-          b.classList.remove('bg-[#1D1D1F]', 'text-white');
-          b.classList.add('bg-[#F5F5F7]', 'text-[#1D1D1F]');
-        });
-        btn.classList.remove('bg-[#F5F5F7]', 'text-[#1D1D1F]');
-        btn.classList.add('bg-[#1D1D1F]', 'text-white');
-        const filter = btn.getAttribute('data-acc-filter') || 'all';
-        this.renderAccessories(filter);
+    // 1.2. Accessory Filter Buttons (dựng động, ủy quyền sự kiện)
+    const accPills = document.getElementById('accessoryFilterPills');
+    if (accPills) {
+      accPills.addEventListener('click', (e) => {
+        const btn = e.target.closest('.accessory-filter-btn');
+        if (!btn) return;
+        this.renderAccessories(btn.getAttribute('data-acc-filter') || 'all');
       });
-    });
+    }
 
     // 2. Dropdown Filters
     const conditionFilter = document.getElementById('filter-condition');
@@ -1032,7 +1022,36 @@ class App {
     });
   }
 
+  /** Dựng lại các thẻ hãng với số máy thật (đã áp dụng tình trạng, khoảng giá, tìm kiếm đang chọn). */
+  renderBrandTags() {
+    const box = document.getElementById('brandFilterPills');
+    if (!box) return;
+    let pool = ProductFilter.filterByCondition([...this.products], this.activeCondition);
+    pool = ProductFilter.filterByPriceRange(pool, this.activePrice);
+    if (this.searchQuery) pool = ProductFilter.searchProducts(pool, this.searchQuery);
+
+    const brands = new Map();
+    for (const p of pool) {
+      const key = String(p.brand || 'other').toLowerCase();
+      const entry = brands.get(key) || { key, label: p.brandName || p.brand || 'Khác', count: 0 };
+      entry.count += 1;
+      brands.set(key, entry);
+    }
+    // hãng đang chọn không còn máy nào: về "Tất cả" để không hiện danh sách trống khó hiểu
+    const all = String(this.activeCategory || 'all').toLowerCase();
+    if (all !== 'all' && !brands.has(all)) this.activeCategory = 'all';
+    const active = String(this.activeCategory || 'all').toLowerCase();
+
+    const list = [...brands.values()].sort((a, b) => (b.key === 'apple') - (a.key === 'apple') || b.count - a.count);
+    const btn = (key, label, count) => {
+      const on = key === active;
+      return `<button type="button" class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium ${on ? 'bg-[#1D1D1F] text-white' : 'bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#EAEAEA]'} transition-colors cursor-pointer shrink-0 whitespace-nowrap" data-brand="${escapeHtml(key)}" aria-pressed="${on}">${escapeHtml(label)} (${count})</button>`;
+    };
+    box.innerHTML = btn('all', 'Tất cả', pool.length) + list.map(b => btn(b.key, b.label, b.count)).join('');
+  }
+
   renderProducts() {
+    this.renderBrandTags();
     let filtered = [...this.products];
 
     // Filter by Brand
@@ -1073,12 +1092,27 @@ class App {
     const grid = document.getElementById('accessoryGrid');
     if (!grid) return;
 
-    let items = this.accessories;
-    if (category !== 'all') {
-      items = items.filter(a => a.category === category);
+    const labels = { charger: 'Củ sạc & Cáp', audio: 'Tai nghe AirPods', case: 'Ốp lưng & Cường lực' };
+    const counts = new Map();
+    for (const a of this.accessories) counts.set(a.category || 'other', (counts.get(a.category || 'other') || 0) + 1);
+    if (category !== 'all' && !counts.has(category)) category = 'all';
+
+    const pills = document.getElementById('accessoryFilterPills');
+    if (pills) {
+      const btn = (key, label, count) => {
+        const on = key === category;
+        return `<button type="button" class="accessory-filter-btn px-4 py-2 rounded-full text-[13px] font-medium ${on ? 'bg-[#1D1D1F] text-white' : 'bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#EAEAEA]'} transition-colors cursor-pointer shrink-0 whitespace-nowrap" data-acc-filter="${escapeHtml(key)}">${escapeHtml(label)} (${count})</button>`;
+      };
+      pills.innerHTML = btn('all', 'Tất cả phụ kiện', this.accessories.length)
+        + [...counts.entries()].map(([key, n]) => btn(key, labels[key] || 'Phụ kiện khác', n)).join('');
     }
 
-    grid.innerHTML = items.map(p => productCardHtml(p, { accessory: true })).join('');
+    let items = this.accessories;
+    if (category !== 'all') {
+      items = items.filter(a => (a.category || 'other') === category);
+    }
+
+    grid.innerHTML = items.length ? items.map(p => productCardHtml(p, { accessory: true })).join('') : emptyCatalogHtml();
   }
 
   findProduct(productId) {
