@@ -1507,10 +1507,19 @@ function bindGlobalEvents() {
     } catch (err) {
       console.error('[Admin] Lỗi đăng nhập:', err);
       let msg = 'Đăng nhập không thành công. Vui lòng kiểm tra lại.';
-      if (err.message.includes('Invalid login credentials')) {
-        msg = 'Sai tên đăng nhập hoặc mật khẩu.';
-      } else if (err.message.includes('Email not confirmed')) {
+      const text = String(err.message || '');
+      if (text.includes('Invalid login credentials')) {
+        msg = `Sai tên đăng nhập hoặc mật khẩu (đang đăng nhập bằng: ${email}). Nếu tài khoản dùng email khác, hãy gõ đầy đủ email.`;
+      } else if (text.includes('Email not confirmed')) {
         msg = 'Tài khoản chưa được xác nhận trên Supabase (cần tick Auto Confirm khi tạo).';
+      } else if (/banned|user_banned/i.test(text)) {
+        msg = 'Tài khoản đã bị khóa trên Supabase.';
+      } else if (/rate limit|too many/i.test(text) || err.status === 429) {
+        msg = 'Đăng nhập sai quá nhiều lần, vui lòng đợi vài phút rồi thử lại.';
+      } else if (/fetch|network|failed|timeout/i.test(text)) {
+        msg = 'Không kết nối được máy chủ. Kiểm tra mạng hoặc tắt trình chặn quảng cáo cho trang này.';
+      } else {
+        msg = `Đăng nhập không thành công: ${text}`;
       }
       showLoginError(msg);
     } finally {

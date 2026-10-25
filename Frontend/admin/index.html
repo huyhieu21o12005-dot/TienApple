@@ -23,7 +23,7 @@
 
       <div id="loginAlert" class="alert-box alert-error hidden" role="alert"></div>
 
-      <form id="loginForm" class="login-form" novalidate>
+      <form id="loginForm" class="login-form" method="post" action="#" novalidate>
         <div class="form-group">
           <label for="loginEmail" class="form-label">Tên đăng nhập</label>
           <input 
@@ -506,3 +506,118 @@
             </div>
           </div>
         </div>
+        <div id="spPaneRules" class="hidden">
+          <p class="dialog-subtext">Mỗi dòng là một quy tắc (để trống ô nào thì không lọc theo ô đó). Mỗi máy chỉ nhận <strong>một</strong> quy tắc, ưu tiên cụ thể nhất: <em>tên máy</em> &gt; <em>khoảng giá gốc</em> &gt; <em>hãng</em> &gt; <em>chung</em>. Máy không khớp dòng nào thì giữ nguyên. Ví dụ: dòng chung +500.000 và dòng Apple, giá gốc từ 20.000.000 +2.000.000 thì iPhone 17 Pro Max +2tr còn iPhone 8 chỉ +500k.</p>
+          <div id="spRules" class="sp-rules"></div>
+          <div class="sp-bulk">
+            <button type="button" id="spAddRule" class="btn btn-secondary btn-sm">+ Thêm quy tắc</button>
+            <select id="spRuleRound" class="form-input" aria-label="Làm tròn lên">
+              <option value="0">Không làm tròn</option><option value="1000">Tròn 1.000đ</option><option value="10000">Tròn 10.000đ</option>
+              <option value="100000">Tròn 100.000đ</option><option value="500000">Tròn 500.000đ</option><option value="1000000">Tròn 1.000.000đ</option>
+            </select>
+            <button type="button" id="spRunRules" class="btn btn-primary btn-sm">Tính vào bảng</button>
+          </div>
+        </div>
+        <div id="spList" class="bd-list sp-list"></div>
+        <p id="spCount" class="dialog-subtext"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="spCancel" class="btn btn-secondary">Đóng</button>
+        <button type="button" id="spApply" class="btn btn-primary" disabled>Lưu giá</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- XÓA HÀNG LOẠT (tích theo hãng, tình trạng, trạng thái...) -->
+  <div id="bulkDeleteModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="bulkDeleteTitle">
+    <div class="modal-dialog bd-dialog">
+      <div class="modal-header">
+        <h2 id="bulkDeleteTitle" class="modal-title">Xóa hàng loạt</h2>
+        <button type="button" id="closeBulkDeleteBtn" class="btn-icon-close" aria-label="Đóng">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="dialog-subtext">Tích theo nhóm để chọn nhanh (cùng nhóm là "hoặc", khác nhóm là "và"), rồi bỏ tích từng sản phẩm nếu cần. Chỉ xóa sản phẩm, <strong>ảnh trong kho được giữ lại</strong>.</p>
+        <div id="bdFacets" class="bd-facets"></div>
+        <div class="bd-toolbar">
+          <input type="search" id="bdSearch" class="form-input" placeholder="Lọc danh sách theo tên..." aria-label="Lọc danh sách">
+          <button type="button" id="bdClear" class="btn btn-ghost btn-sm">Bỏ chọn hết</button>
+        </div>
+        <div id="bdList" class="bd-list"></div>
+        <p id="bdCount" class="dialog-subtext"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="bdCancel" class="btn btn-secondary">Hủy</button>
+        <button type="button" id="bdConfirm" class="btn btn-danger" disabled>Xóa sản phẩm đã chọn</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="deleteModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+    <div class="modal-dialog modal-dialog-sm">
+      <div class="modal-header">
+        <h2 id="deleteTitle" class="modal-title">Xác Nhận Xóa Sản Phẩm</h2>
+        <button type="button" id="closeDeleteBtn" class="btn-icon-close" aria-label="Đóng">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="dialog-text">
+          Bạn có chắc chắn muốn xóa sản phẩm <strong id="deleteProductName" class="text-danger"></strong>?
+        </p>
+        <p class="dialog-subtext">Sản phẩm bị xóa vĩnh viễn và không thể hoàn tác. Ảnh trong kho ảnh vẫn được giữ lại để dùng lại khi đăng hàng.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cancelDeleteBtn" class="btn btn-secondary">Giữ lại</button>
+        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">
+          <span class="btn-text">Xóa vĩnh viễn</span>
+          <span class="btn-loader hidden" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 5. BULK DISCOUNT DIALOG                                                   -->
+  <!-- ========================================================================= -->
+  <div id="bulkDiscountModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="bulkDiscountTitle">
+    <div class="modal-dialog modal-dialog-sm">
+      <div class="modal-header">
+        <h2 id="bulkDiscountTitle" class="modal-title">Giảm Giá Hàng Loạt</h2>
+        <button type="button" id="closeBulkDiscountBtn" class="btn-icon-close" aria-label="Đóng">✕</button>
+      </div>
+      <form id="bulkDiscountForm" class="modal-body" novalidate>
+        <p class="dialog-text">
+          Áp dụng giảm giá cho <strong id="discountItemCount">0</strong> sản phẩm đã chọn:
+        </p>
+        <div class="form-group mt-3">
+          <label for="discountPercentInput" class="form-label">Phần trăm giảm giá (%)</label>
+          <input 
+            type="number" 
+            id="discountPercentInput" 
+            class="form-input" 
+            min="1" 
+            max="90" 
+            value="10" 
+            required 
+            inputmode="numeric"
+          >
+          <small class="field-hint">Giá mới sẽ được làm tròn đến hàng chục nghìn đồng và cập nhật giá gốc.</small>
+        </div>
+        <div class="modal-footer mt-4">
+          <button type="button" id="cancelBulkDiscountBtn" class="btn btn-secondary">Hủy bỏ</button>
+          <button type="submit" id="confirmBulkDiscountBtn" class="btn btn-primary">
+            <span class="btn-text">Áp dụng giảm giá</span>
+            <span class="btn-loader hidden" aria-hidden="true"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 6. TOAST NOTIFICATION CONTAINER                                           -->
+  <!-- ========================================================================= -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- SCRIPT -->
+  <script type="module" src="./admin.js"></script>
+</body>
+</html>
