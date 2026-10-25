@@ -10,6 +10,7 @@ import { SHEET_ACC_CSV_URL, SHEET_ACC_TAB, parseAccessoryRows, planAccessories }
 import { USED_IMAGE_NOTE } from './sheetPricing.js';
 import { planSync } from './syncPlan.js';
 import { LIBRARY_BUCKET, buildLibraryMap, libraryFileName, planImageLinks } from './imageLibrary.js';
+import { IMAGE_SOURCES, imageKeyFor } from './modelImages.js';
 import { SHEET_CSV_URL, SHEET_TAB, SHEET_USED_CSV_URL, SHEET_USED_TAB, parseSheetRows, parseSheetDate, parseUsedRows, planPriceUpdates, planNewProducts, planUsedProducts } from './sheetPricing.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
 
@@ -1336,6 +1337,38 @@ async function openSyncModal() {
   renderSheetModal();
 }
 
+/** Kho ảnh hiện có: khóa mẫu-màu -> URL công khai (rỗng nếu không đọc được). */
+async function loadImageLibrary() {
+  try {
+    const { data: files, error } = await supabase.storage.from(LIBRARY_BUCKET).list('', { limit: 1000 });
+    if (error) throw error;
+    return buildLibraryMap(files, (name) => supabase.storage.from(LIBRARY_BUCKET).getPublicUrl(name).data.publicUrl);
+  } catch (err) {
+    console.error('[Admin] Không đọc được kho ảnh:', err);
+    return new Map();
+  }
+}
+
+/** Ảnh của một mẫu-màu trong kho; chưa có thì tải từ nguồn (cắt viền thừa) vào kho rồi trả URL. Rỗng nếu không có nguồn. */
+async function ensureInLibrary(key, library) {
+  if (!key) return '';
+  if (library.has(key)) return library.get(key);
+  const source = IMAGE_SOURCES[key];
+  if (!source) return '';
+  try {
+    const blob = await fetchTrimmedPng(source);
+    const name = libraryFileName(key);
+    const { error } = await supabase.storage.from(LIBRARY_BUCKET).upload(name, blob, { contentType: 'image/png', upsert: true });
+    if (error) throw error;
+    const url = supabase.storage.from(LIBRARY_BUCKET).getPublicUrl(name).data.publicUrl;
+    library.set(key, url);
+    return url;
+  } catch (err) {
+    console.error('[Admin] Lỗi tải ảnh vào kho', key, err);
+    return '';
+  }
+}
+
 async function applySync() {
   const pool = sheetState.onlyImage ? sheetState.items.filter(sheetHasImage) : sheetState.items;
   const picked = sheetState.items.filter(i => i.checked && pool.includes(i));
@@ -1346,6 +1379,14 @@ async function applySync() {
   applyBtn.textContent = 'Đang đồng bộ...';
   let ok = 0;
   const adds = picked.filter(i => i.action === 'add');
+  if (adds.length) {
+    // máy mới tự lấy ảnh từ kho theo tên mẫu và màu; mẫu chưa có trong kho thì tải vào kho
+    const library = await loadImageLibrary();
+    for (const a of adds) {
+      const url = await ensureInLibrary(imageKeyFor(a.product.name, a.product.default_color), library);
+      if (url) a.product = { ...a.product, image_url: url };
+    }
+  }
   for (let i = 0; i < adds.length; i += 25) {
     const batch = adds.slice(i, i + 25).map(p => ({ ...p.product, is_visible: visible }));
     const { error } = await supabase.from('products').insert(batch);
