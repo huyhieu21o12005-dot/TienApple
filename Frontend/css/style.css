@@ -1097,3 +1097,12 @@ img.tm-zoom { transform: scale(2.3); transform-origin: center 52%; transition: t
 .tm-product-img.tm-zoom { transform: scale(2.4); }
 .search-item img.tm-zoom { transform: none; object-fit: cover; object-position: center; }
 img.tm-zoom { mix-blend-mode: normal !important; }
+
+/* Thanh tag / bộ lọc trên điện thoại: một hàng vuốt ngang, bám mép màn hình, mờ dần ở mép phải để biết còn nữa */
+.tag-scroller { scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+.tag-scroller > * { scroll-snap-align: start; flex-shrink: 0; }
+@media (max-width: 639px) {
+  .tag-scroller { -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 28px), transparent 100%); mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 28px), transparent 100%); scroll-padding-left: 24px; }
+  #brandFilterPills .brand-btn, #accessoryFilterPills .accessory-filter-btn { min-height: 40px; padding-left: 16px; padding-right: 16px; }
+  .tag-scroller select { height: 40px; padding-top: 0; padding-bottom: 0; font-size: 13px; }
+}

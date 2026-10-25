@@ -269,7 +269,7 @@
         <!-- Quick Filter Bar -->
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
           <!-- Nhóm pills thương hiệu -->
-          <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1" id="brandFilterPills">
+          <div class="tag-scroller flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 -mx-6 px-6 sm:mx-0 sm:px-0" id="brandFilterPills">
             <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#1D1D1F] text-white transition-colors cursor-pointer shrink-0" data-brand="all">Tất cả</button>
           </div>
 
@@ -286,21 +286,21 @@
         </div>
 
         <!-- Nhóm dropdowns lọc chi tiết -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-          <select id="filter-condition" class="bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
+        <div class="tag-scroller flex sm:grid sm:grid-cols-3 gap-2 sm:gap-3 mb-6 sm:mb-8 overflow-x-auto no-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0">
+          <select id="filter-condition" class="shrink-0 w-[212px] sm:w-auto bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
             <option value="all">Tình trạng: Tất cả máy</option>
             <option value="new">Mới 100% Nguyên Seal</option>
             <option value="likenew">Like New 99% Keng</option>
           </select>
 
-          <select id="filter-price" class="bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
+          <select id="filter-price" class="shrink-0 w-[212px] sm:w-auto bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
             <option value="all">Khoảng giá: Tất cả mức giá</option>
             <option value="under15">Dưới 15 triệu</option>
             <option value="15to25">15 - 25 triệu</option>
             <option value="above25">Trên 25 triệu</option>
           </select>
 
-          <select id="filter-sort" class="bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
+          <select id="filter-sort" class="shrink-0 w-[212px] sm:w-auto bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
             <option value="newest">Sắp xếp: Mới nhất</option>
             <option value="price-asc">Giá: Thấp đến cao</option>
             <option value="price-desc">Giá: Cao đến thấp</option>
@@ -333,7 +333,7 @@
         </div>
 
         <!-- Filter pills for accessories -->
-        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 mb-8" id="accessoryFilterPills">
+        <div class="tag-scroller flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 mb-6 sm:mb-8 -mx-6 px-6 sm:mx-0 sm:px-0" id="accessoryFilterPills">
           <button class="accessory-filter-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#1D1D1F] text-white transition-colors cursor-pointer shrink-0" data-acc-filter="all">Tất cả phụ kiện</button>
         </div>
 
