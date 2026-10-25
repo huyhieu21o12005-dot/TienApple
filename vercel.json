@@ -1,13 +1,14 @@
 {
   "outputDirectory": "Frontend",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/product.html",
+      "src": "/product.html",
       "has": [
         { "type": "header", "key": "user-agent", "value": ".*(facebookexternalhit|facebot|Messenger|Zalo|Twitterbot|TelegramBot|Slackbot|LinkedInBot|WhatsApp|Discordbot|Viber|Pinterest|Googlebot|bingbot).*" },
         { "type": "query", "key": "id" }
       ],
-      "destination": "/api/product-og"
-    }
+      "dest": "/api/product-og"
+    },
+    { "handle": "filesystem" }
   ]
 }
