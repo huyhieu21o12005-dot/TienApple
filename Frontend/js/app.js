@@ -4,6 +4,7 @@
  */
 
 import { CartManager, ProductFilter, BookingValidator } from './store.js';
+import { alertDialog } from './dialog.js';
 import { Phone3DStudio } from './hero3d.js';
 import { WaterRipplesEngine } from './waterRipples.js';
 import { fetchProducts } from './productsApi.js';
@@ -1201,7 +1202,7 @@ class App {
 
     const validation = BookingValidator.validateOrderForm({ name, phone, address });
     if (!validation.isValid) {
-      alert(validation.errors[0].message);
+      await alertDialog(validation.errors[0].message);
       return;
     }
 
@@ -1219,14 +1220,14 @@ class App {
       });
 
       if (!result.ok) {
-        alert(result.message);
+        await alertDialog(result.message);
         return;
       }
 
       this.cart.clearCart();
       this.updateCartBadge();
       this.closeCartDrawer();
-      alert(`ĐẶT HÀNG THÀNH CÔNG!\n\nMã đơn: ${result.code}\nCảm ơn bạn ${name} (${validation.normalizedPhone || phone}).\nTổng thanh toán: ${CartManager.formatCurrency(result.total)}\nĐịa chỉ nhận: ${address}\n\nNhân viên Tien Mobile sẽ gọi xác nhận đơn trong thời gian sớm nhất.`);
+      await alertDialog(`ĐẶT HÀNG THÀNH CÔNG!\n\nMã đơn: ${result.code}\nCảm ơn bạn ${name} (${validation.normalizedPhone || phone}).\nTổng thanh toán: ${CartManager.formatCurrency(result.total)}\nĐịa chỉ nhận: ${address}\n\nNhân viên Tien Mobile sẽ gọi xác nhận đơn trong thời gian sớm nhất.`);
     } finally {
       this._submitting = false;
       if (submitBtn) submitBtn.disabled = false;
@@ -1267,7 +1268,7 @@ class App {
 
     const validation = BookingValidator.validateBookingForm({ name, phone, device, service });
     if (!validation.isValid) {
-      alert(validation.errors[0].message);
+      await alertDialog(validation.errors[0].message);
       return;
     }
 
@@ -1275,11 +1276,11 @@ class App {
     try {
       const result = await submitBooking({ name, phone: validation.normalizedPhone || phone, device, service });
       if (!result.ok) {
-        alert(result.message);
+        await alertDialog(result.message);
         return;
       }
       this.closeBookingModal();
-      alert(`ĐÃ ĐẶT LỊCH HẸN!\n\nMã lịch: ${result.code}\n- Khách hàng: ${name} (${phone})\n- Máy: ${device}\n- Dịch vụ: ${service}\n\nKỹ thuật viên sẽ gọi xác nhận trong thời gian sớm nhất.`);
+      await alertDialog(`ĐÃ ĐẶT LỊCH HẸN!\n\nMã lịch: ${result.code}\n- Khách hàng: ${name} (${phone})\n- Máy: ${device}\n- Dịch vụ: ${service}\n\nKỹ thuật viên sẽ gọi xác nhận trong thời gian sớm nhất.`);
     } finally {
       this._submitting = false;
     }

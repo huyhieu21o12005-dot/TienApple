@@ -9,7 +9,8 @@ import { imageFor } from './modelImages.js';
 import { USED_IMAGE_NOTE } from './sheetPricing.js';
 import { SHEET_CSV_URL, SHEET_TAB, SHEET_USED_CSV_URL, SHEET_USED_TAB, parseSheetRows, parseSheetDate, parseUsedRows, planPriceUpdates, planNewProducts, planUsedProducts } from './sheetPricing.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
-import {
+
+import { confirmDialog } from '../js/dialog.js';import {
   formatCurrency,
   parseCurrency,
   slugify,
@@ -722,7 +723,7 @@ function updateBulkDeleteCount() {
 async function confirmBulkDelete() {
   const ids = [...bulkDel.selected];
   if (ids.length === 0) return;
-  if (!confirm(`Xóa vĩnh viễn ${ids.length} sản phẩm? Không thể hoàn tác. Ảnh trong kho vẫn được giữ lại.`)) return;
+  if (!await confirmDialog(`Xóa vĩnh viễn ${ids.length} sản phẩm? Không thể hoàn tác. Ảnh trong kho vẫn được giữ lại.`, { title: 'Xóa sản phẩm', okText: `Xóa ${ids.length} sản phẩm`, danger: true })) return;
   const btn = document.getElementById('bdConfirm');
   btn.disabled = true;
   try {
@@ -946,8 +947,8 @@ function bindSetPriceModal() {
   const close = () => document.getElementById('setPriceModal').classList.add('hidden');
   document.getElementById('setPriceBtn').addEventListener('click', openSetPriceModal);
   document.getElementById('spClose').addEventListener('click', close);
-  document.getElementById('spCancel').addEventListener('click', () => {
-    if (spDirty().length && !confirm('Có thay đổi giá chưa lưu. Đóng và bỏ?')) return;
+  document.getElementById('spCancel').addEventListener('click', async () => {
+    if (spDirty().length && !await confirmDialog('Có thay đổi giá chưa lưu. Đóng và bỏ các thay đổi này?', { title: 'Chưa lưu giá', okText: 'Đóng và bỏ', cancelText: 'Quay lại', danger: true })) return;
     close();
   });
   document.getElementById('spApply').addEventListener('click', saveSetPrice);
@@ -1101,7 +1102,7 @@ function bindVisModal() {
   document.getElementById('quickShowAllBtn').addEventListener('click', async () => {
     const hidden = state.products.filter(p => p.is_visible === false);
     if (!hidden.length) { showToast('Tất cả sản phẩm đã đang hiện.', 'info'); return; }
-    if (!confirm(`Hiện ${hidden.length} sản phẩm đang ẩn lên web? Máy chưa có ảnh sẽ hiện ảnh trống.`)) return;
+    if (!await confirmDialog(`Hiện ${hidden.length} sản phẩm đang ẩn lên web? Máy chưa có ảnh sẽ hiện ảnh trống.`, { title: 'Hiện tất cả lên web', okText: `Hiện ${hidden.length} sản phẩm` })) return;
     const ids = hidden.map(p => p.id);
     for (let i = 0; i < ids.length; i += 100) {
       const { error } = await supabase.from('products').update({ is_visible: true, updated_at: new Date().toISOString() }).in('id', ids.slice(i, i + 100));
@@ -1674,7 +1675,7 @@ function bindGlobalEvents() {
 
   // Logout
   document.getElementById('logoutBtn').addEventListener('click', async () => {
-    if (confirm('Bạn có muốn đăng xuất khỏi trang quản trị?')) {
+    if (await confirmDialog('Bạn có muốn đăng xuất khỏi trang quản trị?', { title: 'Đăng xuất', okText: 'Đăng xuất' })) {
       await supabase.auth.signOut();
       showToast('Đã đăng xuất', 'info');
     }

@@ -5,7 +5,8 @@
  */
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
-import { parseMoney } from '../js/installment.js';
+
+import { promptDialog, alertDialog } from '../js/dialog.js';import { parseMoney } from '../js/installment.js';
 import { categoryForInvoice, validateEntry } from './cashflowHelpers.js';
 import { SHOP, buildInvoice, invoiceHtml, buildContract, contractHtml, CONTRACT_TYPES, INVOICE_TABLES, INVOICE_TYPES } from './invoiceHelpers.js';
 
@@ -119,15 +120,15 @@ function buildInfoForm() {
 async function recordIncome() {
   const inv = buildInvoice(docType, record, extra);
   const suggested = inv ? parseMoney(inv.totals.at(-1)?.[1]) : NaN;
-  const input = prompt(`Ghi vào sổ thu phiếu ${record.code}. Số tiền thu (đ):`, Number.isFinite(suggested) ? String(suggested) : '');
+  const input = await promptDialog(`Ghi vào sổ thu phiếu ${record.code}. Số tiền thu (đ):`, { title: 'Ghi vào sổ thu', defaultValue: Number.isFinite(suggested) ? String(suggested) : '', inputMode: 'numeric', okText: 'Ghi sổ' });
   if (input === null) return;
   const result = validateEntry({
     kind: 'in', amount: input, category: categoryForInvoice(docType), refCode: record.code,
     date: new Date().toISOString().slice(0, 10), note: `Hóa đơn ${record.code} - ${record.customer_name || ''}`.slice(0, 300)
   });
-  if (!result.valid) return alert(result.errors[0]);
+  if (!result.valid) return alertDialog(result.errors[0]);
   const { error } = await sb.from('cashflow_entries').insert(result.row);
-  if (error) return alert(error.code === '23505' ? `Phiếu ${record.code} đã được ghi vào sổ thu trước đó.` : (error.message || 'Không ghi được.'));
+  if (error) return alertDialog(error.code === '23505' ? `Phiếu ${record.code} đã được ghi vào sổ thu trước đó.` : (error.message || 'Không ghi được.'));
   $('ledgerBtn').textContent = 'Đã ghi vào sổ thu';
   $('ledgerBtn').disabled = true;
 }

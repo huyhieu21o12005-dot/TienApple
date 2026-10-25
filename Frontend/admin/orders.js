@@ -5,7 +5,8 @@
  */
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
-import { escapeHtml } from '../js/utils.js';
+
+import { confirmDialog } from '../js/dialog.js';import { escapeHtml } from '../js/utils.js';
 import { normalizePhone } from '../js/warranty.js';
 import { formatCurrency, canDeleteProducts } from './adminHelpers.js';
 import {
@@ -198,7 +199,7 @@ async function removeRecord(id) {
   if (!canDeleteProducts(state.role)) return showToast('Nhân viên không có quyền xóa.', 'error');
   const list = state.data[state.kind];
   const record = list.find(r => r.id === id);
-  if (!record || !confirm(`Xóa vĩnh viễn ${record.code} của ${record.customer_name}? Không thể khôi phục.`)) return;
+  if (!record || !await confirmDialog(`Xóa vĩnh viễn ${record.code} của ${record.customer_name}? Không thể khôi phục.`, { title: 'Xóa phiếu', okText: 'Xóa', danger: true })) return;
   const { error } = await supabase.from(TABLES[state.kind]).delete().eq('id', id);
   if (error) return showToast(error.message || 'Không xóa được.', 'error');
   state.data[state.kind] = list.filter(r => r.id !== id);

@@ -4,7 +4,8 @@
  */
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
-import { escapeHtml } from '../js/utils.js';
+
+import { confirmDialog } from '../js/dialog.js';import { escapeHtml } from '../js/utils.js';
 import { warrantyInfo, formatDate, validateWarranty, filterWarranties, addMonths } from '../js/warranty.js';
 import { telHref, formatDateTime } from './ordersHelpers.js';
 import { canDeleteProducts } from './adminHelpers.js';
@@ -163,7 +164,7 @@ async function save(e) {
 async function remove(id) {
   if (!canDeleteProducts(state.role)) return toast('Nhân viên không có quyền xóa.', 'error');
   const record = state.records.find(r => r.id === id);
-  if (!record || !confirm(`Xóa phiếu ${record.code} của ${record.customer_name}?`)) return;
+  if (!record || !await confirmDialog(`Xóa phiếu ${record.code} của ${record.customer_name}?`, { title: 'Xóa phiếu bảo hành', okText: 'Xóa', danger: true })) return;
   const { error } = await supabase.from('warranties').delete().eq('id', id);
   if (error) return toast(error.message || 'Không xóa được.', 'error');
   state.records = state.records.filter(r => r.id !== id);

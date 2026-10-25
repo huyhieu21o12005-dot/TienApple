@@ -5,7 +5,8 @@
  */
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
-import { escapeHtml } from '../js/utils.js';
+
+import { confirmDialog } from '../js/dialog.js';import { escapeHtml } from '../js/utils.js';
 import {
   INSTALLMENT_STATUSES, installmentStatusLabel, filterInstallments, calcInstallment,
   validateInstallmentRecord, buildInstallmentRow, nextDueDate
@@ -191,7 +192,7 @@ async function payOne(id) {
   if (!record || record.status !== 'active') return;
   const paid = Number(record.paid_months) + 1;
   if (paid > Number(record.term_months)) return;
-  if (!confirm(`Ghi nhận khách ${record.customer_name} đã đóng kỳ ${paid}/${record.term_months}?`)) return;
+  if (!await confirmDialog(`Ghi nhận khách ${record.customer_name} đã đóng kỳ ${paid}/${record.term_months}?`, { title: 'Ghi nhận đóng kỳ', okText: 'Ghi nhận' })) return;
   const { error } = await supabase.from('installments').update({ paid_months: paid }).eq('id', id);
   if (error) return toast(error.message || 'Không cập nhật được.', 'error');
   toast(paid >= Number(record.term_months) ? 'Đã tất toán hồ sơ' : `Đã ghi nhận kỳ ${paid}`);
@@ -200,7 +201,7 @@ async function payOne(id) {
 
 async function cancel(id) {
   const record = state.records.find(r => r.id === id);
-  if (!record || !confirm(`Hủy hồ sơ ${record.code} của ${record.customer_name}?`)) return;
+  if (!record || !await confirmDialog(`Hủy hồ sơ ${record.code} của ${record.customer_name}?`, { title: 'Hủy hồ sơ', okText: 'Hủy hồ sơ', cancelText: 'Giữ lại', danger: true })) return;
   const { error } = await supabase.from('installments').update({ status: 'cancelled' }).eq('id', id);
   if (error) return toast(error.message || 'Không cập nhật được.', 'error');
   toast('Đã hủy hồ sơ');
@@ -210,7 +211,7 @@ async function cancel(id) {
 async function remove(id) {
   if (!canDeleteProducts(state.role)) return toast('Nhân viên không có quyền xóa.', 'error');
   const record = state.records.find(r => r.id === id);
-  if (!record || !confirm(`Xóa hồ sơ ${record.code} của ${record.customer_name}?`)) return;
+  if (!record || !await confirmDialog(`Xóa hồ sơ ${record.code} của ${record.customer_name}?`, { title: 'Xóa hồ sơ', okText: 'Xóa', danger: true })) return;
   const { error } = await supabase.from('installments').delete().eq('id', id);
   if (error) return toast(error.message || 'Không xóa được.', 'error');
   state.records = state.records.filter(r => r.id !== id);

@@ -4,7 +4,8 @@
  */
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
-import { escapeHtml } from '../js/utils.js';
+
+import { confirmDialog } from '../js/dialog.js';import { escapeHtml } from '../js/utils.js';
 import { formatCurrency } from './adminHelpers.js';
 import { formatDate } from '../js/warranty.js';
 import {
@@ -131,7 +132,7 @@ async function save(e) {
 
 async function remove(id) {
   if (state.role !== 'owner') return toast('Chỉ chủ shop được xóa.', 'error');
-  if (!confirm('Xóa khoản này? Không thể khôi phục.')) return;
+  if (!await confirmDialog('Xóa khoản này? Không thể khôi phục.', { title: 'Xóa khoản thu chi', okText: 'Xóa', danger: true })) return;
   const { error } = await supabase.from('cashflow_entries').delete().eq('id', id);
   if (error) return toast(error.message || 'Không xóa được.', 'error');
   state.entries = state.entries.filter(x => x.id !== id);
