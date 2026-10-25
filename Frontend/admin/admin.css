@@ -1455,3 +1455,6 @@ body[data-role="staff"] [data-action="delete"] { display: none !important; }
 .card-markup { display: block; font-size: 11px; color: #1D7A3E; margin-top: 2px; }
 .card-markup.neg { color: #D70015; }
 .quick-bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+
+.sync-warnings { margin: 0 0 12px; padding: 10px 14px 10px 28px; border-radius: 8px; background: #fff7e0; color: #7a5a00; font-size: 13px; }
+.sync-warnings li + li { margin-top: 4px; }

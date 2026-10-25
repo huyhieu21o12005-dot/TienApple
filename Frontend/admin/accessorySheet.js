@@ -100,7 +100,7 @@ export function planAccessories(existing, sheetRows, { visible = false } = {}) {
   const byId = new Map(list.map(p => [p.id, p]));
   const byName = new Map(list.map(p => [normalizeKey(p.name), p]));
   const usedIds = new Set(list.map(p => p.id));
-  const out = { items: [], changes: [], same: 0, hiddenInSheet: 0 };
+  const out = { items: [], changes: [], matches: [], same: 0, hiddenInSheet: 0 };
 
   for (const r of Array.isArray(sheetRows) ? sheetRows : []) {
     const name = accessoryNameFor(r);
@@ -110,6 +110,7 @@ export function planAccessories(existing, sheetRows, { visible = false } = {}) {
 
     if (have) {
       if ((have.kind || '') !== 'accessory') { out.same++; continue; }
+      out.matches.push({ product: have, row: r });
       const cur = have.basePrice || have.price;
       const markup = have.basePrice ? have.price - have.basePrice : 0;
       if (cur === r.finalPrice && (have.oldPrice ?? null) === newList) { out.same++; continue; }

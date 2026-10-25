@@ -95,7 +95,7 @@ export function parseSheetRows(csvText) {
       brand: col('Hãng'), model: col('Mẫu Sản Phẩm'), storage: col('Phiên Bản / Bộ Nhớ'),
       list: col('Giá Bán'), sale: col('Sale (%)'), final: col('Giá Sau Sale'),
       ram: col('RAM'), stock: col('Tồn Kho'), status: col('Trạng Thái'),
-      code: col('Mã SP'), show: col('Hiển Thị Web'), warranty: col('Bảo Hành')
+      code: col('Mã SP'), show: col('Hiển Thị Web'), warranty: col('Bảo Hành'), note: col('Ghi Chú')
     };
     for (const k of ['brand', 'model', 'storage', 'list', 'sale', 'final']) if (idx[k] < 0) errors.push(`Thiếu cột: ${k}`);
     if (errors.length) return { rows: [], errors };
@@ -104,7 +104,7 @@ export function parseSheetRows(csvText) {
     const labelRow = table.findIndex(r => norm(r[2]) === norm('Mẫu Sản Phẩm') && norm(r[3]) === norm('Phiên Bản / Bộ Nhớ'));
     if (labelRow < 0) return { rows: [], errors: ['Không tìm thấy dòng tiêu đề (Mẫu Sản Phẩm, Giá Sau Sale) trong sheet.'] };
     headerIndex = labelRow;
-    idx = { brand: 1, model: 2, storage: 3, ram: 4, list: 6, sale: 7, final: 8, stock: 10, status: 11, code: -1, show: -1, warranty: -1 };
+    idx = { brand: 1, model: 2, storage: 3, ram: 4, list: 6, sale: 7, final: 8, stock: 10, status: 11, code: -1, show: -1, warranty: -1, note: -1 };
   }
   const rows = [];
   for (let i = headerIndex + 1; i < table.length; i++) {
@@ -127,6 +127,7 @@ export function parseSheetRows(csvText) {
       code: idx.code >= 0 ? String(r[idx.code] ?? '').trim() : '',
       show: idx.show < 0 || normalizeKey(r[idx.show]) !== 'khong',
       warranty: idx.warranty >= 0 ? String(r[idx.warranty] ?? '').trim() : '',
+      note: idx.note >= 0 ? String(r[idx.note] ?? '').trim() : '',
       stock: stockOf(idx.stock >= 0 ? r[idx.stock] : '', idx.status >= 0 ? r[idx.status] : ''),
       key: normalizeKey(`${model} ${storage}`)
     });
@@ -196,30 +197,40 @@ export function brandsOf(rows) {
  * @returns {{ items: Array<{ key: string, brand: string, line: number, product: object }>, duplicates: number }}
  */
 export function planNewProducts(existingProducts, sheetRows, { visible = false } = {}) {
-  const have = new Set((Array.isArray(existingProducts) ? existingProducts : []).map(p => normalizeKey(p?.name)));
-  const usedIds = new Set((Array.isArray(existingProducts) ? existingProducts : []).map(p => p?.id));
+  const existing = Array.isArray(existingProducts) ? existingProducts : [];
+  const haveKey = new Set(existing.map(p => normalizeKey(p?.name)));
+  const usedIds = new Set(existing.map(p => p?.id));
+  const rows = Array.isArray(sheetRows) ? sheetRows : [];
+  // Cùng mẫu + dung lượng nhưng khác màu/bản (khác Mã SP): thêm màu vào tên để phân biệt trên web
+  const sameKeyCount = new Map();
+  for (const r of rows) sameKeyCount.set(r.key, (sameKeyCount.get(r.key) || 0) + 1);
   const out = { items: [], duplicates: 0, hiddenInSheet: 0, notPhone: 0 };
-  for (const r of Array.isArray(sheetRows) ? sheetRows : []) {
-    if (have.has(r.key)) { out.duplicates++; continue; }
-    if (!r.show) { out.hiddenInSheet++; continue; }
+  for (const r of rows) {
     if (NOT_PHONE.test(r.model)) { out.notPhone++; continue; }
-    have.add(r.key);
-    const name = productNameFor(r);
-    const base = slugify(r.code) || slugify(name) || 'san-pham';
+    const codeId = slugify(r.code);
+    // Có Mã SP thì nhận diện theo mã (ổn định khi đổi tên); không có mã thì theo tên máy + dung lượng
+    const exists = codeId ? usedIds.has(codeId) : haveKey.has(r.key);
+    if (exists) { out.duplicates++; continue; }
+    if (!r.show) { out.hiddenInSheet++; continue; }
+    const color = String(r.note || '').split(' - ')[0].trim();
+    const baseName = productNameFor(r);
+    const name = sameKeyCount.get(r.key) > 1 && color ? `${baseName} - ${color}` : baseName;
+    const base = codeId || slugify(name) || 'san-pham';
     let id = base;
     for (let n = 2; usedIds.has(id); n++) id = `${base}-${n}`;
     usedIds.add(id);
+    if (!codeId) haveKey.add(r.key);
     const brand = r.brand.trim().toLowerCase();
     out.items.push({
-      key: r.key, brand: r.brand, line: r.line,
+      key: r.key, brand: r.brand, line: r.line, code: r.code,
       product: {
         id, name, kind: 'phone', category: null, brand, brand_name: BRAND_NAMES[brand] || r.brand,
         condition: 'new', condition_label: 'Mới 100%', badge: '',
         price: r.finalPrice, base_price: r.finalPrice, old_price: r.salePercent > 0 && r.listPrice > r.finalPrice ? r.listPrice : null,
-        colors: [], default_color: '', storages: r.storage ? [r.storage] : [],
+        colors: [], default_color: color, storages: r.storage ? [r.storage] : [],
         chip: '', camera: '', battery: '', screen: '',
-        description: [r.ram && r.ram !== '--' && `RAM ${r.ram}`, r.storage && `Bộ nhớ ${r.storage}`, r.warranty && `Bảo hành ${r.warranty}`].filter(Boolean).join(' • '),
-        rating: 5, review_count: 0, image_url: imageFor(name), stock: r.stock, is_visible: Boolean(visible), sort_order: 0
+        description: [r.note, r.ram && r.ram !== '--' && `RAM ${r.ram}`, r.storage && `Bộ nhớ ${r.storage}`, r.warranty && `Bảo hành ${r.warranty}`].filter(Boolean).join(' • '),
+        rating: 5, review_count: 0, image_url: imageFor(name) || imageFor(productNameFor(r)), stock: r.stock, is_visible: Boolean(visible), sort_order: 0
       }
     });
   }
@@ -233,6 +244,15 @@ export function planNewProducts(existingProducts, sheetRows, { visible = false }
  * Đọc tab 2ND. Cột cố định: STT, Hãng, Mẫu, Bộ nhớ, RAM, Tình trạng, Mô tả, Giá gốc (KHÔNG đọc), Giá bán, Sale, Giá sau sale, Lợi nhuận, Tồn kho, Trạng thái.
  * @returns {{ rows: Array<object>, errors: string[] }}
  */
+/**
+ * Mã máy cũ ổn định theo mẫu + dung lượng + mô tả; bỏ phần "pin NN%" vì pin tụt dần theo ngày,
+ * để cập nhật hằng ngày không biến máy cũ thành máy mới.
+ */
+export function usedBaseId(model, storage, description) {
+  const stable = String(description ?? '').replace(/pin\s*(?:new|[\dx]+\s*%?)/gi, ' ');
+  return `2nd-${slugify(`${model} ${storage} ${stable}`).slice(0, 80)}`;
+}
+
 export function parseUsedRows(csvText) {
   const table = parseCsv(csvText);
   const rows = [];
@@ -253,9 +273,16 @@ export function parseUsedRows(csvText) {
       salePercent: parsePercent(r[9]) || 0, finalPrice,
       stock: stockOf(r[12], r[13]),
       group: usedGroup(model),
-      id: `2nd-${slugify(`${model} ${storage} ${description}`).slice(0, 80)}`
+      id: usedBaseId(model, storage, description)
     });
   });
+  // Hai máy giống hệt nhau trong sheet: đuôi -2, -3... theo thứ tự xuất hiện để mỗi lần đồng bộ ra cùng một mã
+  const seen = new Map();
+  for (const row of rows) {
+    const n = (seen.get(row.id) || 0) + 1;
+    seen.set(row.id, n);
+    if (n > 1) row.id = `${row.id}-${n}`;
+  }
   return { rows, errors };
 }
 
@@ -280,16 +307,11 @@ function colorOf(description) {
  */
 export function planUsedProducts(existingProducts, usedRows, { visible = false } = {}) {
   const existing = new Set((Array.isArray(existingProducts) ? existingProducts : []).map(p => p?.id));
-  const planned = new Set();
   const out = { items: [], duplicates: 0, soldOut: 0 };
   for (const r0 of Array.isArray(usedRows) ? usedRows : []) {
     if (existing.has(r0.id)) { out.duplicates++; continue; }
     if (r0.stock <= 0) { out.soldOut++; continue; }
-    // Hai máy giống hệt mô tả trong cùng sheet: đuôi -2, -3... để cả hai cùng lên web.
-    let id = r0.id;
-    for (let n = 2; planned.has(id) || existing.has(id); n++) id = `${r0.id}-${n}`;
-    planned.add(id);
-    const r = { ...r0, id };
+    const r = r0;
     const isPhone = /^iphone/i.test(r.model);
     const color = colorOf(r.description);
     const name = [r.model, r.storage, color && `- ${color}`, r.condition && `- ${r.condition}`].filter(Boolean).join(' ').replace(/\s+-\s+/g, ' - ');

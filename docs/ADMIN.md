@@ -278,6 +278,16 @@ Chạy `supabase/cashflow.sql` trong Supabase (một lần). Trang `/admin/cashf
 
 Trang **Sản phẩm** có hai nút. Cả hai đọc tab `TONG_HOP` của Google Sheet (sheet phải chia sẻ "bất kỳ ai có đường liên kết"), hiện bảng xem trước có các tab **Tất cả · Apple · Samsung · Xiaomi · OPPO · Vivo · Realme** (theo cột Hãng), tick rồi mới áp dụng. Bảng xem trước ghi rõ "Bảng giá cập nhật ngày ..." theo dòng ngày trong sheet.
 
+### Đồng bộ Sheet (cập nhật hằng ngày)
+
+Nút **Đồng bộ Sheet** (đầu trang sản phẩm) đọc cùng lúc 3 tab `TONG_HOP` (hàng mới), `2ND` (máy cũ) và `PHU_KIEN`, so với web rồi liệt kê việc cần làm để bạn tick và bấm áp dụng một lần:
+
+- **Thêm mới**: máy/phụ kiện chưa có trên web (mặc định ẩn; tick "Hiện ngay" hoặc "Chỉ thêm máy có ảnh").
+- **Đổi giá / tồn kho**: đổi giá gốc, giữ nguyên phần cộng thêm đã Set giá; đổi tồn kho; sheet đặt Hiển Thị Web = Không thì ẩn. Hàng mới hết hàng (tồn 0 hoặc trạng thái Hết hàng) hiện nhãn hết hàng trên web.
+- **Đã bán (gỡ)**: máy 2ND có tồn 0, hoặc biến mất khỏi sheet, được đặt tồn 0 và ẩn.
+- Cách nhận diện để không tạo trùng: hàng mới theo **Mã SP** (nên điền, mỗi dòng một mã khác nhau); máy cũ theo mẫu + dung lượng + mô tả (bỏ "pin NN%", nên đổi % pin không thành máy mới); hai máy giống hệt nhau tự có hậu tố -2, -3.
+- Giá lệch hơn 30% tô vàng và không tự tick. Cảnh báo hiện ở đầu bảng khi mã trùng, thiếu mã, dòng lỗi, hoặc sheet ghi cập nhật quá 2 ngày.
+
 - **Thêm SP mới từ Sheet**: rà sheet, **bỏ máy đã có** (so theo tên máy + dung lượng) và chỉ thêm máy mới, hàng mới 100%. Giá, giá gạch ngang, tồn kho lấy từ sheet; ảnh, màu, chip, camera để trống để bạn bổ sung sau. Mặc định tạo **ẩn**; thêm ảnh ở trang sửa sản phẩm rồi bật hiển thị (hoặc tick "Hiện ngay trên web"). Khi chưa có ảnh web hiện ảnh tạm.
 - **Cập nhật giá từ Sheet**: đổi giá cho **điện thoại hàng mới đã có trên web**. Giá bán = "Giá Sau Sale", giá gạch ngang = "Giá Bán" (khi có sale). Hàng Like New, hàng cũ, phụ kiện không bị đổi. Giá lệch hơn 30% tô vàng và không tự tick.
 - Tên sản phẩm tạo ra có dạng "<Mẫu> <Dung lượng>" (Samsung/OPPO... thêm tên hãng phía trước nếu mẫu chưa có). Mỗi dung lượng là một sản phẩm riêng.
