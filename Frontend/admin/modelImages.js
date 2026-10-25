@@ -6,6 +6,11 @@
 
 const APPLE = 'https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/';
 const apple = (slug) => `${APPLE}${slug}?wid=800&hei=800&fmt=png-alpha`;
+const SAMSUNG = 'https://images.samsung.com/is/image/samsung/p6pim/vn/2401/gallery/';
+const samsung = (file) => `${SAMSUNG}${file}?$650_519_PNG$`;
+const XIAOMI = 'https://i02.appmifile.com/';
+/** Ảnh sản phẩm của đại lý thegioididong.com (bên thứ ba) cho mẫu chưa có ảnh trên trang hãng. */
+const TGDD = 'https://cdn.tgdd.vn/Products/Images/42/';
 
 /** Khóa chuẩn: bỏ dấu, chữ thường, bỏ tên hãng và 5G/4G, chỉ giữ chữ số và chữ cái. */
 export function modelKey(value) {
@@ -35,7 +40,33 @@ export const MODEL_IMAGES = {
   iphone12: apple('iphone-12-purple-select-2021'),
   iphonexsmax: apple('iphone-xs-max-gold-select-2018'),
   ipadair11m2air7: apple('ipad-air-finish-select-gallery-202405-11inch-blue-wifi'),
-  watchseries9: apple('watch-card-40-s9-202309')
+  watchseries9: apple('watch-card-40-s9-202309'),
+  // Apple (ảnh bên thứ ba vì Apple chưa có ảnh cùng quy tắc)
+  iphone17: `${TGDD}342667/iphone-17-tim-thumb-0.jpg`,
+  iphone17air: `${TGDD}342670/iphone-air-vang-thumb.jpg`,
+  iphoneair: `${TGDD}342670/iphone-air-vang-thumb.jpg`,
+  // Samsung (trang hãng)
+  galaxys24ultra: samsung('vn-galaxy-s24-s928-sm-s928bztqxxv-thumb-539307592'),
+  galaxys24plus: samsung('vn-galaxy-s24-plus-489236-sm-s926blgbxxv-thumb-539322009'),
+  galaxys24: samsung('vn-galaxy-s24-490125-sm-s921blbqxxv-thumb-539378863'),
+  // Samsung A (bên thứ ba)
+  galaxya55: `${TGDD}322096/samsung-galaxy-a55-5g-tim-1.jpg`,
+  galaxya35: `${TGDD}321772/samsung-galaxy-a35-xanh-1.jpg`,
+  galaxya15: `${TGDD}319901/samsung-galaxy-a15-xanh-den-1.jpg`,
+  // Xiaomi (trang hãng). Khóa "14" là Xiaomi 14 vì tên hãng bị bỏ khi chuẩn hóa.
+  14: `${XIAOMI}976_operatorx_operatorx_opx/23/02/2024/c4866f7bdd20c6ed7acf6082417dd340.png`,
+  redminote13pro: `${XIAOMI}13_operatorx_operatorx_opx/11/01/2024/25da829b5997ff8aea28af388df3b8df.png`,
+  redmi13c: `${XIAOMI}477_operatorx_operatorx_opx/08/11/2023/a69b2ced4a4e2403fbfd446994c26a06.png`,
+  // OPPO
+  a79: 'https://www.oppo.com/content/dam/oppo/common/mkt/v2-2/a79-5g-en/listpage/a79-5g-427_600-purple.png',
+  findx7ultra: `${TGDD}320724/oppo-find-x7-ultra-221223-104455-600x600.jpg`,
+  // Vivo (bên thứ ba)
+  x100pro: `${TGDD}307003/vivo-x100-pro-600x600.jpg`,
+  v30: `${TGDD}319214/vivo-v30-black-1-1.jpg`,
+  y100: `${TGDD}302197/vivo-y100-den-1-1.jpg`,
+  // Realme (bên thứ ba). Khóa "12" là Realme 12 5G.
+  12: `${TGDD}322956/realme-12-green-1.jpg`,
+  c67: `${TGDD}319658/realme-c67-xanh-1.jpg`
 };
 
 /** Tên mẫu = phần tên trước dung lượng đầu tiên ("iPhone 16 Pro Max 256GB - Cam" -> "iPhone 16 Pro Max"). */

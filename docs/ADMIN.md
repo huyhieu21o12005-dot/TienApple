@@ -285,7 +285,7 @@ Trang **Sản phẩm** có hai nút. Cả hai đọc tab `TONG_HOP` của Google
 
 ### Ảnh minh họa theo mẫu máy
 
-- Bảng ảnh nằm ở `Frontend/admin/modelImages.js` (khóa = tên mẫu, giá trị = ảnh sản phẩm chính thức trên CDN của hãng). Hiện có Apple: iPhone 17 Pro Max/Pro, 16 (4 mẫu), 15 (4), 14 (4), 13, 12, XS Max, iPad Air 11 M2, Apple Watch Series 9. Mẫu không có trong bảng giữ ảnh tạm "Đang cập nhật ảnh".
+- Bảng ảnh nằm ở `Frontend/admin/modelImages.js` (khóa = tên mẫu, giá trị = ảnh sản phẩm chính thức trên CDN của hãng). Ưu tiên ảnh trang hãng (Apple, Samsung S24, Xiaomi, OPPO A79); mẫu hãng không có ảnh tiện dùng thì lấy ảnh đại lý thegioididong.com (Samsung A, OPPO Find X7 Ultra, Vivo, Realme 12/C67, iPhone 17/Air). Chưa có: Realme GT 6, OPPO Reno 12 Pro, iPhone 12 Pro/Pro Max, đồng hồ SE 3/6/4, iPad Pro 9.7 (giữ ảnh tạm "Đang cập nhật ảnh").
 - Hai nút **Thêm SP mới từ Sheet** và **Thêm máy cũ từ Sheet** tự gắn ảnh nếu có mẫu khớp. Máy cũ có ảnh minh họa được thêm dòng "Ảnh minh họa, ảnh máy thật vui lòng liên hệ cửa hàng" vào mô tả.
 - Nút **Gắn ảnh minh họa** gắn ảnh cho sản phẩm đã có trên web mà chưa có ảnh (chỉ những mẫu khớp trong bảng); xem trước ảnh rồi tick.
 - Ảnh máy thật: thay ở trang sửa sản phẩm, sau đó ảnh minh họa không bị ghi đè (nút chỉ gắn cho sản phẩm chưa có ảnh).
