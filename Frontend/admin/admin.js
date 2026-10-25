@@ -341,7 +341,6 @@ function renderProducts() {
                 }
               </div>
               ${p.oldPrice ? `<span class="card-old-price">${formatCurrency(p.oldPrice)}</span>` : ''}
-              ${p.basePrice && p.basePrice !== p.price ? `<span class="card-markup${p.price < p.basePrice ? ' neg' : ''}" title="Giá gốc ${escapeHtml(formatCurrency(p.basePrice))}">Gốc ${escapeHtml(formatCurrency(p.basePrice))} · ${p.price > p.basePrice ? '+' : '−'}${escapeHtml(formatCurrency(Math.abs(p.price - p.basePrice)))}</span>` : ''}
             </div>
           </div>
 
