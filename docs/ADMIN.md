@@ -309,3 +309,7 @@ Nút **Set giá** ở trang sản phẩm. Giá bán = **giá gốc (`base_price`
 - Popup có 2 thẻ: **Set giá theo tích chọn** (như trên) và **Set giá hàng loạt (theo quy tắc)**: mỗi dòng quy tắc gồm hãng, giá gốc từ/đến, tên máy chứa, mức cộng thêm (đ hoặc %). Mỗi máy nhận một quy tắc, ưu tiên cụ thể nhất: tên máy > khoảng giá > hãng > chung; máy không khớp giữ nguyên. Bấm **Tính vào bảng** để xem kết quả (dòng xanh) rồi **Lưu giá**. Quy tắc được nhớ trên trình duyệt.
 - Bộ lọc dạng danh sách xổ xuống (Hãng, Giá gốc, Tình trạng): chọn xong hiện thành thẻ có nút ✕ để bỏ, chọn được nhiều thẻ. Tiền tự thêm dấu chấm hàng nghìn. Cộng thêm có nút −/+ (±500.000đ hoặc ±1%), các mức gợi ý bấm nhanh và dòng xem trước giá của máy đầu tiên được chọn.
 - **Liên kết với trang sản phẩm:** thẻ sản phẩm ngoài trang chỉ hiện giá bán cho khách (giá gốc và phần cộng thêm chỉ xem trong popup Set giá). Nút **Set giá** (đầu trang và trên thanh "Đã chọn") mở popup với các máy đang tích, thẻ hãng/loại/trạng thái và ô tìm kiếm của danh sách ngoài. Sửa giá nhanh, giảm giá % và form sản phẩm vẫn giữ/ghi giá gốc để Set giá tính đúng; sau khi lưu danh sách ngoài tự tải lại.
+
+### Hiện / ẩn hàng loạt
+
+Nút **Hiện / ẩn hàng loạt** (đầu trang sản phẩm): lọc bằng thẻ (hãng, giá gốc, tình trạng, trạng thái...), tích chọn tất cả hoặc từng máy rồi bấm **Hiện lên web** hoặc **Ẩn khỏi web**. Mỗi dòng ghi rõ đang hiện hay đang ẩn. Máy thêm từ Sheet mặc định ẩn, dùng nút này để đưa lên web sau khi đã có ảnh (ví dụ thẻ Trạng thái: Đang ẩn + Chưa có ảnh để kiểm tra trước).

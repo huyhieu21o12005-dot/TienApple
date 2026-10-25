@@ -1016,6 +1016,88 @@ function bindSetPriceModal() {
   });
 }
 
+// ===== Hiện / ẩn hàng loạt: lọc bằng thẻ, tích chọn tất cả hoặc từng máy =====
+const vis = { facets: new Set(), selected: new Set(), query: '' };
+
+function visShown() {
+  const ids = new Set(matchPricing(state.products, [...vis.facets]));
+  const q = vis.query.trim().toLowerCase();
+  return state.products.filter(p => ids.has(p.id) && (!q || `${p.name} ${p.id}`.toLowerCase().includes(q)));
+}
+
+function renderVis() {
+  renderFacetBar('visFacets', allFilterGroups(state.products), vis.facets);
+  const list = visShown();
+  const shownIds = new Set(list.map(p => p.id));
+  vis.selected = new Set([...vis.selected].filter(id => shownIds.has(id)));
+  document.getElementById('visList').innerHTML = list.length === 0 ? '<p class="dialog-subtext">Không có sản phẩm nào.</p>' : list.map(p => `
+    <label class="bd-row"><input type="checkbox" data-pid="${escapeHtml(p.id)}" ${vis.selected.has(p.id) ? 'checked' : ''}>
+      <span class="bd-name">${escapeHtml(p.name)}</span><span class="bd-price">${p.is_visible === false ? '🚫 Đang ẩn' : '✅ Đang hiện'} · ${escapeHtml(formatCurrency(p.price))}</span></label>`).join('');
+  updateVisCount();
+}
+
+function updateVisCount() {
+  const shown = visShown().length;
+  const n = vis.selected.size;
+  const all = document.getElementById('visAll');
+  all.checked = shown > 0 && n === shown;
+  all.indeterminate = n > 0 && n < shown;
+  all.disabled = shown === 0;
+  document.getElementById('visAllLabel').textContent = `Chọn tất cả ${shown} sản phẩm đang hiện trong danh sách`;
+  document.getElementById('visCount').textContent = `Đã chọn ${n} / ${shown} (tổng ${state.products.length} sản phẩm)`;
+  document.getElementById('visShow').disabled = n === 0;
+  document.getElementById('visHide').disabled = n === 0;
+  document.getElementById('visShow').textContent = n ? `Hiện ${n} lên web` : 'Hiện lên web';
+  document.getElementById('visHide').textContent = n ? `Ẩn ${n} khỏi web` : 'Ẩn khỏi web';
+}
+
+async function applyVis(visible) {
+  const ids = [...vis.selected];
+  if (!ids.length) return;
+  const btns = [document.getElementById('visShow'), document.getElementById('visHide')];
+  btns.forEach(b => { b.disabled = true; });
+  try {
+    for (let i = 0; i < ids.length; i += 100) {
+      const { error } = await supabase.from('products').update({ is_visible: visible, updated_at: new Date().toISOString() }).in('id', ids.slice(i, i + 100));
+      if (error) throw error;
+    }
+    showToast(`Đã ${visible ? 'hiện' : 'ẩn'} ${ids.length} sản phẩm`, 'success');
+    vis.selected.clear();
+    await loadProducts();
+    renderVis();
+  } catch (err) {
+    console.error('[Admin] Lỗi hiện/ẩn hàng loạt:', err);
+    showToast('Lỗi khi đổi trạng thái hiển thị', 'error');
+    updateVisCount();
+  }
+}
+
+function bindVisModal() {
+  const close = () => document.getElementById('visModal').classList.add('hidden');
+  document.getElementById('visBtn').addEventListener('click', () => {
+    vis.facets.clear(); vis.selected = new Set(state.selectedIds); vis.query = '';
+    document.getElementById('visSearch').value = '';
+    document.getElementById('visModal').classList.remove('hidden');
+    renderVis();
+  });
+  document.getElementById('visClose').addEventListener('click', close);
+  document.getElementById('visCancel').addEventListener('click', close);
+  document.getElementById('visShow').addEventListener('click', () => applyVis(true));
+  document.getElementById('visHide').addEventListener('click', () => applyVis(false));
+  bindFacetBar('visFacets', vis.facets, renderVis);
+  document.getElementById('visSearch').addEventListener('input', (e) => { vis.query = e.target.value; renderVis(); });
+  document.getElementById('visAll').addEventListener('change', (e) => {
+    vis.selected = e.target.checked ? new Set(visShown().map(p => p.id)) : new Set();
+    renderVis();
+  });
+  document.getElementById('visList').addEventListener('change', (e) => {
+    const box = e.target.closest('[data-pid]');
+    if (!box) return;
+    if (box.checked) vis.selected.add(box.dataset.pid); else vis.selected.delete(box.dataset.pid);
+    updateVisCount();
+  });
+}
+
 function bindBulkDeleteModal() {
   document.getElementById('closeBulkDeleteBtn').addEventListener('click', closeBulkDeleteModal);
   document.getElementById('bdCancel').addEventListener('click', closeBulkDeleteModal);
@@ -1684,6 +1766,7 @@ function bindGlobalEvents() {
   // Delete modal buttons
   bindSheetModal();
   bindSetPriceModal();
+  bindVisModal();
   document.getElementById('closeDeleteBtn').addEventListener('click', closeDeleteModal);
   document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
   document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDeleteProduct);
