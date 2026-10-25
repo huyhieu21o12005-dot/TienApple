@@ -1398,3 +1398,17 @@ body[data-role="staff"] [data-action="delete"] { display: none !important; }
 .sheet-tab.active span { color: #D2D2D7; }
 .sheet-opt { display: flex; gap: 8px; align-items: center; margin: 12px 0 4px; font-size: 14px; }
 .sheet-thumb { width: 56px; height: 56px; object-fit: contain; background: #F5F5F7; border-radius: 8px; }
+
+/* Xóa hàng loạt */
+.bd-dialog { max-width: 760px; }
+.bd-facets { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin: 10px 0; }
+.bd-group { border: 1px solid #E5E5EA; border-radius: 12px; padding: 8px 10px; margin: 0; }
+.bd-group legend { font-size: 12px; color: #6E6E73; padding: 0 4px; }
+.bd-opt { display: flex; gap: 6px; align-items: center; font-size: 13px; padding: 2px 0; cursor: pointer; }
+.bd-opt span { margin-left: auto; color: #6E6E73; font-size: 12px; }
+.bd-toolbar { display: flex; gap: 8px; align-items: center; margin: 8px 0; }
+.bd-list { max-height: 34vh; overflow: auto; border: 1px solid #E5E5EA; border-radius: 12px; }
+.bd-row { display: flex; gap: 8px; align-items: center; padding: 7px 10px; border-bottom: 1px solid #F0F0F3; font-size: 14px; cursor: pointer; }
+.bd-row:last-child { border-bottom: 0; }
+.bd-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bd-price { color: #6E6E73; font-size: 13px; white-space: nowrap; }

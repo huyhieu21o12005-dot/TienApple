@@ -106,7 +106,7 @@
           <a class="btn btn-secondary" href="./installments.html">Trả góp</a>
           <a class="btn btn-ghost" href="./cashflow.html">Thu chi</a>
           <button type="button" id="sheetNewBtn" class="btn btn-secondary" title="Thêm máy mới có trong Google Sheet, bỏ qua máy đã có">Thêm SP mới từ Sheet</button>
-          <button type="button" id="bulkModeBtn" class="btn btn-secondary" title="Chọn nhiều sản phẩm để xóa, ẩn hoặc giảm giá cùng lúc">Chọn nhiều / Xóa hàng loạt</button>
+          <button type="button" id="bulkModeBtn" class="btn btn-secondary" title="Chọn theo hãng, tình trạng, trạng thái... rồi xóa cùng lúc (ảnh trong kho được giữ lại)">Xóa hàng loạt</button>
           <button type="button" id="sheetImageBtn" class="btn btn-secondary" title="Gắn ảnh minh họa chính thức cho sản phẩm chưa có ảnh">Gắn ảnh minh họa</button>
           <button type="button" id="sheetUsedBtn" class="btn btn-secondary" title="Thêm máy cũ trong tab 2ND của Google Sheet, mỗi máy một sản phẩm">Thêm máy cũ từ Sheet</button>
           <button type="button" id="sheetPriceBtn" class="btn btn-secondary" title="Cập nhật giá hàng mới đã có trên web theo Google Sheet">Cập nhật giá từ Sheet</button>
@@ -469,6 +469,30 @@
     </div>
   </div>
 
+  <!-- XÓA HÀNG LOẠT (tích theo hãng, tình trạng, trạng thái...) -->
+  <div id="bulkDeleteModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="bulkDeleteTitle">
+    <div class="modal-dialog bd-dialog">
+      <div class="modal-header">
+        <h2 id="bulkDeleteTitle" class="modal-title">Xóa hàng loạt</h2>
+        <button type="button" id="closeBulkDeleteBtn" class="btn-icon-close" aria-label="Đóng">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="dialog-subtext">Tích theo nhóm để chọn nhanh (cùng nhóm là "hoặc", khác nhóm là "và"), rồi bỏ tích từng sản phẩm nếu cần. Chỉ xóa sản phẩm, <strong>ảnh trong kho được giữ lại</strong>.</p>
+        <div id="bdFacets" class="bd-facets"></div>
+        <div class="bd-toolbar">
+          <input type="search" id="bdSearch" class="form-input" placeholder="Lọc danh sách theo tên..." aria-label="Lọc danh sách">
+          <button type="button" id="bdClear" class="btn btn-ghost btn-sm">Bỏ chọn hết</button>
+        </div>
+        <div id="bdList" class="bd-list"></div>
+        <p id="bdCount" class="dialog-subtext"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="bdCancel" class="btn btn-secondary">Hủy</button>
+        <button type="button" id="bdConfirm" class="btn btn-danger" disabled>Xóa sản phẩm đã chọn</button>
+      </div>
+    </div>
+  </div>
+
   <div id="deleteModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
     <div class="modal-dialog modal-dialog-sm">
       <div class="modal-header">
@@ -479,7 +503,7 @@
         <p class="dialog-text">
           Bạn có chắc chắn muốn xóa sản phẩm <strong id="deleteProductName" class="text-danger"></strong>?
         </p>
-        <p class="dialog-subtext">Hành động này sẽ xóa dữ liệu và hình ảnh vĩnh viễn trên Supabase và không thể hoàn tác.</p>
+        <p class="dialog-subtext">Sản phẩm bị xóa vĩnh viễn và không thể hoàn tác. Ảnh trong kho ảnh vẫn được giữ lại để dùng lại khi đăng hàng.</p>
       </div>
       <div class="modal-footer">
         <button type="button" id="cancelDeleteBtn" class="btn btn-secondary">Giữ lại</button>

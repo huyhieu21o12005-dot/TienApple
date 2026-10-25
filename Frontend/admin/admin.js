@@ -5,6 +5,7 @@
  */
 
 import { imageFor } from './modelImages.js';
+import { buildFacetGroups, matchByFacets } from './bulkSelect.js';
 import { USED_IMAGE_NOTE } from './sheetPricing.js';
 import { SHEET_CSV_URL, SHEET_TAB, SHEET_USED_CSV_URL, SHEET_USED_TAB, parseSheetRows, parseSheetDate, parseUsedRows, planPriceUpdates, planNewProducts, planUsedProducts } from './sheetPricing.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
@@ -32,7 +33,6 @@ const state = {
   role: null,
   products: [],
   selectedIds: new Set(),
-  bulkMode: false, // thanh thao tác hàng loạt luôn hiện (không cần chọn trước)
   activeFilter: 'all', // all, phone, accessory, visible, hidden, outofstock
   activeBrand: 'all',
   activeSort: 'sort_order',
@@ -594,10 +594,7 @@ function updateBulkActionBar() {
   const count = state.selectedIds.size;
   countEl.innerText = count;
 
-  const modeBtn = document.getElementById('bulkModeBtn');
-  if (modeBtn) modeBtn.textContent = state.bulkMode ? 'Xong chọn nhiều' : 'Chọn nhiều / Xóa hàng loạt';
-
-  if (count > 0 || state.bulkMode) {
+  if (count > 0) {
     bar.classList.remove('hidden');
     selectAllCb.checked = filtered.length > 0 && filtered.every(p => state.selectedIds.has(p.id));
   } else {
@@ -666,53 +663,90 @@ async function executeBulkDiscount(percent) {
   }
 }
 
-async function executeBulkDelete() {
+// ===== Xóa hàng loạt: bảng tích theo hãng / tình trạng / loại / trạng thái / nhãn. Chỉ xóa sản phẩm, KHÔNG xóa ảnh trong kho. =====
+const bulkDel = { picked: new Set(), selected: new Set(), query: '' };
+
+function openBulkDeleteModal() {
   if (!canDeleteProducts(state.role)) {
     showToast('Nhân viên không có quyền xóa sản phẩm.', 'error');
     return;
   }
-  const ids = Array.from(state.selectedIds);
+  bulkDel.picked = new Set();
+  bulkDel.selected = new Set(state.selectedIds);
+  bulkDel.query = '';
+  document.getElementById('bdSearch').value = '';
+  document.getElementById('bulkDeleteModal').classList.remove('hidden');
+  renderBulkDelete();
+}
+
+function closeBulkDeleteModal() {
+  document.getElementById('bulkDeleteModal').classList.add('hidden');
+}
+
+function renderBulkDelete() {
+  const groups = buildFacetGroups(state.products);
+  document.getElementById('bdFacets').innerHTML = groups.map(g => `
+    <fieldset class="bd-group"><legend>${escapeHtml(g.label)}</legend>
+      ${g.options.map(o => `<label class="bd-opt"><input type="checkbox" data-facet="${escapeHtml(o.id)}" ${bulkDel.picked.has(o.id) ? 'checked' : ''}> ${escapeHtml(o.label)} <span>${o.count}</span></label>`).join('')}
+    </fieldset>`).join('');
+  const q = bulkDel.query.trim().toLowerCase();
+  const list = state.products.filter(p => !q || `${p.name} ${p.id}`.toLowerCase().includes(q));
+  document.getElementById('bdList').innerHTML = list.length === 0 ? '<p class="dialog-subtext">Không có sản phẩm nào.</p>' : list.map(p => `
+    <label class="bd-row"><input type="checkbox" data-pid="${escapeHtml(p.id)}" ${bulkDel.selected.has(p.id) ? 'checked' : ''}>
+      <span class="bd-name">${escapeHtml(p.name)}</span><span class="bd-price">${escapeHtml(formatCurrency(p.price))}</span></label>`).join('');
+  updateBulkDeleteCount();
+}
+
+function updateBulkDeleteCount() {
+  const n = bulkDel.selected.size;
+  document.getElementById('bdCount').textContent = `Đã chọn ${n} / ${state.products.length} sản phẩm`;
+  const btn = document.getElementById('bdConfirm');
+  btn.disabled = n === 0;
+  btn.textContent = n ? `Xóa ${n} sản phẩm` : 'Xóa sản phẩm đã chọn';
+}
+
+async function confirmBulkDelete() {
+  const ids = [...bulkDel.selected];
   if (ids.length === 0) return;
-
-  const names = ids.map(id => state.products.find(p => p.id === id)?.name).filter(Boolean);
-  const preview = names.slice(0, 8).map(n => `• ${n}`).join('\n') + (names.length > 8 ? `\n... và ${names.length - 8} sản phẩm khác` : '');
-  if (!confirm(`Xóa vĩnh viễn ${ids.length} sản phẩm đã chọn? Không thể hoàn tác.\n\n${preview}`)) {
-    return;
-  }
-
+  if (!confirm(`Xóa vĩnh viễn ${ids.length} sản phẩm? Không thể hoàn tác. Ảnh trong kho vẫn được giữ lại.`)) return;
+  const btn = document.getElementById('bdConfirm');
+  btn.disabled = true;
   try {
-    // 1. Thu thập danh sách ảnh để dọn dẹp Storage
-    const imagesToDelete = [];
-    ids.forEach(id => {
-      const prod = state.products.find(p => p.id === id);
-      if (prod && prod.image && prod.image.includes('/product-images/')) {
-        const parts = prod.image.split('/product-images/');
-        if (parts[1]) imagesToDelete.push(decodeURIComponent(parts[1]));
-      }
-    });
-
-    // 2. Xóa khỏi table
-    const { error } = await supabase
-      .from('products')
-      .delete()
-      .in('id', ids);
-
-    if (error) throw error;
-
-    // 3. Xóa ảnh khỏi Storage
-    if (imagesToDelete.length > 0) {
-      await supabase.storage.from('product-images').remove(imagesToDelete);
+    for (let i = 0; i < ids.length; i += 100) {
+      const { error } = await supabase.from('products').delete().in('id', ids.slice(i, i + 100));
+      if (error) throw error;
     }
-
-    state.products = state.products.filter(p => !state.selectedIds.has(p.id));
-    state.selectedIds.clear();
+    state.products = state.products.filter(p => !bulkDel.selected.has(p.id));
+    ids.forEach(id => state.selectedIds.delete(id));
+    closeBulkDeleteModal();
     renderProducts();
-    showToast(`Đã xóa ${ids.length} sản phẩm thành công`, 'success');
+    showToast(`Đã xóa ${ids.length} sản phẩm (ảnh trong kho được giữ lại)`, 'success');
   } catch (err) {
     console.error('[Admin] Lỗi xóa hàng loạt:', err);
     showToast('Lỗi khi xóa sản phẩm hàng loạt', 'error');
     loadProducts();
   }
+}
+
+function bindBulkDeleteModal() {
+  document.getElementById('closeBulkDeleteBtn').addEventListener('click', closeBulkDeleteModal);
+  document.getElementById('bdCancel').addEventListener('click', closeBulkDeleteModal);
+  document.getElementById('bdConfirm').addEventListener('click', confirmBulkDelete);
+  document.getElementById('bdSearch').addEventListener('input', (e) => { bulkDel.query = e.target.value; renderBulkDelete(); });
+  document.getElementById('bdClear').addEventListener('click', () => { bulkDel.picked.clear(); bulkDel.selected.clear(); renderBulkDelete(); });
+  document.getElementById('bdFacets').addEventListener('change', (e) => {
+    const box = e.target.closest('[data-facet]');
+    if (!box) return;
+    if (box.checked) bulkDel.picked.add(box.dataset.facet); else bulkDel.picked.delete(box.dataset.facet);
+    bulkDel.selected = new Set(matchByFacets(state.products, [...bulkDel.picked]));
+    renderBulkDelete();
+  });
+  document.getElementById('bdList').addEventListener('change', (e) => {
+    const box = e.target.closest('[data-pid]');
+    if (!box) return;
+    if (box.checked) bulkDel.selected.add(box.dataset.pid); else bulkDel.selected.delete(box.dataset.pid);
+    updateBulkDeleteCount();
+  });
 }
 
 // ==============================================================================
@@ -898,16 +932,7 @@ async function confirmDeleteProduct() {
   setBtnLoading(btn, true);
 
   try {
-    // 1. Dọn dẹp ảnh trong Storage nếu được lưu trong bucket product-images
-    if (prod.image && prod.image.includes('/product-images/')) {
-      const parts = prod.image.split('/product-images/');
-      if (parts[1]) {
-        const fileName = decodeURIComponent(parts[1]);
-        await supabase.storage.from('product-images').remove([fileName]);
-      }
-    }
-
-    // 2. Xóa row trong bảng products
+    // Ảnh giữ lại trong kho (product-images) để dùng lại khi đăng hàng; chỉ xóa dòng sản phẩm.
     const { error } = await supabase
       .from('products')
       .delete()
@@ -1374,12 +1399,7 @@ function bindGlobalEvents() {
     renderProducts();
   });
 
-  document.getElementById('bulkModeBtn').addEventListener('click', () => {
-    state.bulkMode = !state.bulkMode;
-    if (!state.bulkMode) state.selectedIds.clear();
-    renderProducts();
-    updateBulkActionBar();
-  });
+  document.getElementById('bulkModeBtn').addEventListener('click', () => openBulkDeleteModal());
   document.getElementById('bulkDeselectBtn').addEventListener('click', () => {
     state.selectedIds.clear();
     renderProducts();
@@ -1417,15 +1437,15 @@ function bindGlobalEvents() {
     await executeBulkDiscount(percent);
   });
 
-  document.getElementById('bulkDeleteBtn').addEventListener('click', () => {
-    executeBulkDelete();
-  });
+  document.getElementById('bulkDeleteBtn').addEventListener('click', () => openBulkDeleteModal());
+  bindBulkDeleteModal();
 
   // Escape key closes modals
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeModal();
       closeDeleteModal();
+      closeBulkDeleteModal();
       document.getElementById('bulkDiscountModal').classList.add('hidden');
     }
   });
