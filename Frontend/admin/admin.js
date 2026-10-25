@@ -4,7 +4,7 @@
  * Visibility Toggle, Bulk Operations, Image Upload with Client Resize, and Filters.
  */
 
-import { planPricing } from './pricing.js';
+import { baseOf, markupPrice, matchPricing, parseAmount, pricingGroups } from './pricing.js';
 import { imageFor } from './modelImages.js';
 import { buildFacetGroups, matchByFacets } from './bulkSelect.js';
 import { USED_IMAGE_NOTE } from './sheetPricing.js';
@@ -730,105 +730,139 @@ async function confirmBulkDelete() {
 }
 
 // ==============================================================================
-// SET GIÁ: cộng thêm lên giá gốc theo quy tắc (chung / hãng / khoảng giá / tên máy)
+// SET GIÁ: tích hãng / khoảng giá, cộng thêm hàng loạt, sửa trực tiếp từng máy
 // ==============================================================================
-const SP_KEY = 'tm_set_price';
-const setPrice = { rules: [], roundStep: 0, shift: true, query: '', onlyChanged: false, plan: [] };
-
-function loadSetPriceSaved() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(SP_KEY) || 'null');
-    if (saved && Array.isArray(saved.rules)) {
-      setPrice.rules = saved.rules; setPrice.roundStep = Number(saved.roundStep) || 0; setPrice.shift = saved.shift !== false;
-    }
-  } catch { /* bỏ qua */ }
-}
-
-function saveSetPrice() {
-  try { localStorage.setItem(SP_KEY, JSON.stringify({ rules: setPrice.rules, roundStep: setPrice.roundStep, shift: setPrice.shift })); } catch { /* bỏ qua */ }
-}
+// edits: id -> giá bán mới (chưa lưu). picked: máy được tích ở bảng. facets: ô lọc đang tích.
+const setPrice = { facets: new Set(), picked: new Set(), edits: new Map(), query: '' };
 
 const spEsc = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+const spNow = (p) => (setPrice.edits.has(p.id) ? setPrice.edits.get(p.id) : p.price);
 
-function renderSetPriceRules() {
-  const brands = [...new Set(state.products.map(p => (p.brandName || p.brand || '').trim()).filter(Boolean))].sort();
-  document.getElementById('spRules').innerHTML = setPrice.rules.map((r, i) => `
-    <div class="sp-rule" data-i="${i}">
-      <select data-f="brand" class="form-input" aria-label="Hãng"><option value="">Mọi hãng</option>${brands.map(b => `<option value="${spEsc(b.toLowerCase())}"${String(r.brand || '').toLowerCase() === b.toLowerCase() ? ' selected' : ''}>${spEsc(b)}</option>`).join('')}</select>
-      <input data-f="from" class="form-input" inputmode="numeric" placeholder="Giá gốc từ" value="${spEsc(r.from)}" aria-label="Giá gốc từ">
-      <input data-f="to" class="form-input" inputmode="numeric" placeholder="đến" value="${spEsc(r.to)}" aria-label="Giá gốc đến">
-      <input data-f="keyword" class="form-input" placeholder="Tên máy chứa..." value="${spEsc(r.keyword)}" aria-label="Tên máy chứa">
-      <span class="sp-plus">+</span>
-      <input data-f="value" class="form-input" inputmode="decimal" placeholder="Cộng thêm" value="${spEsc(r.value)}" aria-label="Cộng thêm">
-      <select data-f="mode" class="form-input" aria-label="Kiểu"><option value="fixed"${r.mode !== 'percent' ? ' selected' : ''}>đ</option><option value="percent"${r.mode === 'percent' ? ' selected' : ''}>%</option></select>
-      <button type="button" class="btn btn-ghost btn-sm" data-del="${i}" aria-label="Xóa quy tắc">✕</button>
-    </div>`).join('') || '<p class="dialog-subtext">Chưa có quy tắc: tất cả về giá gốc.</p>';
+function spShown() {
+  const ids = new Set(matchPricing(state.products, [...setPrice.facets]));
+  const q = setPrice.query.trim().toLowerCase();
+  return state.products.filter(p => ids.has(p.id) && (!q || `${p.name} ${p.brandName}`.toLowerCase().includes(q)));
+}
+
+function spDirty() {
+  return state.products.filter(p => setPrice.edits.has(p.id) && setPrice.edits.get(p.id) !== p.price);
+}
+
+function renderSetPriceFacets() {
+  document.getElementById('spFacets').innerHTML = pricingGroups(state.products).map(g => `
+    <fieldset class="bd-group"><legend>${spEsc(g.label)}</legend>
+      ${g.options.map(o => `<label class="bd-opt"><input type="checkbox" data-facet="${spEsc(o.id)}" ${setPrice.facets.has(o.id) ? 'checked' : ''}> ${spEsc(o.label)} <span>${o.count}</span></label>`).join('')}
+    </fieldset>`).join('');
 }
 
 function renderSetPriceList() {
-  const q = setPrice.query.trim().toLowerCase();
-  setPrice.plan = planPricing(state.products, setPrice.rules, { roundStep: setPrice.roundStep, shiftOldPrice: setPrice.shift });
-  const changed = setPrice.plan.filter(r => r.newPrice !== r.price || (r.oldPrice !== null && r.newOldPrice !== r.oldPrice));
-  const rows = setPrice.plan.filter(r => (!q || r.name.toLowerCase().includes(q)) && (!setPrice.onlyChanged || changed.includes(r)));
-  document.getElementById('spList').innerHTML = `<table class="sp-table"><thead><tr><th>Sản phẩm</th><th>Giá gốc</th><th>Đang bán</th><th>Cộng thêm</th><th>Giá mới</th></tr></thead><tbody>${rows.map(r => `
-    <tr class="${changed.includes(r) ? 'sp-changed' : ''}"><td>${spEsc(r.name)}<br><small>${spEsc(r.brand)}</small></td>
-    <td>${formatCurrency(r.base)}</td><td>${formatCurrency(r.price)}</td>
-    <td>${r.markup === 0 ? '—' : (r.markup > 0 ? '+' : '') + formatCurrency(r.markup)}</td><td><strong>${formatCurrency(r.newPrice)}</strong></td></tr>`).join('')}</tbody></table>`;
-  document.getElementById('spCount').textContent = `${changed.length} sản phẩm sẽ đổi giá / ${setPrice.plan.length}.`;
-  document.getElementById('spApply').disabled = changed.length === 0;
+  const rows = spShown();
+  document.getElementById('spList').innerHTML = rows.length === 0 ? '<p class="dialog-subtext">Không có sản phẩm nào.</p>' : `
+    <table class="sp-table"><thead><tr><th></th><th>Sản phẩm</th><th>Giá gốc</th><th>Cộng thêm</th><th>Giá bán</th></tr></thead><tbody>${rows.map(p => {
+      const base = baseOf(p); const now = spNow(p); const dirty = setPrice.edits.has(p.id) && now !== p.price;
+      return `<tr class="${dirty ? 'sp-changed' : ''}"><td><input type="checkbox" data-pick="${spEsc(p.id)}" ${setPrice.picked.has(p.id) ? 'checked' : ''} aria-label="Chọn"></td>
+        <td>${spEsc(p.name)}<br><small>${spEsc(p.brandName)}${dirty ? ` · đang bán ${spEsc(formatCurrency(p.price))}` : ''}</small></td>
+        <td>${spEsc(formatCurrency(base))}</td>
+        <td><input class="form-input sp-cell" data-markup="${spEsc(p.id)}" inputmode="numeric" value="${now - base}" aria-label="Cộng thêm"></td>
+        <td><input class="form-input sp-cell" data-final="${spEsc(p.id)}" inputmode="numeric" value="${now}" aria-label="Giá bán"></td></tr>`;
+    }).join('')}</tbody></table>`;
+  updateSetPriceBars();
+}
+
+function updateSetPriceBars() {
+  const picked = [...setPrice.picked].filter(id => state.products.some(p => p.id === id)).length;
+  const dirty = spDirty().length;
+  document.getElementById('spPickedCount').textContent = picked ? `Đã chọn ${picked} máy` : 'Chưa chọn máy';
+  document.getElementById('spApplyPicked').disabled = picked === 0;
+  document.getElementById('spResetPicked').disabled = picked === 0;
+  document.getElementById('spCount').textContent = `Hiện ${spShown().length}/${state.products.length} sản phẩm · ${dirty} thay đổi chưa lưu.`;
+  document.getElementById('spApply').disabled = dirty === 0;
+}
+
+function setPriceEdit(id, price) {
+  const p = state.products.find(item => item.id === id);
+  if (!p) return;
+  if (price === p.price) setPrice.edits.delete(id); else setPrice.edits.set(id, price);
 }
 
 function openSetPriceModal() {
-  loadSetPriceSaved();
-  document.getElementById('spRound').value = String(setPrice.roundStep);
-  document.getElementById('spShift').checked = setPrice.shift;
-  renderSetPriceRules();
+  setPrice.facets = new Set(); setPrice.picked = new Set(); setPrice.edits = new Map(); setPrice.query = '';
+  document.getElementById('spSearch').value = '';
+  document.getElementById('spValue').value = '';
+  renderSetPriceFacets();
   renderSetPriceList();
   document.getElementById('setPriceModal').classList.remove('hidden');
 }
 
-async function applySetPrice() {
-  const changed = setPrice.plan.filter(r => r.newPrice !== r.price || (r.oldPrice !== null && r.newOldPrice !== r.oldPrice));
-  if (!changed.length) return;
+function applySetPricePicked(reset) {
+  const mode = document.getElementById('spMode').value;
+  const value = document.getElementById('spValue').value;
+  const step = Number(document.getElementById('spRound').value) || 0;
+  if (!reset && markupPrice(1, mode, value) === null) { showToast('Nhập mức cộng thêm hợp lệ (số, âm là giảm).', 'error'); return; }
+  for (const p of state.products) {
+    if (!setPrice.picked.has(p.id)) continue;
+    setPriceEdit(p.id, reset ? baseOf(p) : markupPrice(baseOf(p), mode, value, step));
+  }
+  renderSetPriceList();
+}
+
+async function saveSetPrice() {
+  const dirty = spDirty();
+  if (!dirty.length) return;
   const btn = document.getElementById('spApply');
   btn.disabled = true;
   let ok = 0;
-  for (const r of changed) {
-    const patch = { base_price: r.base, price: r.newPrice, updated_at: new Date().toISOString() };
-    if (r.oldPrice !== null) patch.old_price = r.newOldPrice;
-    const { error } = await supabase.from('products').update(patch).eq('id', r.id);
-    if (error) console.error('[Admin] Lỗi set giá', r.id, error); else ok++;
+  for (const p of dirty) {
+    const next = setPrice.edits.get(p.id);
+    const patch = { base_price: baseOf(p), price: next, updated_at: new Date().toISOString() };
+    // giá gạch ngang dời cùng mức đổi để mức giảm hiển thị không đổi
+    if (p.oldPrice) patch.old_price = Math.max(0, p.oldPrice + next - p.price);
+    const { error } = await supabase.from('products').update(patch).eq('id', p.id);
+    if (error) console.error('[Admin] Lỗi set giá', p.id, error); else ok++;
   }
-  showToast(ok === changed.length ? `Đã set giá ${ok} sản phẩm` : `Set được ${ok}/${changed.length}, xem lại console`, ok === changed.length ? 'success' : 'error');
+  showToast(ok === dirty.length ? `Đã lưu giá ${ok} sản phẩm` : `Lưu được ${ok}/${dirty.length}, xem lại console`, ok === dirty.length ? 'success' : 'error');
   document.getElementById('setPriceModal').classList.add('hidden');
   await loadProducts();
 }
 
 function bindSetPriceModal() {
   const close = () => document.getElementById('setPriceModal').classList.add('hidden');
-  const refresh = () => { saveSetPrice(); renderSetPriceList(); };
   document.getElementById('setPriceBtn').addEventListener('click', openSetPriceModal);
   document.getElementById('spClose').addEventListener('click', close);
-  document.getElementById('spCancel').addEventListener('click', close);
-  document.getElementById('spApply').addEventListener('click', applySetPrice);
-  document.getElementById('spAddRule').addEventListener('click', () => {
-    setPrice.rules.push({ brand: '', from: '', to: '', keyword: '', mode: 'fixed', value: '' });
-    renderSetPriceRules(); refresh();
+  document.getElementById('spCancel').addEventListener('click', () => {
+    if (spDirty().length && !confirm('Có thay đổi giá chưa lưu. Đóng và bỏ?')) return;
+    close();
   });
-  document.getElementById('spRules').addEventListener('input', (e) => {
-    const row = e.target.closest('[data-i]'); const f = e.target.dataset.f;
-    if (!row || !f) return;
-    setPrice.rules[Number(row.dataset.i)][f] = e.target.value; refresh();
+  document.getElementById('spApply').addEventListener('click', saveSetPrice);
+  document.getElementById('spApplyPicked').addEventListener('click', () => applySetPricePicked(false));
+  document.getElementById('spResetPicked').addEventListener('click', () => applySetPricePicked(true));
+  document.getElementById('spFacets').addEventListener('change', (e) => {
+    const box = e.target.closest('[data-facet]');
+    if (!box) return;
+    if (box.checked) setPrice.facets.add(box.dataset.facet); else setPrice.facets.delete(box.dataset.facet);
+    renderSetPriceList();
   });
-  document.getElementById('spRules').addEventListener('click', (e) => {
-    const del = e.target.closest('[data-del]');
-    if (!del) return;
-    setPrice.rules.splice(Number(del.dataset.del), 1); renderSetPriceRules(); refresh();
-  });
-  document.getElementById('spRound').addEventListener('change', (e) => { setPrice.roundStep = Number(e.target.value) || 0; refresh(); });
-  document.getElementById('spShift').addEventListener('change', (e) => { setPrice.shift = e.target.checked; refresh(); });
   document.getElementById('spSearch').addEventListener('input', (e) => { setPrice.query = e.target.value; renderSetPriceList(); });
-  document.getElementById('spOnlyChanged').addEventListener('change', (e) => { setPrice.onlyChanged = e.target.checked; renderSetPriceList(); });
+  document.getElementById('spPickShown').addEventListener('click', () => { spShown().forEach(p => setPrice.picked.add(p.id)); renderSetPriceList(); });
+  document.getElementById('spPickNone').addEventListener('click', () => { setPrice.picked.clear(); renderSetPriceList(); });
+  const list = document.getElementById('spList');
+  list.addEventListener('change', (e) => {
+    const pick = e.target.closest('[data-pick]');
+    if (pick) {
+      if (pick.checked) setPrice.picked.add(pick.dataset.pick); else setPrice.picked.delete(pick.dataset.pick);
+      updateSetPriceBars();
+      return;
+    }
+    // sửa trực tiếp: ô "Cộng thêm" hoặc ô "Giá bán"
+    const mk = e.target.closest('[data-markup]');
+    const fin = e.target.closest('[data-final]');
+    const id = (mk || fin)?.dataset.markup || fin?.dataset.final;
+    const p = state.products.find(item => item.id === id);
+    const n = parseAmount(e.target.value);
+    if (p && n !== null && Number.isFinite(n)) setPriceEdit(id, Math.max(0, mk ? baseOf(p) + n : n));
+    else if (p) showToast('Nhập số hợp lệ.', 'error');
+    renderSetPriceList();
+  });
 }
 
 function bindBulkDeleteModal() {

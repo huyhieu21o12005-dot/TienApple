@@ -296,3 +296,13 @@ Nút **Xóa hàng loạt** (trang Sản phẩm; nút "Xóa đã chọn" trên th
 - **Nhóm tích có sẵn:** Hãng, Tình trạng (hàng mới / Like New), Loại (điện thoại / phụ kiện), Trạng thái (đang hiện, đang ẩn, hết hàng, chưa có ảnh), Nhãn. Mỗi ô ghi số sản phẩm. Cùng nhóm là "hoặc", khác nhóm là "và" (ví dụ tích Apple + Like New + Đang ẩn = máy cũ Apple đang ẩn).
 - Danh sách sản phẩm bên dưới tự tích theo nhóm; bỏ tích từng sản phẩm hoặc lọc theo tên nếu cần. Nút **Xóa N sản phẩm** hỏi xác nhận lần cuối.
 - **Chỉ xóa sản phẩm, ảnh trong kho ảnh (product-images) được giữ lại** để dùng lại khi đăng hàng (cả khi xóa từng sản phẩm). Chỉ chủ shop và quản lý được xóa.
+
+## Set giá (cộng thêm lên giá gốc)
+
+Nút **Set giá** ở trang sản phẩm. Giá bán = **giá gốc (`base_price`) + cộng thêm**. Cần chạy `supabase/base_price.sql` một lần.
+
+- Tích **hãng**, **khoảng giá gốc**, **tình trạng** để lọc (cùng nhóm là "hoặc", khác nhóm là "và"); có ô tìm theo tên.
+- Tích máy trong bảng (hoặc "Chọn tất cả đang hiện"), nhập mức cộng thêm (đ hoặc %, số âm là giảm), chọn làm tròn lên, bấm **Áp vào máy đã chọn**. Lặp lại với nhóm khác (ví dụ Apple 20tr+ cộng 2tr, rồi iPhone dưới 3tr cộng 500k).
+- Bấm sửa trực tiếp ô **Cộng thêm** hoặc **Giá bán** của từng máy. Dòng xanh là thay đổi chưa lưu; bấm **Lưu giá** mới ghi vào cơ sở dữ liệu.
+- **Về giá gốc** đưa máy đã chọn về giá gốc. Luôn tính từ giá gốc nên không bị cộng dồn.
+- Đồng bộ giá từ Sheet cập nhật **giá gốc** và giữ phần cộng thêm đã set. Sửa giá tay một sản phẩm không đổi giá gốc.

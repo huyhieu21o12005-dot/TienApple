@@ -470,36 +470,39 @@
     </div>
   </div>
 
-  <!-- SET GIÁ (cộng thêm lên giá gốc theo quy tắc) -->
+  <!-- SET GIÁ: tích hãng / khoảng giá, cộng thêm hàng loạt, sửa trực tiếp từng máy -->
   <div id="setPriceModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="spTitle">
-    <div class="modal-dialog bd-dialog">
+    <div class="modal-dialog bd-dialog sp-dialog">
       <div class="modal-header">
         <h2 id="spTitle" class="modal-title">Set giá bán</h2>
         <button type="button" id="spClose" class="btn-icon-close" aria-label="Đóng">✕</button>
       </div>
       <div class="modal-body">
-        <p class="dialog-subtext">Giá bán = <strong>giá gốc + cộng thêm</strong>. Mỗi sản phẩm chỉ nhận <strong>một</strong> quy tắc, ưu tiên cụ thể nhất: <em>tên máy</em> &gt; <em>khoảng giá gốc</em> &gt; <em>hãng</em> &gt; <em>chung</em>. Luôn tính lại từ giá gốc nên áp dụng nhiều lần không bị cộng dồn. Để trống hết quy tắc rồi áp dụng = hoàn về giá gốc.</p>
-        <div id="spRules" class="sp-rules"></div>
+        <p class="dialog-subtext">Giá bán = <strong>giá gốc + cộng thêm</strong>. Tích hãng / khoảng giá để lọc (cùng nhóm là "hoặc", khác nhóm là "và"), tích máy cần đổi rồi nhập mức cộng thêm. Có thể bấm sửa trực tiếp từng ô. Chưa lưu cho tới khi bấm <strong>Lưu giá</strong>.</p>
+        <div id="spFacets" class="bd-facets"></div>
         <div class="bd-toolbar">
-          <button type="button" id="spAddRule" class="btn btn-secondary btn-sm">+ Thêm quy tắc</button>
-          <label class="sp-opt">Làm tròn lên
-            <select id="spRound" class="form-input">
-              <option value="0">Không</option><option value="1000">1.000đ</option><option value="10000">10.000đ</option>
-              <option value="100000">100.000đ</option><option value="500000">500.000đ</option><option value="1000000">1.000.000đ</option>
-            </select>
-          </label>
-          <label class="sp-opt"><input type="checkbox" id="spShift" checked> Dời giá gạch ngang theo</label>
+          <input type="search" id="spSearch" class="form-input" placeholder="Tìm theo tên máy..." aria-label="Tìm theo tên">
+          <button type="button" id="spPickShown" class="btn btn-secondary btn-sm">Chọn tất cả đang hiện</button>
+          <button type="button" id="spPickNone" class="btn btn-ghost btn-sm">Bỏ chọn</button>
         </div>
-        <div class="bd-toolbar">
-          <input type="search" id="spSearch" class="form-input" placeholder="Lọc danh sách theo tên..." aria-label="Lọc danh sách">
-          <label class="sp-opt"><input type="checkbox" id="spOnlyChanged"> Chỉ hiện máy thay đổi</label>
+        <div class="sp-bulk">
+          <strong id="spPickedCount">Chưa chọn máy</strong>
+          <span class="sp-plus">+</span>
+          <input id="spValue" class="form-input" inputmode="decimal" placeholder="Cộng thêm, vd 2.000.000" aria-label="Mức cộng thêm">
+          <select id="spMode" class="form-input" aria-label="Kiểu"><option value="fixed">đ</option><option value="percent">%</option></select>
+          <select id="spRound" class="form-input" aria-label="Làm tròn lên">
+            <option value="0">Không làm tròn</option><option value="1000">Tròn 1.000đ</option><option value="10000">Tròn 10.000đ</option>
+            <option value="100000">Tròn 100.000đ</option><option value="500000">Tròn 500.000đ</option><option value="1000000">Tròn 1.000.000đ</option>
+          </select>
+          <button type="button" id="spApplyPicked" class="btn btn-primary btn-sm" disabled>Áp vào máy đã chọn</button>
+          <button type="button" id="spResetPicked" class="btn btn-ghost btn-sm" disabled>Về giá gốc</button>
         </div>
         <div id="spList" class="bd-list sp-list"></div>
         <p id="spCount" class="dialog-subtext"></p>
       </div>
       <div class="modal-footer">
         <button type="button" id="spCancel" class="btn btn-secondary">Đóng</button>
-        <button type="button" id="spApply" class="btn btn-primary" disabled>Áp dụng giá</button>
+        <button type="button" id="spApply" class="btn btn-primary" disabled>Lưu giá</button>
       </div>
     </div>
   </div>
