@@ -622,7 +622,7 @@ class App {
       list = all.filter(p => { const hay = norm(`${p.name} ${p.brandName || ''} ${p.chip || ''}`); return tokens.every(t => hay.includes(t)); }).slice(0, 8);
       active = list.length ? 0 : -1;
       results.innerHTML = list.length
-        ? list.map((p, i) => `<button type="button" class="search-item" role="option" data-i="${i}">${p.image ? `<img src="${escapeHtml(safeUrl(p.image))}" alt="" loading="lazy">` : ''}<span class="si-name">${escapeHtml(p.name)}</span><span class="si-price">${CartManager.formatCurrency(Number(p.price) || 0)}</span></button>`).join('')
+        ? list.map((p, i) => `<button type="button" class="search-item" role="option" data-i="${i}">${p.image ? `<img src="${escapeHtml(safeUrl(p.image))}" alt="" loading="lazy" decoding="async">` : ''}<span class="si-name">${escapeHtml(p.name)}</span><span class="si-price">${CartManager.formatCurrency(Number(p.price) || 0)}</span></button>`).join('')
         : '<div class="search-empty">Không thấy sản phẩm phù hợp. Thử tên khác hoặc nhắn Zalo cho shop.</div>';
       paint();
     };

@@ -60,7 +60,7 @@ function render(p) {
   const specs = [['Màn hình', p.screen], ['Vi xử lý', p.chip], ['Camera', p.camera], ['Pin', p.battery]].filter(([, v]) => v);
   $('detail').innerHTML = `
     <div class="bg-[#F5F5F7] rounded-3xl p-8 flex items-center justify-center min-h-[320px] overflow-hidden">
-      <img src="${escapeHtml(safeUrl(p.image) || NO_IMAGE)}" alt="${escapeHtml(p.name)}" class="max-h-[300px] max-w-full object-contain tm-product-img ${imageZoomClass(p.image)}" onerror="this.onerror=null;this.src='${NO_IMAGE}'" />
+      <img src="${escapeHtml(safeUrl(p.image) || NO_IMAGE)}" alt="${escapeHtml(p.name)}" fetchpriority="high" decoding="async" class="max-h-[300px] max-w-full object-contain tm-product-img ${imageZoomClass(p.image)}" onerror="this.onerror=null;this.src='${NO_IMAGE}'" />
     </div>
     <div>
       <div class="flex flex-wrap items-center gap-2 mb-2">

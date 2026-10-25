@@ -35,6 +35,37 @@ export async function getSupabase() {
 }
 
 /**
+ * Client đọc dữ liệu công khai qua PostgREST bằng fetch, cùng cách dùng from().select().eq().order() như SDK.
+ * Trang chủ chỉ cần đọc sản phẩm nên không phải tải SDK Supabase (8 yêu cầu nối tiếp từ CDN).
+ * Ghi dữ liệu (đơn hàng, bảo hành, trả góp) vẫn dùng getSupabase().
+ */
+export function createRestClient({ url = SUPABASE_URL, key = SUPABASE_ANON_KEY, fetchImpl } = {}) {
+  const doFetch = fetchImpl || ((...a) => fetch(...a));
+  return {
+    from(table) {
+      let columns = '*';
+      const filters = [];
+      const orders = [];
+      const builder = {
+        select(cols = '*') { columns = cols; return builder; },
+        eq(column, value) { filters.push([column, `eq.${value}`]); return builder; },
+        order(column, { ascending = true } = {}) { orders.push(`${column}.${ascending ? 'asc' : 'desc'}`); return builder; },
+        then(resolve, reject) {
+          const params = new URLSearchParams([['select', columns], ...filters]);
+          if (orders.length) params.set('order', orders.join(','));
+          return doFetch(`${url}/rest/v1/${table}?${params}`, { headers: { apikey: key, Authorization: `Bearer ${key}` } })
+            .then(async (res) => (res.ok
+              ? { data: await res.json(), error: null }
+              : { data: null, error: { message: `HTTP ${res.status}` } }))
+            .then(resolve, reject);
+        }
+      };
+      return builder;
+    }
+  };
+}
+
+/**
  * Tải danh sách sản phẩm hiển thị từ Supabase
  * Tự động chuyển đổi từ snake_case sang camelCase theo định dạng app.js yêu cầu.
  * Nếu Supabase chưa cấu hình hoặc gặp lỗi mạng, trả về null để app.js kích hoạt fallback.
@@ -43,6 +74,7 @@ export async function getSupabase() {
  * @param {boolean} [options.allowEmpty] true: truy vấn thành công mà không có sản phẩm thì trả [] thay vì null (web không hiện hàng mẫu)
  * @param {string} [options.kind] Lọc theo loại 'phone' hoặc 'accessory' (tùy chọn)
  * @param {object} [options.client] Supabase client truyền sẵn (dùng cho kiểm thử)
+ * @param {Function} [options.fetchImpl] fetch thay thế (dùng cho kiểm thử)
  * @returns {Promise<Array<object>|null>}
  */
 export async function fetchProducts(options = {}) {
@@ -52,8 +84,7 @@ export async function fetchProducts(options = {}) {
   }
 
   try {
-    const supabase = options.client || await getSupabase();
-    if (!supabase) return null;
+    const supabase = options.client || createRestClient({ fetchImpl: options.fetchImpl });
 
     let query = supabase
       .from('products')

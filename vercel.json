@@ -4,11 +4,34 @@
     {
       "src": "/product.html",
       "has": [
-        { "type": "header", "key": "user-agent", "value": ".*(facebookexternalhit|facebot|Messenger|Zalo|Twitterbot|TelegramBot|Slackbot|LinkedInBot|WhatsApp|Discordbot|Viber|Pinterest|Googlebot|bingbot).*" },
-        { "type": "query", "key": "id" }
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|facebot|Messenger|Zalo|Twitterbot|TelegramBot|Slackbot|LinkedInBot|WhatsApp|Discordbot|Viber|Pinterest|Googlebot|bingbot).*"
+        },
+        {
+          "type": "query",
+          "key": "id"
+        }
       ],
       "dest": "/api/product-og"
     },
-    { "handle": "filesystem" }
+    {
+      "src": "/(assets|models)/(.*)",
+      "headers": {
+        "Cache-Control": "public, max-age=2592000, stale-while-revalidate=86400"
+      },
+      "continue": true
+    },
+    {
+      "src": "/(js|css)/(.*)",
+      "headers": {
+        "Cache-Control": "public, max-age=3600, stale-while-revalidate=604800"
+      },
+      "continue": true
+    },
+    {
+      "handle": "filesystem"
+    }
   ]
 }

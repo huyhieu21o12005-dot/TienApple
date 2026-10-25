@@ -9,6 +9,8 @@
  * - Full Touch & Mouse Swipe / Flick momentum rotation
  */
 
+import { loadScriptsInOrder, whenPageIdle } from './lazyScripts.js';
+
 export class Phone3DStudio {
   constructor(canvasId = 'phone3DCanvas', containerId = 'phone3DCanvasWrap') {
     this.canvas = document.getElementById(canvasId);
@@ -24,7 +26,11 @@ export class Phone3DStudio {
     this.lastInteractionTime = 0;
     this.contactShadow = document.getElementById('phoneContactShadow');
 
-    this.init();
+    // three.js (~700KB) và mô hình 3D chỉ tải khi trang đã hiện xong và trình duyệt rảnh
+    whenPageIdle(() => {
+      const ready = typeof THREE !== 'undefined' ? Promise.resolve() : loadScriptsInOrder(['js/three.min.js', 'js/GLTFLoader.js']);
+      ready.then(() => this.init()).catch((err) => console.warn('Không tải được thư viện 3D:', err));
+    });
   }
 
   init() {

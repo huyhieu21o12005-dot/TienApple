@@ -43,6 +43,7 @@ export function productCardHtml(p, opts = {}) {
               class="h-full object-contain transition-transform duration-300 ${imageZoomClass(p.image) || 'group-hover:scale-105'}"
               src="${escapeHtml(safeUrl(p.image) || NO_IMAGE)}"
               loading="lazy"
+              decoding="async"
             />
           </div>
 
@@ -124,7 +125,7 @@ export function cartItemHtml(item, index) {
   return `
         <div class="p-3.5 rounded-2xl bg-[#F5F5F7] flex gap-3.5 relative">
           <div class="w-[72px] h-[72px] rounded-xl bg-white flex-shrink-0 p-1 flex items-center justify-center border border-[#D2D2D7]/50">
-            <img class="max-h-full max-w-full object-contain ${imageZoomClass(product.image)}" src="${escapeHtml(safeUrl(product.image) || NO_IMAGE)}" alt="${escapeHtml(product.name)}" />
+            <img class="max-h-full max-w-full object-contain ${imageZoomClass(product.image)}" src="${escapeHtml(safeUrl(product.image) || NO_IMAGE)}" alt="${escapeHtml(product.name)}" loading="lazy" decoding="async" />
           </div>
           <div class="flex-1 min-w-0 flex flex-col justify-between">
             <div>
