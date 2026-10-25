@@ -5,7 +5,7 @@
  */
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
-import { buildInvoice, invoiceHtml, buildContract, contractHtml, CONTRACT_TYPES, INVOICE_TABLES, INVOICE_TYPES } from './invoiceHelpers.js';
+import { SHOP, buildInvoice, invoiceHtml, buildContract, contractHtml, CONTRACT_TYPES, INVOICE_TABLES, INVOICE_TYPES } from './invoiceHelpers.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -51,6 +51,60 @@ function setEditing(on) {
   $('editBtn').classList.toggle('active', on);
 }
 
+const SHOP_KEY = 'tm_print_shop';
+let record = null;
+let docType = '';
+let isContractDoc = false;
+const extra = {};
+
+function loadShop() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SHOP_KEY) || '{}');
+    for (const k of ['name', 'address', 'hotline']) if (typeof saved[k] === 'string' && saved[k]) SHOP[k] = saved[k];
+  } catch { /* bỏ qua */ }
+}
+
+function saveShop() {
+  try { localStorage.setItem(SHOP_KEY, JSON.stringify({ name: SHOP.name, address: SHOP.address, hotline: SHOP.hotline })); } catch { /* bỏ qua */ }
+}
+
+function render() {
+  $('sheet').innerHTML = isContractDoc
+    ? contractHtml(buildContract(docType, record, extra))
+    : invoiceHtml(buildInvoice(docType, record));
+}
+
+function buildInfoForm() {
+  const fields = [
+    ['Tên cửa hàng', () => SHOP.name, v => { SHOP.name = v; saveShop(); }],
+    ['Địa chỉ cửa hàng', () => SHOP.address, v => { SHOP.address = v; saveShop(); }],
+    ['Hotline', () => SHOP.hotline, v => { SHOP.hotline = v; saveShop(); }],
+    ['Tên khách hàng', () => record.customer_name || '', v => { record.customer_name = v; }],
+    ['Số điện thoại khách', () => record.phone || '', v => { record.phone = v; }]
+  ];
+  if (docType !== 'installment' || isContractDoc) fields.push(['Địa chỉ khách', () => record.address || '', v => { record.address = v; }]);
+  if (isContractDoc) {
+    fields.push(
+      ['Đại diện bên bán', () => extra.rep || '', v => { extra.rep = v; }],
+      ['CCCD/CMND khách', () => extra.cccd || '', v => { extra.cccd = v; }],
+      ['Bảo hành (tháng)', () => extra.warrantyMonths || '', v => { extra.warrantyMonths = v; }]
+    );
+  }
+  const box = $('infoFields');
+  box.innerHTML = '';
+  for (const [label, get, set] of fields) {
+    const wrap = document.createElement('label');
+    wrap.textContent = label;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = get();
+    input.addEventListener('input', () => { set(input.value.trim()); render(); });
+    wrap.appendChild(input);
+    box.appendChild(wrap);
+  }
+  $('info').hidden = false;
+}
+
 async function init() {
   $('editBtn').addEventListener('click', () => setEditing(!document.body.classList.contains('editing')));
   $('printBtn').addEventListener('click', () => window.print());
@@ -78,7 +132,12 @@ async function init() {
     if (error || !data) return fail('Không tìm thấy dữ liệu để in.');
 
     document.title = `${data.code} - ${isContract ? 'In hợp đồng' : 'In hóa đơn'}`;
-    $('sheet').innerHTML = isContract ? contractHtml(buildContract(type, data)) : invoiceHtml(buildInvoice(type, data));
+    record = { ...data };
+    docType = type;
+    isContractDoc = isContract;
+    loadShop();
+    render();
+    buildInfoForm();
     $('sheet').hidden = false;
     $('msg').hidden = true;
     $('hint').hidden = false;

@@ -68,6 +68,11 @@
     .ct-article { page-break-inside: avoid; }
     body.editing .sheet { outline: 2px dashed #0071E3; outline-offset: 4px; cursor: text; }
     body.editing .sheet:focus { outline-style: solid; }
+    .info { max-width: 820px; margin: 12px auto 0; padding: 12px; background: #fff; border: 1px solid var(--line); border-radius: 12px; font-family: "Inter", -apple-system, Arial, sans-serif; }
+    .info-t { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    .info-g { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px; }
+    .info label { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--muted); }
+    .info input { height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; font: inherit; font-size: 14px; color: var(--ink); }
     #hint { text-align: center; font-size: 13px; color: var(--muted); margin: 8px 12px 0; }
 
     /* Bố cục hóa đơn cửa hàng: chữ Times New Roman, tiêu đề in hoa, bảng có viền */
@@ -96,7 +101,7 @@
     .ct-intro, .ct-article p { text-align: justify; }
     @page { size: 80mm auto; margin: 0; }
     @media print {
-      #hint { display: none !important; }
+      #hint, .info { display: none !important; }
       .sheet { outline: none !important; }
       body { background: #fff; }
       .bar, #msg { display: none !important; }
@@ -114,6 +119,10 @@
     <button type="button" id="pa5">Giấy A5</button>
     <a href="javascript:history.back()">← Quay lại</a>
   </div>
+  <form id="info" class="info" hidden autocomplete="off">
+    <div class="info-t">Thông tin trên phiếu (sửa xong phiếu cập nhật ngay, chỉ áp dụng cho bản in)</div>
+    <div class="info-g" id="infoFields"></div>
+  </form>
   <p id="hint" hidden>Bấm vào chữ trên phiếu để sửa trực tiếp (tên, số điện thoại, địa chỉ, chỗ chấm...), xong bấm In. Chỉnh sửa chỉ áp dụng cho bản in, không lưu vào dữ liệu.</p>
   <p id="msg">Đang tải...</p>
   <main class="sheet hidden-until-ready" id="sheet" hidden></main>

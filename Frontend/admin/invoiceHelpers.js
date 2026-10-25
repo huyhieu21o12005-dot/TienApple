@@ -14,7 +14,8 @@ export const SHOP = {
   tagline: 'Điện thoại chính hãng & Sửa chữa lấy ngay',
   hotline: '0986 455 457 - 0933 266 179',
   website: 'tienappletd.com',
-  hours: '7h - 21h (T2 - CN)'
+  hours: '7h - 21h (T2 - CN)',
+  address: ''
 };
 
 export const INVOICE_TYPES = ['order', 'booking', 'warranty', 'installment'];
@@ -166,6 +167,7 @@ export function invoiceHtml(inv) {
   <div class="inv-head">
     <div class="inv-shop">${escapeHtml(SHOP.name)}</div>
     <div class="inv-small">${escapeHtml(SHOP.tagline)}</div>
+    ${SHOP.address ? `<div class="inv-small">${escapeHtml(SHOP.address)}</div>` : ''}
     <div class="inv-small">Hotline: ${escapeHtml(SHOP.hotline)}</div>
     <div class="inv-small">${escapeHtml(SHOP.website)} · ${escapeHtml(SHOP.hours)}</div>
   </div>
@@ -196,22 +198,22 @@ function longDate(value) {
   return `ngày ${d.getDate()} tháng ${d.getMonth() + 1} năm ${d.getFullYear()}`;
 }
 
-function sellerParty() {
+function sellerParty(extra) {
   return {
     heading: 'BÊN A - BÊN BÁN',
     rows: [
       ['Đơn vị', SHOP.name],
-      ['Địa chỉ', BLANK],
+      ['Địa chỉ', SHOP.address || BLANK],
       ['Điện thoại', SHOP.hotline],
-      ['Đại diện', `${BLANK_SHORT} Chức vụ: ${BLANK_SHORT}`]
+      ['Đại diện', extra.rep || `${BLANK_SHORT} Chức vụ: ${BLANK_SHORT}`]
     ]
   };
 }
 
-function buyerParty(r) {
+function buyerParty(r, extra) {
   const rows = [['Họ và tên', r.customer_name], ['Điện thoại', r.phone]];
   rows.push(['Địa chỉ', r.address || BLANK]);
-  rows.push(['CCCD/CMND số', `${BLANK_SHORT} cấp ngày ${BLANK_SHORT} nơi cấp ${BLANK_SHORT}`]);
+  rows.push(['CCCD/CMND số', extra.cccd || `${BLANK_SHORT} cấp ngày ${BLANK_SHORT} nơi cấp ${BLANK_SHORT}`]);
   return { heading: 'BÊN B - BÊN MUA', rows };
 }
 
@@ -229,12 +231,12 @@ const GENERAL_ARTICLE = {
  * @param {'order'|'installment'} type
  * @param {object} r bản ghi lấy từ Supabase
  */
-export function buildContract(type, r) {
+export function buildContract(type, r, extra = {}) {
   if (!CONTRACT_TYPES.includes(type) || !r || typeof r !== 'object') return null;
   const base = {
     place: 'Thủ Đức',
     signatures: ['ĐẠI DIỆN BÊN BÁN (ký, ghi rõ họ tên, đóng dấu)', 'BÊN MUA (ký, ghi rõ họ tên)'],
-    parties: [sellerParty(), buyerParty(r)]
+    parties: [sellerParty(extra), buyerParty(r, extra)]
   };
 
   if (type === 'order') {
@@ -266,7 +268,7 @@ export function buildContract(type, r) {
           `Địa điểm giao nhận: ${r.address || BLANK}.`,
           'Bên A giao hàng đúng chủng loại, số lượng đã thỏa thuận. Bên B kiểm tra ngoại quan và tình trạng hoạt động của máy trước khi nhận.'
         ] },
-        { heading: 'Điều 4. Bảo hành', paragraphs: [`Thời hạn bảo hành: ${BLANK_SHORT} tháng, theo phiếu bảo hành và chính sách của Bên A. Khách tra cứu bảo hành bằng số điện thoại tại ${SHOP.website}.`] },
+        { heading: 'Điều 4. Bảo hành', paragraphs: [`Thời hạn bảo hành: ${extra.warrantyMonths || BLANK_SHORT} tháng, theo phiếu bảo hành và chính sách của Bên A. Khách tra cứu bảo hành bằng số điện thoại tại ${SHOP.website}.`] },
         GENERAL_ARTICLE
       ]
     };
@@ -305,7 +307,7 @@ export function buildContract(type, r) {
         'Bên B thanh toán đủ và đúng hạn các kỳ góp theo Điều 2.',
         `Trường hợp chậm thanh toán, hai bên xử lý theo thỏa thuận: ${BLANK}.`
       ] },
-      { heading: 'Điều 5. Bảo hành', paragraphs: [`Thời hạn bảo hành: ${BLANK_SHORT} tháng, theo phiếu bảo hành và chính sách của Bên A.`] },
+      { heading: 'Điều 5. Bảo hành', paragraphs: [`Thời hạn bảo hành: ${extra.warrantyMonths || BLANK_SHORT} tháng, theo phiếu bảo hành và chính sách của Bên A.`] },
       GENERAL_ARTICLE
     ]
   };
