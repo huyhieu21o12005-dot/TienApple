@@ -282,3 +282,10 @@ Trang **Sản phẩm** có hai nút. Cả hai đọc tab `TONG_HOP` của Google
 - **Cập nhật giá từ Sheet**: đổi giá cho **điện thoại hàng mới đã có trên web**. Giá bán = "Giá Sau Sale", giá gạch ngang = "Giá Bán" (khi có sale). Hàng Like New, hàng cũ, phụ kiện không bị đổi. Giá lệch hơn 30% tô vàng và không tự tick.
 - Tên sản phẩm tạo ra có dạng "<Mẫu> <Dung lượng>" (Samsung/OPPO... thêm tên hãng phía trước nếu mẫu chưa có). Mỗi dung lượng là một sản phẩm riêng.
 - **Thêm máy cũ từ Sheet**: đọc tab `2ND`, mỗi dòng là một sản phẩm riêng (Like New, tồn kho theo sheet, thường là 1). Tab trong bảng xem trước theo dòng máy (iPhone 17, iPhone 16 ... iPad, Apple Watch). Máy đã có trên web (theo mã tạo từ mẫu + dung lượng + mô tả) và máy hết hàng bị bỏ qua. Giá gốc trong sheet không được đọc. Đồng hồ và iPad vào mục phụ kiện. Lưu ý: nếu sửa mô tả của một máy trong sheet, web coi là máy mới; máy đã bán nhớ ẩn hoặc xóa trên web.
+
+### Ảnh minh họa theo mẫu máy
+
+- Bảng ảnh nằm ở `Frontend/admin/modelImages.js` (khóa = tên mẫu, giá trị = ảnh sản phẩm chính thức trên CDN của hãng). Hiện có Apple: iPhone 17 Pro Max/Pro, 16 (4 mẫu), 15 (4), 14 (4), 13, 12, XS Max, iPad Air 11 M2, Apple Watch Series 9. Mẫu không có trong bảng giữ ảnh tạm "Đang cập nhật ảnh".
+- Hai nút **Thêm SP mới từ Sheet** và **Thêm máy cũ từ Sheet** tự gắn ảnh nếu có mẫu khớp. Máy cũ có ảnh minh họa được thêm dòng "Ảnh minh họa, ảnh máy thật vui lòng liên hệ cửa hàng" vào mô tả.
+- Nút **Gắn ảnh minh họa** gắn ảnh cho sản phẩm đã có trên web mà chưa có ảnh (chỉ những mẫu khớp trong bảng); xem trước ảnh rồi tick.
+- Ảnh máy thật: thay ở trang sửa sản phẩm, sau đó ảnh minh họa không bị ghi đè (nút chỉ gắn cho sản phẩm chưa có ảnh).

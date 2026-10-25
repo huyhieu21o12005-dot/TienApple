@@ -1397,3 +1397,4 @@ body[data-role="staff"] [data-action="delete"] { display: none !important; }
 .sheet-tab.active { background: #1D1D1F; border-color: #1D1D1F; color: #fff; }
 .sheet-tab.active span { color: #D2D2D7; }
 .sheet-opt { display: flex; gap: 8px; align-items: center; margin: 12px 0 4px; font-size: 14px; }
+.sheet-thumb { width: 56px; height: 56px; object-fit: contain; background: #F5F5F7; border-radius: 8px; }

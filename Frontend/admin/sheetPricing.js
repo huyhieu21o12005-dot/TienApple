@@ -6,6 +6,8 @@
  *   Giá gạch ngang (old_price)    = cột "Giá Bán" khi có sale, ngược lại bỏ trống
  */
 
+import { imageFor } from './modelImages.js';
+
 export const SHEET_ID = '1Ta3iJAafT8pnm4kuqSvPUqnJO-HLHq7s3Dk_clkIyQE';
 /** Tab tổng hợp (gộp các tab dòng máy / hãng) mà web đọc. Đổi tên tab thì sửa ở đây. */
 export const SHEET_TAB = 'TONG_HOP';
@@ -158,6 +160,9 @@ export function planPriceUpdates(products, sheetRows) {
 /** Không phải điện thoại (đồng hồ, máy tính bảng, tai nghe...): không tự tạo vào mục điện thoại. */
 const NOT_PHONE = /\b(watch|ipad|macbook|airpods|tai nghe|sac|cap)\b/i;
 
+/** Ghi chú thêm vào mô tả máy cũ khi dùng ảnh minh họa của mẫu. */
+export const USED_IMAGE_NOTE = 'Ảnh minh họa, ảnh máy thật vui lòng liên hệ cửa hàng';
+
 const BRAND_NAMES = { apple: 'Apple iPhone', samsung: 'Samsung Galaxy', xiaomi: 'Xiaomi', oppo: 'OPPO', vivo: 'Vivo', realme: 'Realme' };
 
 /** "iPhone 16 Pro Max 256GB" -> "iphone-16-pro-max-256gb". */
@@ -211,7 +216,7 @@ export function planNewProducts(existingProducts, sheetRows, { visible = false }
         colors: [], default_color: '', storages: r.storage ? [r.storage] : [],
         chip: '', camera: '', battery: '', screen: '',
         description: [r.ram && r.ram !== '--' && `RAM ${r.ram}`, r.storage && `Bộ nhớ ${r.storage}`, r.warranty && `Bảo hành ${r.warranty}`].filter(Boolean).join(' • '),
-        rating: 5, review_count: 0, image_url: '', stock: r.stock, is_visible: Boolean(visible), sort_order: 0
+        rating: 5, review_count: 0, image_url: imageFor(name), stock: r.stock, is_visible: Boolean(visible), sort_order: 0
       }
     });
   }
@@ -285,6 +290,7 @@ export function planUsedProducts(existingProducts, usedRows, { visible = false }
     const isPhone = /^iphone/i.test(r.model);
     const color = colorOf(r.description);
     const name = [r.model, r.storage, color && `- ${color}`, r.condition && `- ${r.condition}`].filter(Boolean).join(' ').replace(/\s+-\s+/g, ' - ');
+    const image = imageFor(r.model);
     const battery = /pin\s*(new|\d+%|\d+x%)/i.exec(r.description);
     out.items.push({
       key: r.id, brand: r.group, line: r.line,
@@ -295,8 +301,8 @@ export function planUsedProducts(existingProducts, usedRows, { visible = false }
         price: r.finalPrice, old_price: null,
         colors: [], default_color: color, storages: r.storage ? [r.storage] : [],
         chip: '', camera: '', screen: '', battery: battery ? `Pin ${battery[1]}` : '',
-        description: [r.description, r.ram && r.ram !== '--' && `RAM ${r.ram}`].filter(Boolean).join(' • '),
-        rating: 5, review_count: 0, image_url: '', stock: r.stock, is_visible: Boolean(visible), sort_order: 0
+        description: [r.description, r.ram && r.ram !== '--' && `RAM ${r.ram}`, image && USED_IMAGE_NOTE].filter(Boolean).join(' • '),
+        rating: 5, review_count: 0, image_url: image, stock: r.stock, is_visible: Boolean(visible), sort_order: 0
       }
     });
   }

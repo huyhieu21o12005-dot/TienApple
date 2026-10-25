@@ -106,7 +106,7 @@ describe('sheetPricing - sản phẩm mới', () => {
     assert.equal(p.condition, 'new');
     assert.equal(p.price, 18574800);
     assert.equal(p.old_price, 20190000);
-    assert.equal(p.image_url, '');
+    assert.match(p.image_url, /iphone-15-finish-select/);
     assert.equal(planNewProducts([], rows, { visible: true }).items[0].product.is_visible, true);
     assert.equal(new Set(plan.items.map(i => i.product.id)).size, plan.items.length);
   });

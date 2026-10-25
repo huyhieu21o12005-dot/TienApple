@@ -4,6 +4,8 @@
  * Visibility Toggle, Bulk Operations, Image Upload with Client Resize, and Filters.
  */
 
+import { imageFor } from './modelImages.js';
+import { USED_IMAGE_NOTE } from './sheetPricing.js';
 import { SHEET_CSV_URL, SHEET_TAB, SHEET_USED_CSV_URL, SHEET_USED_TAB, parseSheetRows, parseSheetDate, parseUsedRows, planPriceUpdates, planNewProducts, planUsedProducts } from './sheetPricing.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
 import {
@@ -719,9 +721,12 @@ function closeSheetPriceModal() {
 function renderSheetModal() {
   const body = document.getElementById('sheetPriceBody');
   const applyBtn = document.getElementById('applySheetPriceBtn');
-  const isNew = sheetState.mode !== 'price';
-  document.getElementById('sheetPriceTitle').textContent = sheetState.mode === 'used' ? 'Thêm máy cũ (tab 2ND) từ Google Sheet' : (isNew ? 'Thêm sản phẩm mới từ Google Sheet' : 'Cập nhật giá từ Google Sheet');
-  document.getElementById('sheetPriceIntro').innerHTML = sheetState.mode === 'used'
+  const isNew = sheetState.mode === 'new' || sheetState.mode === 'used';
+  const isImages = sheetState.mode === 'images';
+  document.getElementById('sheetPriceTitle').textContent = isImages ? 'Gắn ảnh minh họa cho sản phẩm chưa có ảnh' :  sheetState.mode === 'used' ? 'Thêm máy cũ (tab 2ND) từ Google Sheet' : (isNew ? 'Thêm sản phẩm mới từ Google Sheet' : 'Cập nhật giá từ Google Sheet');
+  document.getElementById('sheetPriceIntro').innerHTML = isImages
+    ? 'Ảnh sản phẩm chính thức của hãng, ghép theo <strong>tên mẫu máy</strong>. Chỉ gắn cho sản phẩm <strong>chưa có ảnh</strong>; máy cũ được thêm dòng "ảnh minh họa" vào mô tả. Bạn thay bằng ảnh máy thật sau ở trang sửa sản phẩm.'
+    : sheetState.mode === 'used'
     ? 'Mỗi máy cũ là <strong>một sản phẩm riêng</strong> (Like New, tồn kho theo sheet). Máy đã có trên web hoặc đã hết hàng trong sheet được bỏ qua. Giá gốc trong sheet không được đọc.'
     : isNew
     ? 'Web rà sheet, <strong>bỏ qua máy đã có</strong> và chỉ thêm máy mới (hàng mới 100%). Ảnh, màu, thông số để trống, bạn bổ sung sau.'
@@ -734,12 +739,14 @@ function renderSheetModal() {
   const chips = `<div class="sheet-tabs" role="tablist">${tabs.map(([k, label, n]) =>
     `<button type="button" role="tab" class="sheet-tab ${sheetState.tab === k ? 'active' : ''}" data-tab="${escapeHtml(k)}">${escapeHtml(label)} <span>${n}</span></button>`).join('')}</div>`;
   const price = (n) => escapeHtml(formatCurrency(n));
-  const rows = shown.length === 0 ? `<p>${isNew ? 'Không có sản phẩm mới ở mục này.' : 'Không có giá nào cần đổi ở mục này.'}</p>` : `
-    <table class="sheet-price-table"><thead><tr><th></th><th>Sản phẩm</th><th>${isNew ? 'Giá bán' : 'Giá cũ'}</th>${isNew ? '<th>Tồn</th>' : '<th>Giá mới</th>'}</tr></thead><tbody>
+  const rows = shown.length === 0 ? `<p>${isImages ? 'Không có sản phẩm nào cần gắn ảnh ở mục này.' : isNew ? 'Không có sản phẩm mới ở mục này.' : 'Không có giá nào cần đổi ở mục này.'}</p>` : `
+    <table class="sheet-price-table"><thead><tr><th></th><th>Sản phẩm</th>${isImages ? '<th>Ảnh</th>' : `<th>${isNew ? 'Giá bán' : 'Giá cũ'}</th>${isNew ? '<th>Tồn</th>' : '<th>Giá mới</th>'}`}</tr></thead><tbody>
     ${shown.map(i => `<tr class="${i.warn ? 'sheet-price-warn' : ''}">
       <td><input type="checkbox" class="sheet-price-check" data-i="${sheetState.items.indexOf(i)}" ${i.checked ? 'checked' : ''} aria-label="Chọn ${escapeHtml(i.name)}"></td>
       <td>${escapeHtml(i.name)}${i.warn ? '<br><small>Lệch hơn 30%, hãy kiểm tra trước khi tick.</small>' : ''}</td>
-      ${isNew
+      ${isImages
+        ? `<td><img src="${escapeHtml(i.image)}" alt="" class="sheet-thumb" loading="lazy"></td>`
+        : isNew
         ? `<td>${price(i.newPrice)}</td><td>${Number(i.stock) || 0}</td>`
         : `<td>${price(i.oldPrice)}</td><td><strong>${price(i.newPrice)}</strong>${i.newList ? `<br><small>gạch: ${price(i.newList)}</small>` : ''}</td>`}
     </tr>`).join('')}</tbody></table>`;
@@ -747,7 +754,20 @@ function renderSheetModal() {
   body.innerHTML = `${chips}${rows}${visibleOpt}<p class="dialog-subtext">${escapeHtml(sheetState.info)}</p>`;
   const checked = sheetState.items.filter(i => i.checked).length;
   applyBtn.disabled = checked === 0;
-  applyBtn.textContent = isNew ? `Thêm ${checked} sản phẩm` : `Áp dụng giá (${checked})`;
+  applyBtn.textContent = isImages ? `Gắn ảnh (${checked})` : isNew ? `Thêm ${checked} sản phẩm` : `Áp dụng giá (${checked})`;
+}
+
+function openImageModal() {
+  sheetState.mode = 'images';
+  sheetState.tab = 'all';
+  sheetState.error = '';
+  document.getElementById('sheetPriceModal').classList.remove('hidden');
+  const withoutImage = state.products.filter(p => !p.image);
+  sheetState.items = withoutImage
+    .map(p => ({ id: p.id, name: p.name, brand: p.brandName || p.brand || 'Khác', image: imageFor(p.name), description: p.description || '', used: p.condition === 'likenew', checked: true }))
+    .filter(i => i.image);
+  sheetState.info = `Sản phẩm chưa có ảnh: ${withoutImage.length} · Có ảnh minh họa trong kho: ${sheetState.items.length} · Còn lại giữ ảnh tạm.`;
+  renderSheetModal();
 }
 
 async function openSheetModal(mode) {
@@ -795,7 +815,15 @@ async function applySheetChanges() {
   const applyBtn = document.getElementById('applySheetPriceBtn');
   applyBtn.disabled = true;
   let ok = 0;
-  if (sheetState.mode !== 'price') {
+  if (sheetState.mode === 'images') {
+    for (const c of picked) {
+      const description = c.used && !c.description.includes(USED_IMAGE_NOTE) ? [c.description, USED_IMAGE_NOTE].filter(Boolean).join(' • ') : c.description;
+      const { error } = await supabase.from('products').update({ image_url: c.image, description, updated_at: new Date().toISOString() }).eq('id', c.id);
+      if (error) console.error('[Admin] Lỗi gắn ảnh', c.id, error);
+      else ok++;
+    }
+    showToast(ok === picked.length ? `Đã gắn ảnh cho ${ok} sản phẩm` : `Gắn được ${ok}/${picked.length}, xem lại console`, ok === picked.length ? 'success' : 'error');
+  } else if (sheetState.mode !== 'price') {
     const visible = Boolean(document.getElementById('sheetVisibleNow')?.checked);
     for (let i = 0; i < picked.length; i += 25) {
       const batch = picked.slice(i, i + 25).map(p => ({ ...p.product, is_visible: visible }));
@@ -820,6 +848,7 @@ async function applySheetChanges() {
 
 function bindSheetModal() {
   document.getElementById('sheetNewBtn').addEventListener('click', () => openSheetModal('new'));
+  document.getElementById('sheetImageBtn').addEventListener('click', openImageModal);
   document.getElementById('sheetUsedBtn').addEventListener('click', () => openSheetModal('used'));
   document.getElementById('sheetPriceBtn').addEventListener('click', () => openSheetModal('price'));
   document.getElementById('closeSheetPriceBtn').addEventListener('click', closeSheetPriceModal);
@@ -836,7 +865,7 @@ function bindSheetModal() {
     const checked = sheetState.items.filter(i => i.checked).length;
     const btn = document.getElementById('applySheetPriceBtn');
     btn.disabled = checked === 0;
-    btn.textContent = sheetState.mode !== 'price' ? `Thêm ${checked} sản phẩm` : `Áp dụng giá (${checked})`;
+    btn.textContent = sheetState.mode === 'images' ? `Gắn ảnh (${checked})` : sheetState.mode !== 'price' ? `Thêm ${checked} sản phẩm` : `Áp dụng giá (${checked})`;
   });
 }
 
