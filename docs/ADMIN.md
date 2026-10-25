@@ -1,4 +1,4 @@
-# Hướng Dẫn Quản Trị & Cấu Hình Supabase Cho Tiến Mobile
+# Hướng Dẫn Quản Trị & Cấu Hình Supabase Cho Tien Mobile Thu Duc
 
 Tài liệu này hướng dẫn chi tiết từng bước để thiết lập cơ sở dữ liệu Supabase, tạo tài khoản quản trị viên, cấu hình kho lưu trữ hình ảnh và vận hành trang Quản trị sản phẩm (`Frontend/admin/`) cho **Tiến Mobile**.
 

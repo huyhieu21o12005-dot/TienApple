@@ -10,7 +10,7 @@ import { formatDateTime } from './ordersHelpers.js';
 import { installmentStatusLabel, nextDueDate } from '../js/installment.js';
 
 export const SHOP = {
-  name: 'TIEN MOBILE',
+  name: 'TIEN MOBILE THU DUC',
   tagline: 'Điện thoại chính hãng & Sửa chữa lấy ngay',
   hotline: '0986 455 457 - 0933 266 179',
   website: 'tienappletd.com',

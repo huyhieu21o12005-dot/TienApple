@@ -727,7 +727,7 @@ class App {
       chatSendBtn.addEventListener('click', () => {
         const input = document.getElementById('chat-input');
         if (input && input.value.trim()) {
-          this.showToast('Tien Mobile đã nhận tin nhắn. Kỹ thuật viên sẽ hỗ trợ bạn sau vài giây!');
+          this.showToast('Tien Mobile Thu Duc đã nhận tin nhắn. Kỹ thuật viên sẽ hỗ trợ bạn sau vài giây!');
           input.value = '';
         }
       });

@@ -348,7 +348,7 @@ begin
     select count(*) into f from public.warranties
       where (start_date + make_interval(months => warranty_months))::date between current_date and current_date + 30;
     select count(*) into g from public.installments where status = 'active';
-    v_text := E'\U0001f3ea <b>TIEN MOBILE \u00b7 QU\u1ea2N L\u00dd</b>'
+    v_text := E'\U0001f3ea <b>TIEN MOBILE THU DUC \u00b7 QU\u1ea2N L\u00dd</b>'
       || E'\n\u0110\u01a1n m\u1edbi: <b>' || a || E'</b> \u00b7 L\u1ecbch s\u1eeda m\u1edbi: <b>' || b || E'</b> \u00b7 Thu c\u0169 m\u1edbi: <b>' || c || '</b>'
       || E'\nB\u1ea3o h\u00e0nh s\u1eafp h\u1ebft h\u1ea1n (30 ng\u00e0y): <b>' || f || E'</b> \u00b7 Tr\u1ea3 g\u00f3p \u0111ang g\u00f3p: <b>' || g || '</b>'
       || E'\n\nCh\u1ecdn m\u1ee5c b\u00ean d\u01b0\u1edbi:';
@@ -563,7 +563,7 @@ begin
   if v_cmd = '/start' then
     perform public.tg_call('sendMessage', jsonb_build_object('message_thread_id', v_thread,
       'chat_id', v_chat,
-      'text', E'\U0001f44b Ch\u00e0o m\u1eebng \u0111\u1ebfn <b>Tien Mobile \u00b7 Qu\u1ea3n l\u00fd</b>. D\u00f9ng b\u00e0n ph\u00edm b\u00ean d\u01b0\u1edbi ho\u1eb7c g\u00f5 /help.',
+      'text', E'\U0001f44b Ch\u00e0o m\u1eebng \u0111\u1ebfn <b>Tien Mobile Thu Duc \u00b7 Qu\u1ea3n l\u00fd</b>. D\u00f9ng b\u00e0n ph\u00edm b\u00ean d\u01b0\u1edbi ho\u1eb7c g\u00f5 /help.',
       'parse_mode', 'HTML',
       'reply_markup', public.tg_keyboard()));
     v_screen := public.tg_screen('m');

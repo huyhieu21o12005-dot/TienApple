@@ -29,7 +29,7 @@ export function validateZaloOffer(data) {
  */
 export function buildZaloMessage(data) {
   const lines = [
-    'ƯU ĐÃI SỬA CHỮA GIẢM 10% - TIEN MOBILE',
+    'ƯU ĐÃI SỬA CHỮA GIẢM 10% - TIEN MOBILE THU DUC',
     `Họ tên: ${text(data.name).slice(0, 100)}`,
     `SĐT: ${normalizePhone(data.phone) || text(data.phone)}`,
     `Máy: ${text(data.device).slice(0, 100)}`,

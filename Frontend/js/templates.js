@@ -189,7 +189,7 @@ export function warrantyResultsHtml(records) {
     return `
         <div class="rounded-2xl bg-[#F5F5F7] p-6 text-center text-[#6E6E73]">
           <p class="text-[15px] font-medium text-[#1D1D1F]">Không tìm thấy phiếu bảo hành</p>
-          <p class="text-[13px] mt-1">Số điện thoại này chưa có phiếu bảo hành tại Tien Mobile. Vui lòng kiểm tra lại số hoặc liên hệ hotline.</p>
+          <p class="text-[13px] mt-1">Số điện thoại này chưa có phiếu bảo hành tại Tien Mobile Thu Duc. Vui lòng kiểm tra lại số hoặc liên hệ hotline.</p>
         </div>`;
   }
   return list.map(warrantyRecordHtml).join('');
