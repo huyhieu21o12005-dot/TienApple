@@ -195,6 +195,7 @@ export function mapDbToProduct(row) {
     conditionLabel: row.condition_label || (row.condition === 'like_new' ? 'Like New 99%' : 'Mới 100%'),
     badge: row.badge || '',
     price: Number(row.price) || 0,
+    basePrice: row.base_price ? Number(row.base_price) : undefined,
     oldPrice: row.old_price ? Number(row.old_price) : undefined,
     rating: row.rating !== null && row.rating !== undefined && isFinite(Number(row.rating)) ? Number(row.rating) : 5.0,
     reviewCount: Number(row.review_count) || 0,

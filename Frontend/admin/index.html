@@ -105,6 +105,7 @@
           <a class="btn btn-secondary" href="./warranty.html">Bảo hành</a>
           <a class="btn btn-secondary" href="./installments.html">Trả góp</a>
           <a class="btn btn-ghost" href="./cashflow.html">Thu chi</a>
+          <button type="button" id="setPriceBtn" class="btn btn-secondary" title="Cộng thêm tiền lãi lên giá gốc: chung, theo hãng, theo khoảng giá, theo tên máy">Set giá</button>
           <button type="button" id="sheetNewBtn" class="btn btn-secondary" title="Thêm máy mới có trong Google Sheet, bỏ qua máy đã có">Thêm SP mới từ Sheet</button>
           <button type="button" id="bulkModeBtn" class="btn btn-secondary" title="Chọn theo hãng, tình trạng, trạng thái... rồi xóa cùng lúc (ảnh trong kho được giữ lại)">Xóa hàng loạt</button>
           <button type="button" id="sheetImageBtn" class="btn btn-secondary" title="Gắn ảnh minh họa chính thức cho sản phẩm chưa có ảnh">Gắn ảnh minh họa</button>
@@ -465,6 +466,40 @@
       <div class="modal-footer">
         <button type="button" id="cancelSheetPriceBtn" class="btn btn-secondary">Đóng</button>
         <button type="button" id="applySheetPriceBtn" class="btn btn-primary" disabled>Áp dụng giá</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SET GIÁ (cộng thêm lên giá gốc theo quy tắc) -->
+  <div id="setPriceModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="spTitle">
+    <div class="modal-dialog bd-dialog">
+      <div class="modal-header">
+        <h2 id="spTitle" class="modal-title">Set giá bán</h2>
+        <button type="button" id="spClose" class="btn-icon-close" aria-label="Đóng">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="dialog-subtext">Giá bán = <strong>giá gốc + cộng thêm</strong>. Mỗi sản phẩm chỉ nhận <strong>một</strong> quy tắc, ưu tiên cụ thể nhất: <em>tên máy</em> &gt; <em>khoảng giá gốc</em> &gt; <em>hãng</em> &gt; <em>chung</em>. Luôn tính lại từ giá gốc nên áp dụng nhiều lần không bị cộng dồn. Để trống hết quy tắc rồi áp dụng = hoàn về giá gốc.</p>
+        <div id="spRules" class="sp-rules"></div>
+        <div class="bd-toolbar">
+          <button type="button" id="spAddRule" class="btn btn-secondary btn-sm">+ Thêm quy tắc</button>
+          <label class="sp-opt">Làm tròn lên
+            <select id="spRound" class="form-input">
+              <option value="0">Không</option><option value="1000">1.000đ</option><option value="10000">10.000đ</option>
+              <option value="100000">100.000đ</option><option value="500000">500.000đ</option><option value="1000000">1.000.000đ</option>
+            </select>
+          </label>
+          <label class="sp-opt"><input type="checkbox" id="spShift" checked> Dời giá gạch ngang theo</label>
+        </div>
+        <div class="bd-toolbar">
+          <input type="search" id="spSearch" class="form-input" placeholder="Lọc danh sách theo tên..." aria-label="Lọc danh sách">
+          <label class="sp-opt"><input type="checkbox" id="spOnlyChanged"> Chỉ hiện máy thay đổi</label>
+        </div>
+        <div id="spList" class="bd-list sp-list"></div>
+        <p id="spCount" class="dialog-subtext"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="spCancel" class="btn btn-secondary">Đóng</button>
+        <button type="button" id="spApply" class="btn btn-primary" disabled>Áp dụng giá</button>
       </div>
     </div>
   </div>

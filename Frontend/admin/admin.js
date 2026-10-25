@@ -4,6 +4,7 @@
  * Visibility Toggle, Bulk Operations, Image Upload with Client Resize, and Filters.
  */
 
+import { planPricing, normalizeRule } from './pricing.js';
 import { imageFor } from './modelImages.js';
 import { buildFacetGroups, matchByFacets } from './bulkSelect.js';
 import { USED_IMAGE_NOTE } from './sheetPricing.js';
@@ -728,6 +729,108 @@ async function confirmBulkDelete() {
   }
 }
 
+// ==============================================================================
+// SET GIÁ: cộng thêm lên giá gốc theo quy tắc (chung / hãng / khoảng giá / tên máy)
+// ==============================================================================
+const SP_KEY = 'tm_set_price';
+const setPrice = { rules: [], roundStep: 0, shift: true, query: '', onlyChanged: false, plan: [] };
+
+function loadSetPriceSaved() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SP_KEY) || 'null');
+    if (saved && Array.isArray(saved.rules)) {
+      setPrice.rules = saved.rules; setPrice.roundStep = Number(saved.roundStep) || 0; setPrice.shift = saved.shift !== false;
+    }
+  } catch { /* bỏ qua */ }
+}
+
+function saveSetPrice() {
+  try { localStorage.setItem(SP_KEY, JSON.stringify({ rules: setPrice.rules, roundStep: setPrice.roundStep, shift: setPrice.shift })); } catch { /* bỏ qua */ }
+}
+
+const spEsc = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
+function renderSetPriceRules() {
+  const brands = [...new Set(state.products.map(p => (p.brandName || p.brand || '').trim()).filter(Boolean))].sort();
+  document.getElementById('spRules').innerHTML = setPrice.rules.map((r, i) => `
+    <div class="sp-rule" data-i="${i}">
+      <select data-f="brand" class="form-input" aria-label="Hãng"><option value="">Mọi hãng</option>${brands.map(b => `<option value="${spEsc(b.toLowerCase())}"${String(r.brand || '').toLowerCase() === b.toLowerCase() ? ' selected' : ''}>${spEsc(b)}</option>`).join('')}</select>
+      <input data-f="from" class="form-input" inputmode="numeric" placeholder="Giá gốc từ" value="${spEsc(r.from)}" aria-label="Giá gốc từ">
+      <input data-f="to" class="form-input" inputmode="numeric" placeholder="đến" value="${spEsc(r.to)}" aria-label="Giá gốc đến">
+      <input data-f="keyword" class="form-input" placeholder="Tên máy chứa..." value="${spEsc(r.keyword)}" aria-label="Tên máy chứa">
+      <span class="sp-plus">+</span>
+      <input data-f="value" class="form-input" inputmode="decimal" placeholder="Cộng thêm" value="${spEsc(r.value)}" aria-label="Cộng thêm">
+      <select data-f="mode" class="form-input" aria-label="Kiểu"><option value="fixed"${r.mode !== 'percent' ? ' selected' : ''}>đ</option><option value="percent"${r.mode === 'percent' ? ' selected' : ''}>%</option></select>
+      <button type="button" class="btn btn-ghost btn-sm" data-del="${i}" aria-label="Xóa quy tắc">✕</button>
+    </div>`).join('') || '<p class="dialog-subtext">Chưa có quy tắc: tất cả về giá gốc.</p>';
+}
+
+function renderSetPriceList() {
+  const q = setPrice.query.trim().toLowerCase();
+  setPrice.plan = planPricing(state.products, setPrice.rules, { roundStep: setPrice.roundStep, shiftOldPrice: setPrice.shift });
+  const changed = setPrice.plan.filter(r => r.newPrice !== r.price || (r.oldPrice !== null && r.newOldPrice !== r.oldPrice));
+  const rows = setPrice.plan.filter(r => (!q || r.name.toLowerCase().includes(q)) && (!setPrice.onlyChanged || changed.includes(r)));
+  document.getElementById('spList').innerHTML = `<table class="sp-table"><thead><tr><th>Sản phẩm</th><th>Giá gốc</th><th>Đang bán</th><th>Cộng thêm</th><th>Giá mới</th></tr></thead><tbody>${rows.map(r => `
+    <tr class="${changed.includes(r) ? 'sp-changed' : ''}"><td>${spEsc(r.name)}<br><small>${spEsc(r.brand)}</small></td>
+    <td>${formatCurrency(r.base)}</td><td>${formatCurrency(r.price)}</td>
+    <td>${r.markup === 0 ? '—' : (r.markup > 0 ? '+' : '') + formatCurrency(r.markup)}</td><td><strong>${formatCurrency(r.newPrice)}</strong></td></tr>`).join('')}</tbody></table>`;
+  document.getElementById('spCount').textContent = `${changed.length} sản phẩm sẽ đổi giá / ${setPrice.plan.length}.`;
+  document.getElementById('spApply').disabled = changed.length === 0;
+}
+
+function openSetPriceModal() {
+  loadSetPriceSaved();
+  document.getElementById('spRound').value = String(setPrice.roundStep);
+  document.getElementById('spShift').checked = setPrice.shift;
+  renderSetPriceRules();
+  renderSetPriceList();
+  document.getElementById('setPriceModal').classList.remove('hidden');
+}
+
+async function applySetPrice() {
+  const changed = setPrice.plan.filter(r => r.newPrice !== r.price || (r.oldPrice !== null && r.newOldPrice !== r.oldPrice));
+  if (!changed.length) return;
+  const btn = document.getElementById('spApply');
+  btn.disabled = true;
+  let ok = 0;
+  for (const r of changed) {
+    const patch = { base_price: r.base, price: r.newPrice, updated_at: new Date().toISOString() };
+    if (r.oldPrice !== null) patch.old_price = r.newOldPrice;
+    const { error } = await supabase.from('products').update(patch).eq('id', r.id);
+    if (error) console.error('[Admin] Lỗi set giá', r.id, error); else ok++;
+  }
+  showToast(ok === changed.length ? `Đã set giá ${ok} sản phẩm` : `Set được ${ok}/${changed.length}, xem lại console`, ok === changed.length ? 'success' : 'error');
+  document.getElementById('setPriceModal').classList.add('hidden');
+  await loadProducts();
+}
+
+function bindSetPriceModal() {
+  const close = () => document.getElementById('setPriceModal').classList.add('hidden');
+  const refresh = () => { saveSetPrice(); renderSetPriceList(); };
+  document.getElementById('setPriceBtn').addEventListener('click', openSetPriceModal);
+  document.getElementById('spClose').addEventListener('click', close);
+  document.getElementById('spCancel').addEventListener('click', close);
+  document.getElementById('spApply').addEventListener('click', applySetPrice);
+  document.getElementById('spAddRule').addEventListener('click', () => {
+    setPrice.rules.push({ brand: '', from: '', to: '', keyword: '', mode: 'fixed', value: '' });
+    renderSetPriceRules(); refresh();
+  });
+  document.getElementById('spRules').addEventListener('input', (e) => {
+    const row = e.target.closest('[data-i]'); const f = e.target.dataset.f;
+    if (!row || !f) return;
+    setPrice.rules[Number(row.dataset.i)][f] = e.target.value; refresh();
+  });
+  document.getElementById('spRules').addEventListener('click', (e) => {
+    const del = e.target.closest('[data-del]');
+    if (!del) return;
+    setPrice.rules.splice(Number(del.dataset.del), 1); renderSetPriceRules(); refresh();
+  });
+  document.getElementById('spRound').addEventListener('change', (e) => { setPrice.roundStep = Number(e.target.value) || 0; refresh(); });
+  document.getElementById('spShift').addEventListener('change', (e) => { setPrice.shift = e.target.checked; refresh(); });
+  document.getElementById('spSearch').addEventListener('input', (e) => { setPrice.query = e.target.value; renderSetPriceList(); });
+  document.getElementById('spOnlyChanged').addEventListener('change', (e) => { setPrice.onlyChanged = e.target.checked; renderSetPriceList(); });
+}
+
 function bindBulkDeleteModal() {
   document.getElementById('closeBulkDeleteBtn').addEventListener('click', closeBulkDeleteModal);
   document.getElementById('bdCancel').addEventListener('click', closeBulkDeleteModal);
@@ -875,7 +978,7 @@ async function applySheetChanges() {
   } else {
     for (const c of picked) {
       const { error } = await supabase.from('products')
-        .update({ price: c.newPrice, old_price: c.newList, updated_at: new Date().toISOString() })
+        .update({ base_price: c.newPrice, price: c.newPrice + (c.markup || 0), old_price: c.newList && (c.newList + (c.markup || 0)), updated_at: new Date().toISOString() })
         .eq('id', c.id);
       if (error) console.error('[Admin] Lỗi cập nhật giá', c.id, error);
       else ok++;
@@ -1384,6 +1487,7 @@ function bindGlobalEvents() {
 
   // Delete modal buttons
   bindSheetModal();
+  bindSetPriceModal();
   document.getElementById('closeDeleteBtn').addEventListener('click', closeDeleteModal);
   document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
   document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDeleteProduct);

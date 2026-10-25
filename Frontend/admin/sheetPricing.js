@@ -149,9 +149,12 @@ export function planPriceUpdates(products, sheetRows) {
     if (!row) { out.unmatched.push({ id: p.id, name: p.name }); continue; }
     const newPrice = row.finalPrice;
     const newOld = row.salePercent > 0 && row.listPrice > newPrice ? row.listPrice : null;
-    const item = { id: p.id, name: p.name, line: row.line, sheetKey: row.key, oldPrice: p.price, newPrice, oldList: p.oldPrice ?? null, newList: newOld };
-    if (p.price === newPrice && (p.oldPrice ?? null) === newOld) { out.same.push(item); continue; }
-    item.bigChange = p.price > 0 && Math.abs(newPrice - p.price) / p.price > BIG_CHANGE_RATIO;
+    // So sánh với GIÁ GỐC (base_price); phần cộng thêm đã set (price - base_price) được giữ nguyên khi áp giá mới.
+    const cur = p.basePrice || p.price;
+    const markup = p.basePrice ? p.price - p.basePrice : 0;
+    const item = { id: p.id, name: p.name, line: row.line, sheetKey: row.key, oldPrice: cur, newPrice, oldList: p.oldPrice ?? null, newList: newOld, markup };
+    if (cur === newPrice && (p.oldPrice ?? null) === newOld) { out.same.push(item); continue; }
+    item.bigChange = cur > 0 && Math.abs(newPrice - cur) / cur > BIG_CHANGE_RATIO;
     out.changes.push(item);
   }
   return out;
@@ -212,7 +215,7 @@ export function planNewProducts(existingProducts, sheetRows, { visible = false }
       product: {
         id, name, kind: 'phone', category: null, brand, brand_name: BRAND_NAMES[brand] || r.brand,
         condition: 'new', condition_label: 'Mới 100%', badge: '',
-        price: r.finalPrice, old_price: r.salePercent > 0 && r.listPrice > r.finalPrice ? r.listPrice : null,
+        price: r.finalPrice, base_price: r.finalPrice, old_price: r.salePercent > 0 && r.listPrice > r.finalPrice ? r.listPrice : null,
         colors: [], default_color: '', storages: r.storage ? [r.storage] : [],
         chip: '', camera: '', battery: '', screen: '',
         description: [r.ram && r.ram !== '--' && `RAM ${r.ram}`, r.storage && `Bộ nhớ ${r.storage}`, r.warranty && `Bảo hành ${r.warranty}`].filter(Boolean).join(' • '),
@@ -298,7 +301,7 @@ export function planUsedProducts(existingProducts, usedRows, { visible = false }
         id: r.id, name, kind: isPhone ? 'phone' : 'accessory', category: isPhone ? null : 'other',
         brand: 'apple', brand_name: isPhone ? 'Apple iPhone' : 'Apple',
         condition: 'like_new', condition_label: r.condition || 'Máy cũ', badge: 'Máy cũ',
-        price: r.finalPrice, old_price: null,
+        price: r.finalPrice, base_price: r.finalPrice, old_price: null,
         colors: [], default_color: color, storages: r.storage ? [r.storage] : [],
         chip: '', camera: '', screen: '', battery: battery ? `Pin ${battery[1]}` : '',
         description: [r.description, r.ram && r.ram !== '--' && `RAM ${r.ram}`, image && USED_IMAGE_NOTE].filter(Boolean).join(' • '),
