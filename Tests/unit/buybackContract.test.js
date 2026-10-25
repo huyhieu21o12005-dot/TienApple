@@ -32,3 +32,9 @@ describe('buybackContract', () => {
     assert.match(html, /\.{10,}/);
   });
 });
+
+test('hóa đơn và hợp đồng in có logo cửa hàng', async () => {
+  const { brandMarkHtml, contractHtml } = await import('../../Frontend/admin/invoiceHelpers.js');
+  assert.match(brandMarkHtml(), /<svg[\s\S]*Tien Mobile[\s\S]*Thu Duc/);
+  assert.match(contractHtml({ title: 'T', number: 'N', place: 'P', dateText: 'D', intro: 'I', parties: [], articles: [], signatures: [] }), /brand-mark/);
+});
