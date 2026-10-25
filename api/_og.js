@@ -7,7 +7,7 @@
 import { imageFor, isKnownSource } from '../Frontend/admin/modelImages.js';
 
 export const SITE_NAME = 'Tien Mobile Thu Duc';
-export const LOGO_PATH = '/assets/og-logo.png';
+export const LOGO_PATH = '/assets/og-logo.jpg';
 const DEFAULT_DESC = 'Phân phối iPhone, Samsung chính hãng và sửa chữa lấy liền minh bạch tại Thủ Đức.';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
