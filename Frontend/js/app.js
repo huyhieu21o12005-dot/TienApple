@@ -371,6 +371,7 @@ class App {
     this.openCartFromQuery();
     this.initMobileMenu();
     this.initMegaMenu();
+    this.initSiteSearch();
     this.initWarrantyLookup();
     this.initTradeInForm();
     this.initInstallmentForm();
@@ -612,6 +613,60 @@ class App {
     const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 8);
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
+  }
+
+  /** Tìm kiếm nhanh: nút trên header hoặc phím "/", Ctrl/Cmd+K. */
+  initSiteSearch() {
+    const overlay = document.getElementById('searchOverlay');
+    const input = document.getElementById('siteSearchInput');
+    const results = document.getElementById('siteSearchResults');
+    const openBtn = document.getElementById('searchOpenBtn');
+    if (!overlay || !input || !results || !openBtn) return;
+    let list = [];
+    let active = -1;
+    const norm = (s) => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase();
+    const setOpen = (open) => {
+      if (open) {
+        overlay.hidden = false;
+        requestAnimationFrame(() => overlay.classList.add('is-open'));
+        input.value = '';
+        results.innerHTML = '';
+        input.focus();
+      } else {
+        overlay.classList.remove('is-open');
+        setTimeout(() => { if (!overlay.classList.contains('is-open')) overlay.hidden = true; }, 180);
+      }
+    };
+    const paint = () => {
+      results.querySelectorAll('.search-item').forEach((el, i) => el.classList.toggle('is-active', i === active));
+    };
+    const render = () => {
+      const tokens = norm(input.value).split(/\s+/).filter(Boolean);
+      if (!tokens.length) { results.innerHTML = ''; list = []; return; }
+      const all = [...this.products, ...this.accessories];
+      list = all.filter(p => { const hay = norm(`${p.name} ${p.brandName || ''} ${p.chip || ''}`); return tokens.every(t => hay.includes(t)); }).slice(0, 8);
+      active = list.length ? 0 : -1;
+      results.innerHTML = list.length
+        ? list.map((p, i) => `<button type="button" class="search-item" role="option" data-i="${i}">${p.image ? `<img src="${escapeHtml(safeUrl(p.image))}" alt="" loading="lazy">` : ''}<span class="si-name">${escapeHtml(p.name)}</span><span class="si-price">${CartManager.formatCurrency(Number(p.price) || 0)}</span></button>`).join('')
+        : '<div class="search-empty">Không thấy sản phẩm phù hợp. Thử tên khác hoặc nhắn Zalo cho shop.</div>';
+      paint();
+    };
+    const go = (i) => { if (list[i]) { setOpen(false); this.openProductModalById(list[i].id); } };
+    openBtn.addEventListener('click', () => setOpen(true));
+    input.addEventListener('input', render);
+    results.addEventListener('click', (e) => { const it = e.target.closest('.search-item'); if (it) go(Number(it.dataset.i)); });
+    overlay.addEventListener('mousedown', (e) => { if (e.target === overlay) setOpen(false); });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (list.length) { active = (active + (e.key === 'ArrowDown' ? 1 : list.length - 1)) % list.length; paint(); }
+      } else if (e.key === 'Enter') { e.preventDefault(); go(active); }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !overlay.hidden) { setOpen(false); return; }
+      const typing = /^(input|textarea|select)$/i.test(e.target.tagName) || e.target.isContentEditable;
+      if ((e.key === '/' && !typing) || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) { e.preventDefault(); setOpen(true); }
+    });
   }
 
   initMobileMenu() {

@@ -906,24 +906,49 @@ body.menu-open {
 /* Vùng an toàn của iPhone (tai thỏ / thanh home) */
 /* Header kính nổi (giữ bảng màu trắng của web) */
 .site-header { padding-top: calc(6px + env(safe-area-inset-top)); padding-bottom: 6px; background: transparent; pointer-events: none; }
-.nav-pill, .mega-menu { pointer-events: auto; }
+.nav-pill, .mega-menu, .search-overlay { pointer-events: auto; }
+.nav-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; max-width: 1240px; margin: 0 auto; }
 .nav-pill {
-  max-width: 1240px; height: 52px; padding: 0 10px 0 18px; border-radius: 999px;
+  height: 48px; padding: 0 18px; border-radius: 999px;
   background: rgba(255, 255, 255, 0.78);
   -webkit-backdrop-filter: blur(18px) saturate(180%); backdrop-filter: blur(18px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.9);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 6px 20px rgba(0, 0, 0, 0.08);
-  transition: background .2s, box-shadow .2s;
+  transition: background .2s, box-shadow .2s, transform .2s;
 }
-.site-header.is-scrolled .nav-pill { background: rgba(255, 255, 255, 0.92); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.07), 0 10px 28px rgba(0, 0, 0, 0.12); }
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .nav-pill, .mega-menu::before { background: #fff; } }
-#mainNav { gap: 2px; }
-#mainNav a { height: 34px; padding: 0 9px; border-radius: 999px; transition: background .15s, color .15s; }
-#mainNav a:hover { background: rgba(0, 0, 0, 0.05); }
-#mainNav a.active { background: rgba(0, 0, 0, 0.07); }
+.nav-pill:hover { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 10px 26px rgba(0, 0, 0, 0.12); }
+.nav-menu { flex: 1 1 auto; justify-content: center; gap: 4px; padding: 0 14px; }
+.nav-actions { padding: 0 8px 0 10px; }
+.site-header.is-scrolled .nav-pill { background: rgba(255, 255, 255, 0.92); }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .nav-pill, .mega-menu::before, .search-panel { background: #fff; } }
+/* Mục menu: chữ xám, rê vào thì sáng lên, nhấc nhẹ và gạch chân chạy ra */
+#mainNav a { position: relative; height: 34px; padding: 0 11px; color: #6E6E73 !important; font-weight: 500 !important; transition: color .18s, transform .18s; }
+#mainNav a::before { content: ''; position: absolute; left: 11px; right: 11px; bottom: 3px; height: 2px; border-radius: 2px; background: #1D1D1F; transform: scaleX(0); transform-origin: left; transition: transform .22s ease; }
+#mainNav a:hover, #mainNav a:focus-visible, #mainNav a.active { color: #1D1D1F !important; }
+#mainNav a:hover, #mainNav a:focus-visible { transform: translateY(-1px); }
+#mainNav a:hover::before, #mainNav a:focus-visible::before, #mainNav a.active::before { transform: scaleX(1); }
 #mainNav .nav-active-bar { display: none !important; }
 #mainNav a[data-mega]::after { content: ''; width: 5px; height: 5px; margin: 0 0 3px 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); opacity: .55; transition: transform .2s; }
 #mainNav a[data-mega][aria-expanded="true"]::after { transform: rotate(225deg) translate(-1px, -1px); }
+.nav-search-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 50%; background: rgba(255, 255, 255, 0.6); color: #1D1D1F; cursor: pointer; transition: background .15s, transform .15s; }
+.nav-search-btn:hover { background: #fff; transform: translateY(-1px); }
+
+.search-overlay { position: fixed; inset: 0; z-index: 60; display: flex; justify-content: center; align-items: flex-start; padding: 84px 16px 16px; background: rgba(245, 245, 247, 0.55); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); opacity: 0; transition: opacity .18s ease; }
+.search-overlay[hidden] { display: none; }
+.search-overlay.is-open { opacity: 1; }
+.search-panel { width: 100%; max-width: 620px; border-radius: 22px; background: rgba(255, 255, 255, 0.92); -webkit-backdrop-filter: blur(22px); backdrop-filter: blur(22px); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 24px 56px rgba(0, 0, 0, 0.18); overflow: hidden; transform: translateY(-8px); transition: transform .2s ease; }
+.search-overlay.is-open .search-panel { transform: none; }
+.search-field { display: flex; align-items: center; gap: 10px; padding: 0 18px; height: 56px; color: #6E6E73; }
+.search-field input { flex: 1; min-width: 0; height: 100%; border: 0; outline: none; background: transparent; font: inherit; font-size: 16px; color: #1D1D1F; box-shadow: none !important; }
+.search-field kbd { padding: 2px 7px; border: 1px solid rgba(0, 0, 0, 0.15); border-radius: 6px; font: inherit; font-size: 11px; color: #6E6E73; }
+.search-results { max-height: min(60vh, 420px); overflow-y: auto; border-top: 1px solid rgba(0, 0, 0, 0.06); }
+.search-results:empty { display: none; }
+.search-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 18px; border: 0; background: transparent; text-align: left; font: inherit; cursor: pointer; }
+.search-item:hover, .search-item.is-active { background: rgba(0, 0, 0, 0.05); }
+.search-item img { width: 40px; height: 40px; object-fit: contain; border-radius: 8px; background: #F5F5F7; flex: none; }
+.search-item .si-name { flex: 1; min-width: 0; font-size: 14px; font-weight: 500; color: #1D1D1F; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.search-item .si-price { font-size: 13px; font-weight: 600; color: #1D1D1F; white-space: nowrap; }
+.search-empty { padding: 18px; font-size: 14px; color: #6E6E73; }
 
 .mega-menu {
   position: absolute; top: calc(100% + 4px); width: 280px; max-width: calc(100vw - 24px);
@@ -951,7 +976,7 @@ body.menu-open {
 .mega-link:disabled, .mega-tag:disabled { opacity: .4; cursor: default; pointer-events: none; }
 .mobile-quick { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 0 6px; }
 .mobile-quick .mega-chip { padding: 9px 16px; border: 0; border-radius: 999px; background: #F5F5F7; font: inherit; font-size: 14px; font-weight: 500; color: #1D1D1F; cursor: pointer; }
-@media (max-width: 1279px) { .mega-menu { display: none !important; } .nav-pill { height: 48px; padding-left: 14px; } }
+@media (max-width: 1279px) { .mega-menu { display: none !important; } .nav-pill { height: 46px; padding: 0 14px; } .nav-actions { padding: 0 6px 0 10px; } }
 
 @media (max-width: 1279px) {
   #mobileMenuPanel {
