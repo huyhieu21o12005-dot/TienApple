@@ -32,6 +32,7 @@ const state = {
   role: null,
   products: [],
   selectedIds: new Set(),
+  bulkMode: false, // thanh thao tác hàng loạt luôn hiện (không cần chọn trước)
   activeFilter: 'all', // all, phone, accessory, visible, hidden, outofstock
   activeBrand: 'all',
   activeSort: 'sort_order',
@@ -593,7 +594,10 @@ function updateBulkActionBar() {
   const count = state.selectedIds.size;
   countEl.innerText = count;
 
-  if (count > 0) {
+  const modeBtn = document.getElementById('bulkModeBtn');
+  if (modeBtn) modeBtn.textContent = state.bulkMode ? 'Xong chọn nhiều' : 'Chọn nhiều / Xóa hàng loạt';
+
+  if (count > 0 || state.bulkMode) {
     bar.classList.remove('hidden');
     selectAllCb.checked = filtered.length > 0 && filtered.every(p => state.selectedIds.has(p.id));
   } else {
@@ -670,7 +674,9 @@ async function executeBulkDelete() {
   const ids = Array.from(state.selectedIds);
   if (ids.length === 0) return;
 
-  if (!confirm(`Bạn có chắc chắn muốn xóa ${ids.length} sản phẩm đã chọn? Thao tác này không thể hoàn tác.`)) {
+  const names = ids.map(id => state.products.find(p => p.id === id)?.name).filter(Boolean);
+  const preview = names.slice(0, 8).map(n => `• ${n}`).join('\n') + (names.length > 8 ? `\n... và ${names.length - 8} sản phẩm khác` : '');
+  if (!confirm(`Xóa vĩnh viễn ${ids.length} sản phẩm đã chọn? Không thể hoàn tác.\n\n${preview}`)) {
     return;
   }
 
@@ -1368,6 +1374,12 @@ function bindGlobalEvents() {
     renderProducts();
   });
 
+  document.getElementById('bulkModeBtn').addEventListener('click', () => {
+    state.bulkMode = !state.bulkMode;
+    if (!state.bulkMode) state.selectedIds.clear();
+    renderProducts();
+    updateBulkActionBar();
+  });
   document.getElementById('bulkDeselectBtn').addEventListener('click', () => {
     state.selectedIds.clear();
     renderProducts();

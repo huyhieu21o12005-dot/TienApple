@@ -289,3 +289,7 @@ Trang **Sản phẩm** có hai nút. Cả hai đọc tab `TONG_HOP` của Google
 - Hai nút **Thêm SP mới từ Sheet** và **Thêm máy cũ từ Sheet** tự gắn ảnh nếu có mẫu khớp. Máy cũ có ảnh minh họa được thêm dòng "Ảnh minh họa, ảnh máy thật vui lòng liên hệ cửa hàng" vào mô tả.
 - Nút **Gắn ảnh minh họa** gắn ảnh cho sản phẩm đã có trên web mà chưa có ảnh (chỉ những mẫu khớp trong bảng); xem trước ảnh rồi tick.
 - Ảnh máy thật: thay ở trang sửa sản phẩm, sau đó ảnh minh họa không bị ghi đè (nút chỉ gắn cho sản phẩm chưa có ảnh).
+
+### Xóa hàng loạt
+
+Nút **Chọn nhiều / Xóa hàng loạt** (trang Sản phẩm) hiện thanh thao tác hàng loạt ngay cả khi chưa chọn gì: tick từng sản phẩm hoặc ô "chọn tất cả" (chọn mọi sản phẩm đang lọc), rồi **Xóa đã chọn** / Ẩn / Hiện / Giảm giá %. Hộp xác nhận liệt kê tên các sản phẩm sắp xóa. Chỉ chủ shop và quản lý được xóa; xóa cả ảnh trong kho ảnh của web, không hoàn tác được.
