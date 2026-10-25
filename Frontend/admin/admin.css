@@ -1359,3 +1359,7 @@ body[data-role="staff"] [data-action="delete"] { display: none !important; }
   .brand-name { line-height: 1.1; }
   .brand-name .brand-name-l2 { display: block; }
 }
+
+.ord-edit { margin: 8px 0; }
+.ord-edit .form-input { margin-bottom: 8px; }
+.ord-edit-err { color: #C0392B; font-size: 13px; margin: 0 0 8px; }

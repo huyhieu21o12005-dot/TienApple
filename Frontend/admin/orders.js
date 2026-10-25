@@ -6,6 +6,7 @@
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
 import { escapeHtml } from '../js/utils.js';
+import { normalizePhone } from '../js/warranty.js';
 import { formatCurrency } from './adminHelpers.js';
 import {
   statusesFor,
@@ -26,6 +27,7 @@ const state = {
   kind: 'orders',
   status: 'all',
   query: '',
+  editingId: null,
   data: { orders: [], bookings: [] }
 };
 
@@ -61,7 +63,7 @@ async function init() {
     $('gateSection').classList.add('hidden');
     $('ordersApp').classList.remove('hidden');
     await loadAll();
-    setInterval(() => { if (!document.hidden) loadAll({ silent: true }); }, REFRESH_MS);
+    setInterval(() => { if (!document.hidden && !state.editingId) loadAll({ silent: true }); }, REFRESH_MS);
   } catch (err) {
     console.error('[Orders] Không thể khởi tạo:', err);
     showGate('Không thể kết nối máy chủ. Vui lòng thử lại.');
@@ -144,6 +146,49 @@ function printLink(type, record) {
   return `<a class="btn btn-secondary btn-sm" href="./print.html?type=${type}&id=${encodeURIComponent(record.id)}" target="_blank" rel="noopener">In hóa đơn</a>`;
 }
 
+function editForm(record, kind) {
+  const id = escapeHtml(record.id);
+  const field = (name, label, value, max, extra = '') => `
+    <label class="form-label" for="ed-${name}-${id}">${label}</label>
+    <input class="form-input" id="ed-${name}-${id}" data-edit="${name}" maxlength="${max}" value="${escapeHtml(value || '')}" ${extra}>`;
+  const fields = kind === 'orders'
+    ? field('customer_name', 'Tên khách', record.customer_name, 100) + field('phone', 'Số điện thoại', record.phone, 15, 'inputmode="tel"') + field('address', 'Địa chỉ giao hàng', record.address, 300) + field('note', 'Khách ghi chú', record.note, 500)
+    : field('customer_name', 'Tên khách', record.customer_name, 100) + field('phone', 'Số điện thoại', record.phone, 15, 'inputmode="tel"') + field('device', 'Máy', record.device, 100) + field('service', 'Dịch vụ', record.service, 100) + field('note', 'Khách ghi chú', record.note, 500);
+  return `
+    <div class="ord-edit" data-edit-for="${id}">
+      ${fields}
+      <p class="ord-edit-err" data-edit-err hidden></p>
+      <div class="ord-actions">
+        <button type="button" class="btn btn-primary btn-sm" data-action="save-edit" data-id="${id}">Lưu thông tin</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-action="cancel-edit" data-id="${id}">Hủy</button>
+      </div>
+    </div>`;
+}
+
+function collectEdit(id) {
+  const box = document.querySelector(`[data-edit-for="${CSS.escape(id)}"]`);
+  const val = (name) => (box?.querySelector(`[data-edit="${name}"]`)?.value || '').trim();
+  const patch = { customer_name: val('customer_name'), phone: normalizePhone(val('phone')) };
+  const errors = [];
+  if (!patch.customer_name) errors.push('Vui lòng nhập tên khách.');
+  if (!patch.phone) errors.push('Số điện thoại không hợp lệ.');
+  if (state.kind === 'orders') {
+    patch.address = val('address');
+    if (patch.address.length < 5) errors.push('Địa chỉ cần ít nhất 5 ký tự.');
+  } else {
+    patch.device = val('device');
+    patch.service = val('service');
+    if (!patch.device) errors.push('Vui lòng nhập tên máy.');
+    if (!patch.service) errors.push('Vui lòng nhập dịch vụ.');
+  }
+  patch.note = val('note') || null;
+  return { patch, errors, box };
+}
+
+function editButton(record) {
+  return `<button type="button" class="btn btn-secondary btn-sm" data-action="edit" data-id="${escapeHtml(record.id)}">Sửa thông tin</button>`;
+}
+
 function phoneLine(record) {
   const href = telHref(record.phone);
   return `<p class="ord-line"><a href="${escapeHtml(href)}">${escapeHtml(record.phone)}</a> · ${escapeHtml(record.customer_name)}</p>`;
@@ -156,13 +201,13 @@ function orderCard(o) {
         <span class="ord-code">${escapeHtml(o.code)}</span>
         <span class="ord-time">${escapeHtml(formatDateTime(o.created_at))}</span>
       </div>
-      ${phoneLine(o)}
-      <p class="ord-line ord-muted">${escapeHtml(o.address)}</p>
+      ${state.editingId === o.id ? editForm(o, 'orders') : `${phoneLine(o)}
+      <p class="ord-line ord-muted">${escapeHtml(o.address)}</p>`}
       <p class="ord-line">${escapeHtml(summarizeItems(o.items))}</p>
-      ${o.note ? `<p class="ord-line ord-muted">Khách ghi chú: ${escapeHtml(o.note)}</p>` : ''}
+      ${o.note && state.editingId !== o.id ? `<p class="ord-line ord-muted">Khách ghi chú: ${escapeHtml(o.note)}</p>` : ''}
       <p class="ord-line">Tổng: <span class="ord-total">${escapeHtml(formatCurrency(o.total))}</span>
         ${o.voucher ? `<span class="ord-muted"> · mã ${escapeHtml(o.voucher)}</span>` : ''}</p>
-      <div class="ord-actions">${statusSelect(o)}${printLink('order', o)}${contractLink('order', o)}</div>
+      <div class="ord-actions">${statusSelect(o)}${editButton(o)}${printLink('order', o)}${contractLink('order', o)}</div>
       ${noteBlock(o)}
     </article>`;
 }
@@ -174,10 +219,10 @@ function bookingCard(b) {
         <span class="ord-code">${escapeHtml(b.code)}</span>
         <span class="ord-time">${escapeHtml(formatDateTime(b.created_at))}</span>
       </div>
-      ${phoneLine(b)}
-      <p class="ord-line">${escapeHtml(b.device)} · ${escapeHtml(b.service)}</p>
-      ${b.note ? `<p class="ord-line ord-muted">Khách ghi chú: ${escapeHtml(b.note)}</p>` : ''}
-      <div class="ord-actions">${statusSelect(b)}${printLink('booking', b)}</div>
+      ${state.editingId === b.id ? editForm(b, 'bookings') : `${phoneLine(b)}
+      <p class="ord-line">${escapeHtml(b.device)} · ${escapeHtml(b.service)}</p>`}
+      ${b.note && state.editingId !== b.id ? `<p class="ord-line ord-muted">Khách ghi chú: ${escapeHtml(b.note)}</p>` : ''}
+      <div class="ord-actions">${statusSelect(b)}${editButton(b)}${printLink('booking', b)}</div>
       ${noteBlock(b)}
     </article>`;
 }
@@ -245,6 +290,18 @@ function bindEvents() {
   });
 
   $('ordList').addEventListener('click', (e) => {
+    const edit = e.target.closest('[data-action="edit"], [data-action="cancel-edit"], [data-action="save-edit"]');
+    if (edit) {
+      const act = edit.dataset.action;
+      if (act === 'edit') { state.editingId = edit.dataset.id; render(); return; }
+      if (act === 'cancel-edit') { state.editingId = null; render(); return; }
+      const { patch, errors, box } = collectEdit(edit.dataset.id);
+      const err = box.querySelector('[data-edit-err]');
+      if (errors.length) { err.textContent = errors[0]; err.hidden = false; return; }
+      state.editingId = null;
+      updateRecord(edit.dataset.id, patch, 'Đã lưu thông tin');
+      return;
+    }
     const btn = e.target.closest('[data-action="save-note"]');
     if (!btn) return;
     const area = document.querySelector(`[data-note-for="${CSS.escape(btn.dataset.id)}"]`);
