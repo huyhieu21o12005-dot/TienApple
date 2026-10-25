@@ -43,7 +43,16 @@ function setContractMode() {
   style.textContent = '@page { size: A4; margin: 0; }';
 }
 
+function setEditing(on) {
+  document.body.classList.toggle('editing', on);
+  $('sheet').contentEditable = on ? 'true' : 'false';
+  $('sheet').spellcheck = false;
+  $('editBtn').textContent = on ? 'Chỉnh sửa: Bật' : 'Chỉnh sửa: Tắt';
+  $('editBtn').classList.toggle('active', on);
+}
+
 async function init() {
+  $('editBtn').addEventListener('click', () => setEditing(!document.body.classList.contains('editing')));
   $('printBtn').addEventListener('click', () => window.print());
   $('p80').addEventListener('click', () => setPaper(false));
   $('pa5').addEventListener('click', () => setPaper(true));
@@ -72,7 +81,9 @@ async function init() {
     $('sheet').innerHTML = isContract ? contractHtml(buildContract(type, data)) : invoiceHtml(buildInvoice(type, data));
     $('sheet').hidden = false;
     $('msg').hidden = true;
-    if (params.get('auto') !== '0') setTimeout(() => window.print(), 400);
+    $('hint').hidden = false;
+    setEditing(true);
+    if (params.get('auto') === '1') setTimeout(() => window.print(), 400);
   } catch (err) {
     console.error('[Print] Lỗi:', err);
     fail('Không tải được dữ liệu. Vui lòng thử lại.');

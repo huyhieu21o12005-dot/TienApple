@@ -69,8 +69,13 @@
     .ct-signs { display: flex; justify-content: space-between; gap: 24px; margin-top: 26px; text-align: center; page-break-inside: avoid; }
     .ct-sign { flex: 1; min-height: 110px; color: var(--ink); font-weight: 500; }
     .ct-article { page-break-inside: avoid; }
+    body.editing .sheet { outline: 2px dashed #0071E3; outline-offset: 4px; cursor: text; }
+    body.editing .sheet:focus { outline-style: solid; }
+    #hint { text-align: center; font-size: 13px; color: var(--muted); margin: 8px 12px 0; }
     @page { size: 80mm auto; margin: 0; }
     @media print {
+      #hint { display: none !important; }
+      .sheet { outline: none !important; }
       body { background: #fff; }
       .bar, #msg { display: none !important; }
       .sheet { width: 100%; margin: 0; padding: 3mm; box-shadow: none; }
@@ -82,10 +87,12 @@
 <body>
   <div class="bar" id="bar">
     <button type="button" id="printBtn" class="primary">In</button>
+    <button type="button" id="editBtn">Chỉnh sửa: Bật</button>
     <button type="button" id="p80" class="active">Giấy 80mm</button>
     <button type="button" id="pa5">Giấy A5</button>
     <a href="javascript:history.back()">← Quay lại</a>
   </div>
+  <p id="hint" hidden>Bấm vào chữ trên phiếu để sửa trực tiếp (tên, số điện thoại, địa chỉ, chỗ chấm...), xong bấm In. Chỉnh sửa chỉ áp dụng cho bản in, không lưu vào dữ liệu.</p>
   <p id="msg">Đang tải...</p>
   <main class="sheet hidden-until-ready" id="sheet" hidden></main>
   <script type="module" src="./print.js"></script>

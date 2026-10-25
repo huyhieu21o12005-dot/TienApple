@@ -255,7 +255,7 @@ Hồ sơ trả góp do **cửa hàng tự nhập** ở trang quản trị, khác
 
 ## In hóa đơn
 
-Mỗi mục có nút in: **Đơn hàng** (hóa đơn bán hàng), **Lịch sửa chữa** (phiếu tiếp nhận), **Bảo hành** (phiếu bảo hành), **Trả góp** (hóa đơn trả góp). Bấm **In hóa đơn** hoặc **In phiếu** trên thẻ, trang `/admin/print.html` mở ra và tự gọi hộp thoại in.
+Mỗi mục có nút in: **Đơn hàng** (hóa đơn bán hàng), **Lịch sửa chữa** (phiếu tiếp nhận), **Bảo hành** (phiếu bảo hành), **Trả góp** (hóa đơn trả góp). Bấm **In hóa đơn** hoặc **In phiếu** trên thẻ, trang `/admin/print.html` mở ra . Trước khi in có thể bấm thẳng vào chữ trên phiếu để sửa (nút "Chỉnh sửa" bật/tắt); chỉnh sửa chỉ áp dụng cho bản in, không lưu vào dữ liệu.
 - Mặc định khổ **80mm** cho máy in hóa đơn nhiệt; nút **Giấy A5** chuyển sang khổ A5. Trong hộp thoại in chọn đúng máy in, lề **Không (None)**, tỷ lệ 100%.
 - Cần đăng nhập quản trị trong cùng trình duyệt. Thêm `&auto=0` vào đường dẫn nếu chỉ muốn xem trước, không tự bật hộp thoại in.
 - Phiếu sửa chữa có dòng "Chi phí" để điền tay. Thông tin cửa hàng trên đầu hóa đơn sửa trong `SHOP` ở `Frontend/admin/invoiceHelpers.js`.
