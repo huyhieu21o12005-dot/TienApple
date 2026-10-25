@@ -5,16 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <title>In hóa đơn - Tien Mobile Thu Duc</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
   <style>
     :root { --paper: 80mm; --ink: #1D1D1F; --muted: #6E6E73; --line: #D2D2D7; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: #F5F5F7; color: var(--ink); font-family: "Inter", -apple-system, "Segoe UI", Roboto, Arial, sans-serif; font-weight: 400; -webkit-font-smoothing: antialiased; }
+    body { margin: 0; background: #F5F5F7; color: var(--ink); font-family: "Times New Roman", Times, "Liberation Serif", serif; font-weight: 400; -webkit-font-smoothing: antialiased; }
     .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; padding: 12px; background: #fff; border-bottom: 1px solid var(--line); }
-    .bar button, .bar a { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: #F5F5F7; font: inherit; font-size: 14px; cursor: pointer; color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; }
+    .bar button, .bar a { font-family: "Inter", -apple-system, "Segoe UI", Arial, sans-serif; min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: #F5F5F7; font: inherit; font-size: 14px; cursor: pointer; color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; }
     .bar button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
     .bar button.active { outline: 2px solid #0071E3; }
     #msg { text-align: center; padding: 24px; font-size: 14px; color: var(--muted); }
@@ -72,6 +69,31 @@
     body.editing .sheet { outline: 2px dashed #0071E3; outline-offset: 4px; cursor: text; }
     body.editing .sheet:focus { outline-style: solid; }
     #hint { text-align: center; font-size: 13px; color: var(--muted); margin: 8px 12px 0; }
+
+    /* Bố cục hóa đơn cửa hàng: chữ Times New Roman, tiêu đề in hoa, bảng có viền */
+    .sheet { font-size: 13px; line-height: 1.4; }
+    body.a5 .sheet { font-size: 14px; }
+    body.a4 .sheet { font-size: 15px; }
+    .inv-shop { font-size: 18px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+    .inv-small { font-size: 12px; color: var(--ink); }
+    .inv-title { font-size: 16px; font-weight: 700; letter-spacing: .05em; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--ink); }
+    .inv-h { font-size: 12px; font-weight: 700; color: var(--ink); letter-spacing: .03em; border-bottom: 1px solid var(--ink); padding-bottom: 1px; }
+    .inv-k { color: var(--ink); }
+    .inv-items { border: 1px solid var(--ink); }
+    .inv-items th { font-size: 12px; font-weight: 700; color: var(--ink); text-transform: none; letter-spacing: 0; border: 1px solid var(--ink); padding: 3px 4px; }
+    .inv-items td { border: 1px solid var(--ink); padding: 3px 4px; }
+    .inv-items small, .inv-note, .inv-thanks, .inv-sign { color: var(--ink); }
+    .inv-thanks { font-style: italic; }
+    .inv-sign span { font-weight: 700; }
+    .ct-items { border: 1px solid var(--ink); }
+    .ct-items th, .ct-items td { border: 1px solid var(--ink); }
+    .ct-items th { font-weight: 700; color: var(--ink); }
+    .ct-k, .ct-meta { color: var(--ink); }
+    .ct-nation { font-weight: 700; text-transform: uppercase; font-size: 13px; }
+    .ct-title { font-size: 20px; }
+    .ct-h { font-weight: 700; }
+    .ct-sign { font-weight: 700; }
+    .ct-intro, .ct-article p { text-align: justify; }
     @page { size: 80mm auto; margin: 0; }
     @media print {
       #hint { display: none !important; }
