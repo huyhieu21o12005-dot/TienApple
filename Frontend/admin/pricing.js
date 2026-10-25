@@ -147,3 +147,12 @@ export function planRules(products, rawRules, roundStep = 0) {
   }
   return out;
 }
+
+/** "2000000" -> "2.000.000", giữ dấu âm; bỏ mọi ký tự khác chữ số. Rỗng -> ''. */
+export function formatThousands(value) {
+  const raw = String(value ?? '');
+  const neg = raw.trim().startsWith('-');
+  const digits = raw.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
+  if (!digits) return neg ? '-' : '';
+  return (neg ? '-' : '') + digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}

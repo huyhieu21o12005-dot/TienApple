@@ -307,3 +307,4 @@ Nút **Set giá** ở trang sản phẩm. Giá bán = **giá gốc (`base_price`
 - **Về giá gốc** đưa máy đã chọn về giá gốc. Luôn tính từ giá gốc nên không bị cộng dồn.
 - Đồng bộ giá từ Sheet cập nhật **giá gốc** và giữ phần cộng thêm đã set. Sửa giá tay một sản phẩm không đổi giá gốc.
 - Popup có 2 thẻ: **Set giá theo tích chọn** (như trên) và **Set giá hàng loạt (theo quy tắc)**: mỗi dòng quy tắc gồm hãng, giá gốc từ/đến, tên máy chứa, mức cộng thêm (đ hoặc %). Mỗi máy nhận một quy tắc, ưu tiên cụ thể nhất: tên máy > khoảng giá > hãng > chung; máy không khớp giữ nguyên. Bấm **Tính vào bảng** để xem kết quả (dòng xanh) rồi **Lưu giá**. Quy tắc được nhớ trên trình duyệt.
+- Bộ lọc dạng danh sách xổ xuống (Hãng, Giá gốc, Tình trạng): chọn xong hiện thành thẻ có nút ✕ để bỏ, chọn được nhiều thẻ. Tiền tự thêm dấu chấm hàng nghìn. Cộng thêm có nút −/+ (±500.000đ hoặc ±1%), các mức gợi ý bấm nhanh và dòng xem trước giá của máy đầu tiên được chọn.

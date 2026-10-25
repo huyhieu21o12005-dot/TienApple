@@ -79,3 +79,13 @@ test('planRules: không khớp thì bỏ qua, phần trăm có làm tròn', () =
   assert.deepEqual(planRules(list, [{ brand: 'xiaomi', value: '1' }]), []);
   assert.equal(planRules([list[0]], [{ mode: 'percent', value: '3.3' }], 100000)[0].newPrice, 36200000);
 });
+
+import { formatThousands } from '../../Frontend/admin/pricing.js';
+test('formatThousands thêm dấu chấm hàng nghìn', () => {
+  assert.equal(formatThousands('2000000'), '2.000.000');
+  assert.equal(formatThousands('2.000.000đ'), '2.000.000');
+  assert.equal(formatThousands(-1500000), '-1.500.000');
+  assert.equal(formatThousands('-'), '-');
+  assert.equal(formatThousands(''), '');
+  assert.equal(formatThousands('500'), '500');
+});
