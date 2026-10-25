@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseCsv, parseVnd, parsePercent, normalizeKey, parseSheetRows, planPriceUpdates } from '../../Frontend/admin/sheetPricing.js';
+import { planNewProducts, brandsOf, parseSheetDate, slugify, productNameFor, parseCsv, parseVnd, parsePercent, normalizeKey, parseSheetRows, planPriceUpdates } from '../../Frontend/admin/sheetPricing.js';
 
 const csv = [
   'TIEN MOBILE - BẢNG BÁO GIÁ,,,,,,',
@@ -80,5 +80,34 @@ describe('sheetPricing - planPriceUpdates', () => {
   it('báo đổi giá lớn và sản phẩm không có trong sheet', () => {
     assert.equal(plan.changes.find(c => c.id === 'c').bigChange, true);
     assert.deepEqual(plan.unmatched.map(u => u.id), ['f']);
+  });
+});
+
+describe('sheetPricing - sản phẩm mới', () => {
+  const text = csv.replace('TIEN MOBILE - BẢNG BÁO GIÁ,,,,,,', 'TIEN MOBILE | Cập nhật ngày 25/10/2026,,,,,,');
+  const { rows } = parseSheetRows(text);
+  it('đọc ngày cập nhật và danh sách hãng', () => {
+    assert.equal(parseSheetDate(text), '25/10/2026');
+    assert.deepEqual(brandsOf(rows).map(b => b.brand), ['Apple', 'Samsung', 'Xiaomi']);
+  });
+  it('slug và tên hiển thị', () => {
+    assert.equal(slugify('iPhone 16 Pro Max 256GB'), 'iphone-16-pro-max-256gb');
+    assert.equal(slugify('Galaxy S24+ 256GB'), 'galaxy-s24-plus-256gb');
+    assert.equal(productNameFor({ brand: 'Samsung', model: 'Galaxy S24 Ultra', storage: '256GB' }), 'Samsung Galaxy S24 Ultra 256GB');
+    assert.equal(productNameFor({ brand: 'Xiaomi', model: 'Xiaomi 14', storage: '256GB' }), 'Xiaomi 14 256GB');
+    assert.equal(productNameFor({ brand: 'Apple', model: 'iPhone 15', storage: '128GB' }), 'iPhone 15 128GB');
+  });
+  it('bỏ máy đã có, tạo máy mới ẩn, mã không trùng', () => {
+    const plan = planNewProducts([{ id: 'ip15-pink', name: 'iPhone 15 128GB' }, { id: 'galaxy-s24-ultra-256gb', name: 'x' }], rows);
+    assert.equal(plan.duplicates, 1);
+    assert.equal(plan.items.length, 3);
+    const p = plan.items.find(i => i.product.name.includes('256GB') && i.brand === 'Apple').product;
+    assert.equal(p.is_visible, false);
+    assert.equal(p.condition, 'new');
+    assert.equal(p.price, 18574800);
+    assert.equal(p.old_price, 20190000);
+    assert.equal(p.image_url, '');
+    assert.equal(planNewProducts([], rows, { visible: true }).items[0].product.is_visible, true);
+    assert.equal(new Set(plan.items.map(i => i.product.id)).size, plan.items.length);
   });
 });

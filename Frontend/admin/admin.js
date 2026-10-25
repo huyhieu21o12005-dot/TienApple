@@ -4,7 +4,7 @@
  * Visibility Toggle, Bulk Operations, Image Upload with Client Resize, and Filters.
  */
 
-import { SHEET_CSV_URL, parseSheetRows, planPriceUpdates } from './sheetPricing.js';
+import { SHEET_CSV_URL, parseSheetRows, parseSheetDate, planPriceUpdates, planNewProducts } from './sheetPricing.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
 import {
   formatCurrency,
@@ -710,61 +710,126 @@ async function executeBulkDelete() {
 // ==============================================================================
 // 7. DELETE SINGLE PRODUCT (WITH IMAGE CLEANUP)
 // ==============================================================================
-const sheetPlan = { changes: [] };
+const sheetState = { mode: 'price', tab: 'all', items: [], date: '', info: '', error: '' };
 
 function closeSheetPriceModal() {
   document.getElementById('sheetPriceModal').classList.add('hidden');
 }
 
-async function openSheetPriceModal() {
+function renderSheetModal() {
   const body = document.getElementById('sheetPriceBody');
   const applyBtn = document.getElementById('applySheetPriceBtn');
+  const isNew = sheetState.mode === 'new';
+  document.getElementById('sheetPriceTitle').textContent = isNew ? 'Thêm sản phẩm mới từ Google Sheet' : 'Cập nhật giá từ Google Sheet';
+  document.getElementById('sheetPriceIntro').innerHTML = isNew
+    ? 'Web rà sheet, <strong>bỏ qua máy đã có</strong> và chỉ thêm máy mới (hàng mới 100%). Ảnh, màu, thông số để trống, bạn bổ sung sau.'
+    : 'Chỉ đổi giá <strong>điện thoại hàng mới đã có trên web</strong>. Hàng Like New, hàng cũ và phụ kiện giữ nguyên giá. Giá bán = "Giá Sau Sale", giá gạch ngang = "Giá Bán".';
+  if (sheetState.error) { body.textContent = sheetState.error; applyBtn.disabled = true; return; }
+
+  const brands = [...new Set(sheetState.items.map(i => i.brand))];
+  const tabs = [['all', 'Tất cả', sheetState.items.length], ...brands.map(b => [b, b, sheetState.items.filter(i => i.brand === b).length])];
+  const shown = sheetState.items.filter(i => sheetState.tab === 'all' || i.brand === sheetState.tab);
+  const chips = `<div class="sheet-tabs" role="tablist">${tabs.map(([k, label, n]) =>
+    `<button type="button" role="tab" class="sheet-tab ${sheetState.tab === k ? 'active' : ''}" data-tab="${escapeHtml(k)}">${escapeHtml(label)} <span>${n}</span></button>`).join('')}</div>`;
+  const price = (n) => escapeHtml(formatCurrency(n));
+  const rows = shown.length === 0 ? `<p>${isNew ? 'Không có sản phẩm mới ở mục này.' : 'Không có giá nào cần đổi ở mục này.'}</p>` : `
+    <table class="sheet-price-table"><thead><tr><th></th><th>Sản phẩm</th><th>${isNew ? 'Giá bán' : 'Giá cũ'}</th>${isNew ? '<th>Tồn</th>' : '<th>Giá mới</th>'}</tr></thead><tbody>
+    ${shown.map(i => `<tr class="${i.warn ? 'sheet-price-warn' : ''}">
+      <td><input type="checkbox" class="sheet-price-check" data-i="${sheetState.items.indexOf(i)}" ${i.checked ? 'checked' : ''} aria-label="Chọn ${escapeHtml(i.name)}"></td>
+      <td>${escapeHtml(i.name)}${i.warn ? '<br><small>Lệch hơn 30%, hãy kiểm tra trước khi tick.</small>' : ''}</td>
+      ${isNew
+        ? `<td>${price(i.newPrice)}</td><td>${Number(i.stock) || 0}</td>`
+        : `<td>${price(i.oldPrice)}</td><td><strong>${price(i.newPrice)}</strong>${i.newList ? `<br><small>gạch: ${price(i.newList)}</small>` : ''}</td>`}
+    </tr>`).join('')}</tbody></table>`;
+  const visibleOpt = isNew ? `<label class="sheet-opt"><input type="checkbox" id="sheetVisibleNow"> Hiện ngay trên web (mặc định ẩn cho tới khi có ảnh)</label>` : '';
+  body.innerHTML = `${chips}${rows}${visibleOpt}<p class="dialog-subtext">${escapeHtml(sheetState.info)}</p>`;
+  const checked = sheetState.items.filter(i => i.checked).length;
+  applyBtn.disabled = checked === 0;
+  applyBtn.textContent = isNew ? `Thêm ${checked} sản phẩm` : `Áp dụng giá (${checked})`;
+}
+
+async function openSheetModal(mode) {
+  sheetState.mode = mode;
+  sheetState.tab = 'all';
+  sheetState.items = [];
+  sheetState.error = '';
   document.getElementById('sheetPriceModal').classList.remove('hidden');
-  applyBtn.disabled = true;
-  body.textContent = 'Đang tải bảng giá...';
-  sheetPlan.changes = [];
+  document.getElementById('sheetPriceBody').textContent = 'Đang tải bảng giá...';
+  document.getElementById('applySheetPriceBtn').disabled = true;
   try {
     const res = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const { rows, errors } = parseSheetRows(await res.text());
+    const text = await res.text();
+    const { rows, errors } = parseSheetRows(text);
     if (rows.length === 0) throw new Error(errors[0] || 'Sheet không có dữ liệu giá.');
-    const plan = planPriceUpdates(state.products, rows);
-    sheetPlan.changes = plan.changes;
-
-    const price = (n) => escapeHtml(formatCurrency(n));
-    const list = plan.changes.length === 0 ? '<p>Không có giá nào cần đổi.</p>' : `
-      <table class="sheet-price-table"><thead><tr><th></th><th>Sản phẩm</th><th>Giá cũ</th><th>Giá mới</th></tr></thead><tbody>
-      ${plan.changes.map((c, i) => `<tr class="${c.bigChange ? 'sheet-price-warn' : ''}">
-        <td><input type="checkbox" class="sheet-price-check" data-i="${i}" ${c.bigChange ? '' : 'checked'} aria-label="Áp dụng ${escapeHtml(c.name)}"></td>
-        <td>${escapeHtml(c.name)}${c.bigChange ? '<br><small>Lệch hơn 30%, hãy kiểm tra trước khi tick.</small>' : ''}</td>
-        <td>${price(c.oldPrice)}</td><td><strong>${price(c.newPrice)}</strong>${c.newList ? `<br><small>gạch: ${price(c.newList)}</small>` : ''}</td></tr>`).join('')}
-      </tbody></table>`;
-    const unmatched = plan.unmatched.length ? `<p class="dialog-subtext">Không có trong sheet (giữ nguyên giá): ${plan.unmatched.map(u => escapeHtml(u.name)).join(', ')}</p>` : '';
-    const warn = errors.length ? `<p class="dialog-subtext">Bỏ qua ${errors.length} dòng lỗi trong sheet.</p>` : '';
-    body.innerHTML = `${list}<p class="dialog-subtext">Không đổi: ${plan.same.length} · Bỏ qua (hàng cũ, phụ kiện): ${plan.skipped}</p>${unmatched}${warn}`;
-    applyBtn.disabled = plan.changes.length === 0;
+    const date = parseSheetDate(text);
+    const extra = errors.length ? ` · Bỏ qua ${errors.length} dòng lỗi trong sheet.` : '';
+    if (mode === 'new') {
+      const plan = planNewProducts(state.products, rows);
+      sheetState.items = plan.items.map(i => ({ name: i.product.name, brand: i.brand, newPrice: i.product.price, stock: i.product.stock, product: i.product, checked: true }));
+      sheetState.info = `Bảng giá cập nhật ngày ${date || 'không rõ'} · Đã có trên web (bỏ qua): ${plan.duplicates}${extra}`;
+    } else {
+      const plan = planPriceUpdates(state.products, rows);
+      const brandOf = new Map(rows.map(r => [r.key, r.brand]));
+      sheetState.items = plan.changes.map(c => ({ ...c, brand: brandOf.get(c.sheetKey) || '', warn: c.bigChange, checked: !c.bigChange }));
+      const missing = plan.unmatched.length ? ` · Không có trong sheet (giữ giá): ${plan.unmatched.map(u => u.name).join(', ')}` : '';
+      sheetState.info = `Bảng giá cập nhật ngày ${date || 'không rõ'} · Không đổi: ${plan.same.length} · Bỏ qua (hàng cũ, phụ kiện): ${plan.skipped}${missing}${extra}`;
+    }
   } catch (err) {
     console.error('[Admin] Lỗi đọc Google Sheet:', err);
-    body.textContent = 'Không đọc được Google Sheet. Kiểm tra sheet còn chia sẻ "bất kỳ ai có đường liên kết" và thử lại.';
+    sheetState.error = 'Không đọc được Google Sheet. Kiểm tra sheet còn chia sẻ "bất kỳ ai có đường liên kết" và thử lại.';
   }
+  renderSheetModal();
 }
 
-async function applySheetPrices() {
-  const picked = [...document.querySelectorAll('.sheet-price-check:checked')].map(el => sheetPlan.changes[Number(el.dataset.i)]).filter(Boolean);
+async function applySheetChanges() {
+  const picked = sheetState.items.filter(i => i.checked);
   if (picked.length === 0) return showToast('Chưa chọn sản phẩm nào.', 'error');
   const applyBtn = document.getElementById('applySheetPriceBtn');
   applyBtn.disabled = true;
   let ok = 0;
-  for (const c of picked) {
-    const { error } = await supabase.from('products')
-      .update({ price: c.newPrice, old_price: c.newList, updated_at: new Date().toISOString() })
-      .eq('id', c.id);
-    if (error) console.error('[Admin] Lỗi cập nhật giá', c.id, error);
-    else ok++;
+  if (sheetState.mode === 'new') {
+    const visible = Boolean(document.getElementById('sheetVisibleNow')?.checked);
+    for (let i = 0; i < picked.length; i += 25) {
+      const batch = picked.slice(i, i + 25).map(p => ({ ...p.product, is_visible: visible }));
+      const { error } = await supabase.from('products').insert(batch);
+      if (error) console.error('[Admin] Lỗi thêm sản phẩm', error);
+      else ok += batch.length;
+    }
+    showToast(ok === picked.length ? `Đã thêm ${ok} sản phẩm mới${visible ? '' : ' (đang ẩn, thêm ảnh rồi bật hiển thị)'}` : `Thêm được ${ok}/${picked.length}, xem lại console`, ok === picked.length ? 'success' : 'error');
+  } else {
+    for (const c of picked) {
+      const { error } = await supabase.from('products')
+        .update({ price: c.newPrice, old_price: c.newList, updated_at: new Date().toISOString() })
+        .eq('id', c.id);
+      if (error) console.error('[Admin] Lỗi cập nhật giá', c.id, error);
+      else ok++;
+    }
+    showToast(ok === picked.length ? `Đã cập nhật giá ${ok} sản phẩm từ Sheet` : `Cập nhật được ${ok}/${picked.length}, xem lại console`, ok === picked.length ? 'success' : 'error');
   }
   closeSheetPriceModal();
-  showToast(ok === picked.length ? `Đã cập nhật giá ${ok} sản phẩm từ Sheet` : `Cập nhật được ${ok}/${picked.length} sản phẩm, xem lại console`, ok === picked.length ? 'success' : 'error');
   await loadProducts();
+}
+
+function bindSheetModal() {
+  document.getElementById('sheetNewBtn').addEventListener('click', () => openSheetModal('new'));
+  document.getElementById('sheetPriceBtn').addEventListener('click', () => openSheetModal('price'));
+  document.getElementById('closeSheetPriceBtn').addEventListener('click', closeSheetPriceModal);
+  document.getElementById('cancelSheetPriceBtn').addEventListener('click', closeSheetPriceModal);
+  document.getElementById('applySheetPriceBtn').addEventListener('click', applySheetChanges);
+  document.getElementById('sheetPriceBody').addEventListener('click', (e) => {
+    const tab = e.target.closest('[data-tab]');
+    if (tab) { sheetState.tab = tab.dataset.tab; renderSheetModal(); }
+  });
+  document.getElementById('sheetPriceBody').addEventListener('change', (e) => {
+    const box = e.target.closest('.sheet-price-check');
+    if (!box) return;
+    sheetState.items[Number(box.dataset.i)].checked = box.checked;
+    const checked = sheetState.items.filter(i => i.checked).length;
+    const btn = document.getElementById('applySheetPriceBtn');
+    btn.disabled = checked === 0;
+    btn.textContent = sheetState.mode === 'new' ? `Thêm ${checked} sản phẩm` : `Áp dụng giá (${checked})`;
+  });
 }
 
 function openDeleteModal(prod) {
@@ -1250,10 +1315,7 @@ function bindGlobalEvents() {
   document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
 
   // Delete modal buttons
-  document.getElementById('sheetPriceBtn').addEventListener('click', openSheetPriceModal);
-  document.getElementById('closeSheetPriceBtn').addEventListener('click', closeSheetPriceModal);
-  document.getElementById('cancelSheetPriceBtn').addEventListener('click', closeSheetPriceModal);
-  document.getElementById('applySheetPriceBtn').addEventListener('click', applySheetPrices);
+  bindSheetModal();
   document.getElementById('closeDeleteBtn').addEventListener('click', closeDeleteModal);
   document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
   document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDeleteProduct);

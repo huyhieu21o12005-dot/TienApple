@@ -6,6 +6,9 @@
 import { CartManager } from './store.js';
 import { escapeHtml, jsArg, safeUrl, safeColor, discountPercent } from './utils.js';
 import { formatDate } from './warranty.js';
+
+/** Ảnh tạm khi sản phẩm chưa có ảnh. */
+const NO_IMAGE = './assets/no-image.svg';
 import { installmentStatusLabel } from './installment.js';
 
 export function isOutOfStock(product) {
@@ -38,7 +41,7 @@ export function productCardHtml(p, opts = {}) {
             <img
               alt="${escapeHtml(p.name)}"
               class="h-full object-contain group-hover:scale-105 transition-transform duration-300"
-              src="${escapeHtml(safeUrl(p.image))}"
+              src="${escapeHtml(safeUrl(p.image) || NO_IMAGE)}"
               loading="lazy"
             />
           </div>
@@ -119,7 +122,7 @@ export function cartItemHtml(item, index) {
   return `
         <div class="p-3.5 rounded-2xl bg-[#F5F5F7] flex gap-3.5 relative">
           <div class="w-18 h-18 rounded-xl bg-white flex-shrink-0 p-1 flex items-center justify-center border border-[#D2D2D7]/50">
-            <img class="max-h-full max-w-full object-contain" src="${escapeHtml(safeUrl(product.image))}" alt="${escapeHtml(product.name)}" />
+            <img class="max-h-full max-w-full object-contain" src="${escapeHtml(safeUrl(product.image) || NO_IMAGE)}" alt="${escapeHtml(product.name)}" />
           </div>
           <div class="flex-1 min-w-0 flex flex-col justify-between">
             <div>

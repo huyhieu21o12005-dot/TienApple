@@ -274,10 +274,10 @@ Chạy `supabase/cashflow.sql` trong Supabase (một lần). Trang `/admin/cashf
 - Ở trang in hóa đơn có nút **Ghi vào sổ thu**: ghi tổng tiền của phiếu vào sổ thu (mỗi mã phiếu chỉ ghi một lần, có thể sửa số tiền trước khi ghi).
 - Chỉ chủ shop (owner) được xóa khoản thu chi.
 
-## Cập nhật giá từ Google Sheet
+## Đồng bộ sản phẩm và giá từ Google Sheet
 
-Trang **Sản phẩm** có nút **Cập nhật giá từ Sheet**. Bấm nút: web đọc bảng giá (sheet phải chia sẻ "bất kỳ ai có đường liên kết"), ghép với **điện thoại hàng mới** theo tên máy + dung lượng (ví dụ "iPhone 15 128GB"), hiện bảng giá cũ / giá mới, bạn tick rồi bấm **Áp dụng giá**.
-- Giá bán = cột "Giá Sau Sale"; giá gạch ngang = cột "Giá Bán" (chỉ khi có sale).
-- Hàng Like New, hàng cũ và phụ kiện không bao giờ bị đổi giá. Sản phẩm không có trong sheet giữ nguyên.
-- Giá lệch hơn 30% so với giá cũ được tô vàng và không tự tick.
-- Muốn một sản phẩm ăn theo sheet: đặt tên đúng dạng "<Mẫu> <Dung lượng>" như trong sheet (hãng và "5G" được bỏ qua khi so tên).
+Trang **Sản phẩm** có hai nút. Cả hai đọc bảng giá Google Sheet (sheet phải chia sẻ "bất kỳ ai có đường liên kết"), hiện bảng xem trước có các tab **Tất cả · Apple · Samsung · Xiaomi · OPPO · Vivo · Realme** (theo cột Hãng), tick rồi mới áp dụng. Bảng xem trước ghi rõ "Bảng giá cập nhật ngày ..." theo dòng ngày trong sheet.
+
+- **Thêm SP mới từ Sheet**: rà sheet, **bỏ máy đã có** (so theo tên máy + dung lượng) và chỉ thêm máy mới, hàng mới 100%. Giá, giá gạch ngang, tồn kho lấy từ sheet; ảnh, màu, chip, camera để trống để bạn bổ sung sau. Mặc định tạo **ẩn**; thêm ảnh ở trang sửa sản phẩm rồi bật hiển thị (hoặc tick "Hiện ngay trên web"). Khi chưa có ảnh web hiện ảnh tạm.
+- **Cập nhật giá từ Sheet**: đổi giá cho **điện thoại hàng mới đã có trên web**. Giá bán = "Giá Sau Sale", giá gạch ngang = "Giá Bán" (khi có sale). Hàng Like New, hàng cũ, phụ kiện không bị đổi. Giá lệch hơn 30% tô vàng và không tự tick.
+- Tên sản phẩm tạo ra có dạng "<Mẫu> <Dung lượng>" (Samsung/OPPO... thêm tên hãng phía trước nếu mẫu chưa có). Mỗi dung lượng là một sản phẩm riêng.
