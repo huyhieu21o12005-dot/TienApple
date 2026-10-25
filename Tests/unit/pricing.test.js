@@ -55,3 +55,27 @@ test('matchPricing: cùng nhóm hoặc, khác nhóm và, không tích là tất 
   assert.deepEqual(matchPricing(list, ['brand:apple', 'brand:samsung', 'price:5', 'price:4']), ['a', 'c']);
   assert.deepEqual(matchPricing(list, ['cond:likenew']), ['d']);
 });
+
+import { planRules, normalizeRule } from '../../Frontend/admin/pricing.js';
+
+test('planRules: iPhone 17 Pro Max +2tr, iPhone 8 chỉ +500k', () => {
+  const rules = [{ value: '500000' }, { brand: 'Apple', from: '20000000', value: '2000000' }];
+  const out = Object.fromEntries(planRules(list, rules).map(r => [r.id, r.newPrice]));
+  assert.equal(out.a, 37000000);
+  assert.equal(out.b, 2500000);
+  assert.equal(out.c, 22500000);
+});
+
+test('planRules: tên máy > khoảng giá > hãng > chung, bỏ dòng chưa nhập mức', () => {
+  const rules = [{ value: '100000' }, { brand: 'apple', value: '200000' }, { from: '1', to: '5000000', value: '300000' }, { keyword: 'IPHONE 8', value: '400000' }, { brand: 'apple', value: '' }];
+  const out = Object.fromEntries(planRules(list, rules).map(r => [r.id, r.newPrice]));
+  assert.equal(out.b, 2400000);
+  assert.equal(out.a, 35200000);
+  assert.equal(out.c, 22100000);
+  assert.equal(normalizeRule({ value: '' }), null);
+});
+
+test('planRules: không khớp thì bỏ qua, phần trăm có làm tròn', () => {
+  assert.deepEqual(planRules(list, [{ brand: 'xiaomi', value: '1' }]), []);
+  assert.equal(planRules([list[0]], [{ mode: 'percent', value: '3.3' }], 100000)[0].newPrice, 36200000);
+});

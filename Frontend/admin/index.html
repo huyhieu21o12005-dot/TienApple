@@ -479,6 +479,11 @@
       </div>
       <div class="modal-body">
         <p class="dialog-subtext">Giá bán = <strong>giá gốc + cộng thêm</strong>. Tích hãng / khoảng giá để lọc (cùng nhóm là "hoặc", khác nhóm là "và"), tích máy cần đổi rồi nhập mức cộng thêm. Có thể bấm sửa trực tiếp từng ô. Chưa lưu cho tới khi bấm <strong>Lưu giá</strong>.</p>
+        <div class="sheet-tabs" role="tablist">
+          <button type="button" class="sheet-tab active" data-sptab="pick" role="tab">Set giá theo tích chọn</button>
+          <button type="button" class="sheet-tab" data-sptab="rules" role="tab">Set giá hàng loạt (theo quy tắc)</button>
+        </div>
+        <div id="spPanePick">
         <div id="spFacets" class="bd-facets"></div>
         <div class="bd-toolbar">
           <input type="search" id="spSearch" class="form-input" placeholder="Tìm theo tên máy..." aria-label="Tìm theo tên">
@@ -496,6 +501,19 @@
           </select>
           <button type="button" id="spApplyPicked" class="btn btn-primary btn-sm" disabled>Áp vào máy đã chọn</button>
           <button type="button" id="spResetPicked" class="btn btn-ghost btn-sm" disabled>Về giá gốc</button>
+        </div>
+        </div>
+        <div id="spPaneRules" class="hidden">
+          <p class="dialog-subtext">Mỗi dòng là một quy tắc (để trống ô nào thì không lọc theo ô đó). Mỗi máy chỉ nhận <strong>một</strong> quy tắc, ưu tiên cụ thể nhất: <em>tên máy</em> &gt; <em>khoảng giá gốc</em> &gt; <em>hãng</em> &gt; <em>chung</em>. Máy không khớp dòng nào thì giữ nguyên. Ví dụ: dòng chung +500.000 và dòng Apple, giá gốc từ 20.000.000 +2.000.000 thì iPhone 17 Pro Max +2tr còn iPhone 8 chỉ +500k.</p>
+          <div id="spRules" class="sp-rules"></div>
+          <div class="sp-bulk">
+            <button type="button" id="spAddRule" class="btn btn-secondary btn-sm">+ Thêm quy tắc</button>
+            <select id="spRuleRound" class="form-input" aria-label="Làm tròn lên">
+              <option value="0">Không làm tròn</option><option value="1000">Tròn 1.000đ</option><option value="10000">Tròn 10.000đ</option>
+              <option value="100000">Tròn 100.000đ</option><option value="500000">Tròn 500.000đ</option><option value="1000000">Tròn 1.000.000đ</option>
+            </select>
+            <button type="button" id="spRunRules" class="btn btn-primary btn-sm">Tính vào bảng</button>
+          </div>
         </div>
         <div id="spList" class="bd-list sp-list"></div>
         <p id="spCount" class="dialog-subtext"></p>

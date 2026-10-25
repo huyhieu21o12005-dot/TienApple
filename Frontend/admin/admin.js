@@ -4,7 +4,7 @@
  * Visibility Toggle, Bulk Operations, Image Upload with Client Resize, and Filters.
  */
 
-import { baseOf, markupPrice, matchPricing, parseAmount, pricingGroups } from './pricing.js';
+import { baseOf, markupPrice, matchPricing, parseAmount, planRules, pricingGroups } from './pricing.js';
 import { imageFor } from './modelImages.js';
 import { buildFacetGroups, matchByFacets } from './bulkSelect.js';
 import { USED_IMAGE_NOTE } from './sheetPricing.js';
@@ -733,7 +733,8 @@ async function confirmBulkDelete() {
 // SET GIÁ: tích hãng / khoảng giá, cộng thêm hàng loạt, sửa trực tiếp từng máy
 // ==============================================================================
 // edits: id -> giá bán mới (chưa lưu). picked: máy được tích ở bảng. facets: ô lọc đang tích.
-const setPrice = { facets: new Set(), picked: new Set(), edits: new Map(), query: '' };
+const setPrice = { facets: new Set(), picked: new Set(), edits: new Map(), query: '', tab: 'pick', rules: [] };
+const SP_RULES_KEY = 'tm_set_price_rules';
 
 const spEsc = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 const spNow = (p) => (setPrice.edits.has(p.id) ? setPrice.edits.get(p.id) : p.price);
@@ -785,7 +786,46 @@ function setPriceEdit(id, price) {
   if (price === p.price) setPrice.edits.delete(id); else setPrice.edits.set(id, price);
 }
 
+function renderSetPriceRules() {
+  const brands = [...new Set(state.products.map(p => (p.brandName || p.brand || '').trim()).filter(Boolean))].sort();
+  document.getElementById('spRules').innerHTML = setPrice.rules.map((r, i) => `
+    <div class="sp-rule" data-i="${i}">
+      <select data-f="brand" class="form-input" aria-label="Hãng"><option value="">Mọi hãng</option>${brands.map(b => `<option value="${spEsc(b)}"${String(r.brand || '').toLowerCase() === b.toLowerCase() ? ' selected' : ''}>${spEsc(b)}</option>`).join('')}</select>
+      <input data-f="from" class="form-input" inputmode="numeric" placeholder="Giá gốc từ" value="${spEsc(r.from)}" aria-label="Giá gốc từ">
+      <input data-f="to" class="form-input" inputmode="numeric" placeholder="đến" value="${spEsc(r.to)}" aria-label="Giá gốc đến">
+      <input data-f="keyword" class="form-input" placeholder="Tên máy chứa..." value="${spEsc(r.keyword)}" aria-label="Tên máy chứa">
+      <span class="sp-plus">+</span>
+      <input data-f="value" class="form-input" inputmode="decimal" placeholder="Cộng thêm" value="${spEsc(r.value)}" aria-label="Cộng thêm">
+      <select data-f="mode" class="form-input" aria-label="Kiểu"><option value="fixed"${r.mode !== 'percent' ? ' selected' : ''}>đ</option><option value="percent"${r.mode === 'percent' ? ' selected' : ''}>%</option></select>
+      <button type="button" class="btn btn-ghost btn-sm" data-del="${i}" aria-label="Xóa quy tắc">✕</button>
+    </div>`).join('') || '<p class="dialog-subtext">Chưa có quy tắc, bấm "+ Thêm quy tắc".</p>';
+}
+
+function saveSetPriceRules() {
+  try { localStorage.setItem(SP_RULES_KEY, JSON.stringify(setPrice.rules)); } catch { /* bỏ qua */ }
+}
+
+function showSetPriceTab(tab) {
+  setPrice.tab = tab;
+  document.querySelectorAll('[data-sptab]').forEach(b => b.classList.toggle('active', b.dataset.sptab === tab));
+  document.getElementById('spPanePick').classList.toggle('hidden', tab !== 'pick');
+  document.getElementById('spPaneRules').classList.toggle('hidden', tab !== 'rules');
+}
+
+function runSetPriceRules() {
+  const step = Number(document.getElementById('spRuleRound').value) || 0;
+  const plan = planRules(state.products, setPrice.rules, step);
+  if (!plan.length) { showToast('Chưa có quy tắc hợp lệ hoặc không máy nào khớp.', 'error'); return; }
+  plan.forEach(r => setPriceEdit(r.id, r.newPrice));
+  renderSetPriceList();
+  showToast(`Đã tính giá cho ${plan.length} máy, kiểm tra bảng rồi bấm Lưu giá.`, 'success');
+}
+
 function openSetPriceModal() {
+  try { const saved = JSON.parse(localStorage.getItem(SP_RULES_KEY) || '[]'); setPrice.rules = Array.isArray(saved) ? saved : []; } catch { setPrice.rules = []; }
+  if (!setPrice.rules.length) setPrice.rules = [{ brand: '', from: '', to: '', keyword: '', mode: 'fixed', value: '' }];
+  showSetPriceTab('pick');
+  renderSetPriceRules();
   setPrice.facets = new Set(); setPrice.picked = new Set(); setPrice.edits = new Map(); setPrice.query = '';
   document.getElementById('spSearch').value = '';
   document.getElementById('spValue').value = '';
@@ -834,6 +874,21 @@ function bindSetPriceModal() {
     close();
   });
   document.getElementById('spApply').addEventListener('click', saveSetPrice);
+  document.querySelectorAll('[data-sptab]').forEach(b => b.addEventListener('click', () => showSetPriceTab(b.dataset.sptab)));
+  document.getElementById('spAddRule').addEventListener('click', () => {
+    setPrice.rules.push({ brand: '', from: '', to: '', keyword: '', mode: 'fixed', value: '' });
+    renderSetPriceRules(); saveSetPriceRules();
+  });
+  document.getElementById('spRunRules').addEventListener('click', runSetPriceRules);
+  document.getElementById('spRules').addEventListener('input', (e) => {
+    const row = e.target.closest('[data-i]'); const f = e.target.dataset.f;
+    if (row && f) { setPrice.rules[Number(row.dataset.i)][f] = e.target.value; saveSetPriceRules(); }
+  });
+  document.getElementById('spRules').addEventListener('click', (e) => {
+    const del = e.target.closest('[data-del]');
+    if (!del) return;
+    setPrice.rules.splice(Number(del.dataset.del), 1); renderSetPriceRules(); saveSetPriceRules();
+  });
   document.getElementById('spApplyPicked').addEventListener('click', () => applySetPricePicked(false));
   document.getElementById('spResetPicked').addEventListener('click', () => applySetPricePicked(true));
   document.getElementById('spFacets').addEventListener('change', (e) => {

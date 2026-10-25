@@ -88,3 +88,62 @@ export function matchPricing(products, pickedIds) {
     return [...byGroup.values()].every(opts => opts.some(o => have.has(o)));
   }).map(p => p.id);
 }
+
+// ---------------------------------------------------------------------------
+// Set giá hàng loạt theo bảng quy tắc
+// ---------------------------------------------------------------------------
+
+/** Bỏ dấu, chữ thường, chỉ giữ chữ và số, để so tên máy với từ khóa. */
+export function normalizeText(value) {
+  return text(value)
+    .normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd')
+    .toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+/** Chuẩn hóa một dòng quy tắc từ biểu mẫu; null nếu chưa có mức cộng thêm hợp lệ. */
+export function normalizeRule(raw) {
+  const r = raw && typeof raw === 'object' ? raw : {};
+  const mode = r.mode === 'percent' ? 'percent' : 'fixed';
+  const value = mode === 'percent' ? parsePercent(r.value) : parseAmount(r.value);
+  if (value === null || !Number.isFinite(value)) return null;
+  const from = parseAmount(r.from);
+  const to = parseAmount(r.to);
+  return {
+    brand: text(r.brand).toLowerCase(),
+    from: Number.isFinite(from) ? from : null,
+    to: Number.isFinite(to) ? to : null,
+    keyword: normalizeText(r.keyword),
+    mode, value
+  };
+}
+
+/** Điểm cụ thể: tên máy 4 > khoảng giá gốc 2 > hãng 1 > chung 0. */
+export function ruleScore(rule) {
+  return (rule.keyword ? 4 : 0) + (rule.from !== null || rule.to !== null ? 2 : 0) + (rule.brand ? 1 : 0);
+}
+
+function ruleMatches(p, rule) {
+  const base = baseOf(p);
+  if (rule.brand && !text(p.brandName || p.brand).toLowerCase().includes(rule.brand)) return false;
+  if (rule.from !== null && base < rule.from) return false;
+  if (rule.to !== null && base > rule.to) return false;
+  if (rule.keyword && !normalizeText(p.name).includes(rule.keyword)) return false;
+  return true;
+}
+
+/**
+ * Mỗi sản phẩm nhận MỘT quy tắc khớp, cụ thể nhất (hòa điểm: dòng nằm sau thắng). Sản phẩm không khớp thì bỏ qua.
+ * @returns {Array<{ id: string, newPrice: number, ruleIndex: number }>} ruleIndex theo mảng rules gốc
+ */
+export function planRules(products, rawRules, roundStep = 0) {
+  const rules = (Array.isArray(rawRules) ? rawRules : []).map((r, index) => ({ rule: normalizeRule(r), index })).filter(x => x.rule);
+  const out = [];
+  for (const p of Array.isArray(products) ? products : []) {
+    let best = null;
+    for (const x of rules) {
+      if (ruleMatches(p, x.rule) && (!best || ruleScore(x.rule) >= ruleScore(best.rule))) best = x;
+    }
+    if (best) out.push({ id: p.id, newPrice: markupPrice(baseOf(p), best.rule.mode, best.rule.value, roundStep), ruleIndex: best.index });
+  }
+  return out;
+}
