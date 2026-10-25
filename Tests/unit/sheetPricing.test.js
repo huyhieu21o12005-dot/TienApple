@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { planNewProducts, brandsOf, parseSheetDate, slugify, productNameFor, parseCsv, parseVnd, parsePercent, normalizeKey, parseSheetRows, planPriceUpdates } from '../../Frontend/admin/sheetPricing.js';
+import { parseUsedRows, usedGroup, planUsedProducts, planNewProducts, brandsOf, parseSheetDate, slugify, productNameFor, parseCsv, parseVnd, parsePercent, normalizeKey, parseSheetRows, planPriceUpdates } from '../../Frontend/admin/sheetPricing.js';
 
 const csv = [
   'TIEN MOBILE - BẢNG BÁO GIÁ,,,,,,',
@@ -109,5 +109,49 @@ describe('sheetPricing - sản phẩm mới', () => {
     assert.equal(p.image_url, '');
     assert.equal(planNewProducts([], rows, { visible: true }).items[0].product.is_visible, true);
     assert.equal(new Set(plan.items.map(i => i.product.id)).size, plan.items.length);
+  });
+});
+
+describe('sheetPricing - máy cũ (2ND)', () => {
+  const nd = [
+    'TIEN MOBILE - BẢNG BÁO GIÁ CŨ,,,,,,,,,,,,,',
+    '"","Hãng","Mẫu Sản Phẩm","Phiên Bản / Bộ Nhớ","RAM","Tình Trạng (Độ mới)","Mô Tả","","","","","","","Trạng Thái"',
+    '1,Apple,iPhone 17 Pro Max,512GB,12GB,99% Like New,"Cam, bản VN/A, pin 94%","31.800.000 ₫","31.800.000 ₫",0%,"31.800.000 ₫","0 ₫",1,Còn hàng',
+    '2,Apple,iPhone 17 Pro Max,512GB,12GB,99% Like New,"Cam, bản VN/A, pin 94%","31.000.000 ₫","31.000.000 ₫",0%,"31.000.000 ₫","0 ₫",1,Còn hàng',
+    '3,Apple,Apple Watch Series 9,64GB,1GB,99% Like New,"45mm, Trắng","4.600.000 ₫","4.600.000 ₫",0%,"4.600.000 ₫","0 ₫",0,Hết hàng',
+    '4,Apple,iPhone 16,128GB,8GB,98% Phẩy nhẹ,"Hồng, bản LL/A, pin 100%","14.600.000 ₫","14.600.000 ₫",0%,"14.600.000 ₫","0 ₫",1,Còn hàng'
+  ].join('\n');
+  const { rows } = parseUsedRows(nd);
+  it('đọc 4 dòng, không đọc giá gốc', () => {
+    assert.equal(rows.length, 4);
+    assert.equal(rows[0].finalPrice, 31800000);
+    assert.equal(rows[0].group, 'iPhone 17');
+    assert.equal(rows[2].stock, 0);
+  });
+  it('nhóm hiển thị', () => {
+    assert.equal(usedGroup('iPhone 12 Pro Max'), 'iPhone 12');
+    assert.equal(usedGroup('iPhone XS Max'), 'iPhone XS');
+    assert.equal(usedGroup('Apple Watch Series 9'), 'Apple Watch');
+    assert.equal(usedGroup('iPad Air 11 M2 (Air 7)'), 'iPad');
+  });
+  it('mỗi máy một sản phẩm Like New, bỏ máy hết hàng, mã không trùng', () => {
+    const plan = planUsedProducts([], rows);
+    assert.equal(plan.items.length, 3);
+    assert.equal(plan.soldOut, 1);
+    const ids = plan.items.map(i => i.product.id);
+    assert.equal(new Set(ids).size, 3);
+    const p = plan.items[0].product;
+    assert.equal(p.condition, 'like_new');
+    assert.equal(p.stock, 1);
+    assert.equal(p.is_visible, false);
+    assert.equal(p.battery, 'Pin 94%');
+    assert.equal(p.price, 31800000);
+    assert.match(p.name, /iPhone 17 Pro Max 512GB - Cam - 99% Like New/);
+  });
+  it('bỏ qua máy đã có trên web (theo mã)', () => {
+    const first = planUsedProducts([], rows);
+    const again = planUsedProducts(first.items.map(i => ({ id: i.product.id })), rows);
+    assert.equal(again.items.length, 0);
+    assert.equal(again.duplicates, 3);
   });
 });

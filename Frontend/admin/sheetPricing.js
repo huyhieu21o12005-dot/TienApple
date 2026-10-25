@@ -9,6 +9,9 @@
 export const SHEET_ID = '1Ta3iJAafT8pnm4kuqSvPUqnJO-HLHq7s3Dk_clkIyQE';
 /** Tab tổng hợp (gộp các tab dòng máy / hãng) mà web đọc. Đổi tên tab thì sửa ở đây. */
 export const SHEET_TAB = 'TONG_HOP';
+/** Tab máy cũ (2ND): mỗi dòng là một máy riêng, tồn kho 1. */
+export const SHEET_USED_TAB = '2ND';
+export const SHEET_USED_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_USED_TAB)}`;
 export const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_TAB)}`;
 /** Đổi giá lệch quá mức này (so với giá cũ) thì không tự chọn, chờ người dùng tick. */
 export const BIG_CHANGE_RATIO = 0.3;
@@ -208,6 +211,91 @@ export function planNewProducts(existingProducts, sheetRows, { visible = false }
         colors: [], default_color: '', storages: r.storage ? [r.storage] : [],
         chip: '', camera: '', battery: '', screen: '',
         description: [r.ram && r.ram !== '--' && `RAM ${r.ram}`, r.storage && `Bộ nhớ ${r.storage}`, r.warranty && `Bảo hành ${r.warranty}`].filter(Boolean).join(' • '),
+        rating: 5, review_count: 0, image_url: '', stock: r.stock, is_visible: Boolean(visible), sort_order: 0
+      }
+    });
+  }
+  return out;
+}
+
+
+// ===== Máy cũ (tab 2ND): mỗi dòng một máy =====
+
+/**
+ * Đọc tab 2ND. Cột cố định: STT, Hãng, Mẫu, Bộ nhớ, RAM, Tình trạng, Mô tả, Giá gốc (KHÔNG đọc), Giá bán, Sale, Giá sau sale, Lợi nhuận, Tồn kho, Trạng thái.
+ * @returns {{ rows: Array<object>, errors: string[] }}
+ */
+export function parseUsedRows(csvText) {
+  const table = parseCsv(csvText);
+  const rows = [];
+  const errors = [];
+  table.forEach((r, i) => {
+    if (!/^\d+$/.test(String(r[0] ?? '').trim()) || !String(r[2] ?? '').trim()) return;
+    const finalPrice = parseVnd(r[10]);
+    const listPrice = parseVnd(r[8]);
+    if (!Number.isFinite(finalPrice) || finalPrice <= 0) { errors.push(`Dòng ${i + 1} (${r[2]}): giá không hợp lệ.`); return; }
+    const model = String(r[2]).trim();
+    const storage = String(r[3] ?? '').trim();
+    const condition = String(r[5] ?? '').trim();
+    const description = String(r[6] ?? '').trim();
+    rows.push({
+      line: i + 1, brand: String(r[1] ?? '').trim() || 'Apple', model, storage,
+      ram: String(r[4] ?? '').trim(), condition, description,
+      listPrice: Number.isFinite(listPrice) ? listPrice : finalPrice,
+      salePercent: parsePercent(r[9]) || 0, finalPrice,
+      stock: stockOf(r[12], r[13]),
+      group: usedGroup(model),
+      id: `2nd-${slugify(`${model} ${storage} ${description}`).slice(0, 80)}`
+    });
+  });
+  return { rows, errors };
+}
+
+/** Nhóm hiển thị: "iPhone 17 Pro Max" -> "iPhone 17", "Apple Watch Series 9" -> "Apple Watch", "iPad Pro 9.7 inch" -> "iPad". */
+export function usedGroup(model) {
+  const m = String(model ?? '').trim();
+  const phone = /^(iPhone\s+(?:\d+|XS|XR|X|SE)\b)/i.exec(m);
+  if (phone) return phone[1].replace(/\s+/g, ' ');
+  if (/^apple watch/i.test(m)) return 'Apple Watch';
+  if (/^ipad/i.test(m)) return 'iPad';
+  return m.split(/\s+/).slice(0, 2).join(' ');
+}
+
+/** Màu: phần trước dấu phẩy đầu tiên của mô tả, bỏ phần trong ngoặc. */
+function colorOf(description) {
+  return String(description ?? '').split(',')[0].replace(/\(.*?\)/g, '').replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * Máy cũ trong sheet chưa có trên web (so theo mã tạo từ mẫu + dung lượng + mô tả) -> sản phẩm Like New, tồn kho theo sheet, ẩn mặc định.
+ * @returns {{ items: Array<{ key: string, brand: string, line: number, product: object }>, duplicates: number, soldOut: number }}
+ */
+export function planUsedProducts(existingProducts, usedRows, { visible = false } = {}) {
+  const existing = new Set((Array.isArray(existingProducts) ? existingProducts : []).map(p => p?.id));
+  const planned = new Set();
+  const out = { items: [], duplicates: 0, soldOut: 0 };
+  for (const r0 of Array.isArray(usedRows) ? usedRows : []) {
+    if (existing.has(r0.id)) { out.duplicates++; continue; }
+    if (r0.stock <= 0) { out.soldOut++; continue; }
+    // Hai máy giống hệt mô tả trong cùng sheet: đuôi -2, -3... để cả hai cùng lên web.
+    let id = r0.id;
+    for (let n = 2; planned.has(id) || existing.has(id); n++) id = `${r0.id}-${n}`;
+    planned.add(id);
+    const r = { ...r0, id };
+    const isPhone = /^iphone/i.test(r.model);
+    const color = colorOf(r.description);
+    const name = [r.model, r.storage, color && `- ${color}`, r.condition && `- ${r.condition}`].filter(Boolean).join(' ').replace(/\s+-\s+/g, ' - ');
+    const battery = /pin\s*(new|\d+%|\d+x%)/i.exec(r.description);
+    out.items.push({
+      key: r.id, brand: r.group, line: r.line,
+      product: {
+        id: r.id, name, kind: isPhone ? 'phone' : 'accessory', category: isPhone ? null : 'other',
+        brand: 'apple', brand_name: isPhone ? 'Apple iPhone' : 'Apple',
+        condition: 'like_new', condition_label: r.condition || 'Máy cũ', badge: 'Máy cũ',
+        price: r.finalPrice, old_price: null,
+        colors: [], default_color: color, storages: r.storage ? [r.storage] : [],
+        chip: '', camera: '', screen: '', battery: battery ? `Pin ${battery[1]}` : '',
+        description: [r.description, r.ram && r.ram !== '--' && `RAM ${r.ram}`].filter(Boolean).join(' • '),
         rating: 5, review_count: 0, image_url: '', stock: r.stock, is_visible: Boolean(visible), sort_order: 0
       }
     });
