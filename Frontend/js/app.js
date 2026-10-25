@@ -323,10 +323,13 @@ class App {
   async init() {
     // Thử tải dữ liệu từ Supabase trước; nếu chưa cấu hình hoặc lỗi sẽ fallback về data/products.json hoặc dữ liệu dự phòng
     let loaded = null;
+    let remoteLoaded = false;
     try {
-      const remoteProducts = await fetchProducts();
-      if (remoteProducts && Array.isArray(remoteProducts) && remoteProducts.length > 0) {
+      // Kết nối được cơ sở dữ liệu thì chỉ hiện hàng thật (kể cả khi trống); hàng mẫu chỉ dùng lúc không kết nối được
+      const remoteProducts = await fetchProducts({ allowEmpty: true });
+      if (remoteProducts && Array.isArray(remoteProducts)) {
         loaded = remoteProducts;
+        remoteLoaded = true;
       } else {
         let res = await fetch('data/products.json');
         if (!res.ok) {
@@ -343,8 +346,8 @@ class App {
 
     if (loaded) {
       const { phones, accessories } = partitionProducts(loaded);
-      if (phones.length > 0) this.products = phones;
-      if (accessories.length > 0) this.accessories = accessories;
+      if (remoteLoaded || phones.length > 0) this.products = phones;
+      if (remoteLoaded || accessories.length > 0) this.accessories = accessories;
     }
 
     // Load giỏ hàng từ localStorage rồi đồng bộ giá mới nhất (giá có thể đổi liên tục từ trang quản trị)
@@ -1080,7 +1083,7 @@ class App {
     if (!grid) return;
 
     if (filtered.length === 0) {
-      grid.innerHTML = emptyCatalogHtml();
+      grid.innerHTML = emptyCatalogHtml({ storeEmpty: this.products.length === 0 });
       return;
     }
 
@@ -1112,7 +1115,7 @@ class App {
       items = items.filter(a => (a.category || 'other') === category);
     }
 
-    grid.innerHTML = items.length ? items.map(p => productCardHtml(p, { accessory: true })).join('') : emptyCatalogHtml();
+    grid.innerHTML = items.length ? items.map(p => productCardHtml(p, { accessory: true })).join('') : emptyCatalogHtml({ storeEmpty: this.accessories.length === 0 });
   }
 
   findProduct(productId) {

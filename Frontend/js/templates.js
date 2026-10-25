@@ -79,12 +79,14 @@ export function productCardHtml(p, opts = {}) {
     `;
 }
 
-export function emptyCatalogHtml() {
+export function emptyCatalogHtml({ storeEmpty = false } = {}) {
+  const title = storeEmpty ? 'Cửa hàng đang cập nhật sản phẩm' : 'Không tìm thấy thiết bị phù hợp';
+  const hint = storeEmpty ? 'Vui lòng quay lại sau hoặc liên hệ Zalo/hotline để được báo giá và tư vấn.' : 'Vui lòng điều chỉnh lại bộ lọc hoặc từ khóa tìm kiếm.';
   return `
         <div class="col-span-full py-16 text-center text-[#6E6E73]">
           <span class="material-symbols-outlined text-[48px] text-[#D2D2D7] mb-2 block">devices_off</span>
-          <p class="text-[17px] font-medium text-[#1D1D1F]">Không tìm thấy thiết bị phù hợp</p>
-          <p class="text-[14px]">Vui lòng điều chỉnh lại bộ lọc hoặc từ khóa tìm kiếm.</p>
+          <p class="text-[17px] font-medium text-[#1D1D1F]">${title}</p>
+          <p class="text-[14px]">${hint}</p>
         </div>
       `;
 }

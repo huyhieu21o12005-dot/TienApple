@@ -346,3 +346,5 @@ Nút **Phụ kiện từ Sheet** (đầu trang sản phẩm) đọc tab `PHU_KIE
 | Bảo Hành, Link Ảnh, Ghi Chú | Link ảnh http/https tùy chọn; Ghi chú và bảo hành vào mô tả |
 
 Bấm nút sẽ liệt kê: **món chưa có** (thêm mới, mặc định ẩn, có ô "Hiện ngay" và "Chỉ thêm máy có ảnh") và **món đã có** (đổi giá nếu khác giá gốc; phần cộng thêm đã Set giá được giữ). Tích chọn rồi bấm Áp dụng.
+
+**Trang khách không dùng hàng mẫu:** khi kết nối được cơ sở dữ liệu, web chỉ hiện sản phẩm thật đang bật hiển thị; chưa có sản phẩm nào thì hiện "Cửa hàng đang cập nhật sản phẩm". Dữ liệu mẫu (`data/products.json`) chỉ dùng khi không kết nối được máy chủ.

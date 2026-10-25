@@ -73,3 +73,11 @@ describe('productsApi - fetchProducts', () => {
     assert.equal(await quiet(() => fetchProducts({ client: fakeClient(new Error('network')) })), null);
   });
 });
+
+describe('fetchProducts allowEmpty', () => {
+  it('trả [] khi truy vấn thành công nhưng chưa có sản phẩm, vẫn null khi lỗi', async () => {
+    assert.deepEqual(await quiet(() => fetchProducts({ allowEmpty: true, client: fakeClient({ data: [], error: null }) })), []);
+    assert.equal(await quiet(() => fetchProducts({ allowEmpty: true, client: fakeClient({ data: null, error: { message: 'rls' } }) })), null);
+    assert.equal(await quiet(() => fetchProducts({ allowEmpty: true, client: fakeClient(new Error('network')) })), null);
+  });
+});

@@ -38,6 +38,7 @@ export async function getSupabase() {
  * Nếu Supabase chưa cấu hình hoặc gặp lỗi mạng, trả về null để app.js kích hoạt fallback.
  * 
  * @param {object} [options]
+ * @param {boolean} [options.allowEmpty] true: truy vấn thành công mà không có sản phẩm thì trả [] thay vì null (web không hiện hàng mẫu)
  * @param {string} [options.kind] Lọc theo loại 'phone' hoặc 'accessory' (tùy chọn)
  * @param {object} [options.client] Supabase client truyền sẵn (dùng cho kiểm thử)
  * @returns {Promise<Array<object>|null>}
@@ -69,6 +70,9 @@ export async function fetchProducts(options = {}) {
       console.warn('[productsApi] Lỗi truy vấn Supabase:', error.message);
       return null;
     }
+
+    // Truy vấn thành công nhưng chưa có sản phẩm nào đang hiện: cửa hàng thật sự trống, không dùng hàng mẫu
+    if (options.allowEmpty && Array.isArray(data) && data.length === 0) return [];
 
     if (!data || !Array.isArray(data) || data.length === 0) {
       console.warn('[productsApi] Dữ liệu từ Supabase rỗng, sử dụng fallback.');

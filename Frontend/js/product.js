@@ -34,8 +34,9 @@ function toast(message) {
 
 async function loadProduct(id) {
   let list = null;
-  try { list = await fetchProducts(); } catch { list = null; }
-  if (!Array.isArray(list) || list.length === 0) {
+  try { list = await fetchProducts({ allowEmpty: true }); } catch { list = null; }
+  // chỉ dùng dữ liệu mẫu khi không kết nối được cơ sở dữ liệu (null); danh sách trống là trống thật
+  if (!Array.isArray(list)) {
     try {
       const res = await fetch('data/products.json');
       if (res.ok) list = await res.json();
