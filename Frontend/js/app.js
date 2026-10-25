@@ -534,21 +534,22 @@ class App {
     const accOrder = ['charger', 'case', 'watch', 'audio'];
     const accKeys = [...accOrder, ...[...cats.keys()].filter(k => !accOrder.includes(k) && k !== 'tablet')];
     if (mega) {
-      mega.innerHTML = `
-        <div class="mega-col">
-          <h3>Điện thoại &amp; iPad</h3>
-          <div class="mega-tags">
-            <button type="button" class="mega-tag" data-mm="phone" data-key="all">Điện thoại <span>${this.products.length}</span></button>
-            <button type="button" class="mega-tag" data-mm="acc" data-key="tablet"${tablets ? '' : ' disabled'}>iPad <span>${tablets}</span></button>
-          </div>
-          <div class="mega-sub">Theo hãng</div>
-          ${phones.map(b => link('phone', b.key, b.label, b.count)).join('')}
-        </div>
-        <div class="mega-col">
-          <h3>Phụ kiện</h3>
-          ${accKeys.map(k => link('acc', k, ACCESSORY_LABELS[k] || 'Phụ kiện khác', cats.get(k) || 0, !cats.get(k))).join('')}
-          ${link('acc', 'all', 'Tất cả phụ kiện', this.accessories.length)}
-        </div>`;
+      this.megaHtml = {
+        phone: `
+          <div class="mega-col">
+            <div class="mega-tags">
+              <button type="button" class="mega-tag" data-mm="phone" data-key="all">Điện thoại <span>${this.products.length}</span></button>
+              <button type="button" class="mega-tag" data-mm="acc" data-key="tablet"${tablets ? '' : ' disabled'}>iPad <span>${tablets}</span></button>
+            </div>
+            ${phones.map(b => link('phone', b.key, b.label, b.count)).join('')}
+          </div>`,
+        acc: `
+          <div class="mega-col">
+            ${accKeys.map(k => link('acc', k, ACCESSORY_LABELS[k] || 'Phụ kiện khác', cats.get(k) || 0, !cats.get(k))).join('')}
+            ${link('acc', 'all', 'Tất cả phụ kiện', this.accessories.length)}
+          </div>`
+      };
+      if (!mega.hidden && mega.dataset.kind) mega.innerHTML = this.megaHtml[mega.dataset.kind];
     }
     if (quick) {
       const chip = (kind, key, label) => `<button type="button" class="mega-chip" data-mm="${kind}" data-key="${escapeHtml(key)}">${escapeHtml(label)}</button>`;
@@ -575,10 +576,17 @@ class App {
     if (!header || !mega) return;
     const triggers = [...document.querySelectorAll('#mainNav [data-mega]')];
     let timer = null;
+    let current = triggers[0];
     const setOpen = (open) => {
       clearTimeout(timer);
-      triggers.forEach(t => t.setAttribute('aria-expanded', String(open)));
+      triggers.forEach(t => t.setAttribute('aria-expanded', String(open && t === current)));
       if (open) {
+        const kind = current.dataset.layer === 'layer-phukien' ? 'acc' : 'phone';
+        mega.dataset.kind = kind;
+        mega.innerHTML = (this.megaHtml || {})[kind] || '';
+        const hb = header.getBoundingClientRect();
+        const tb = current.getBoundingClientRect();
+        mega.style.left = `${Math.max(12, Math.min(tb.left - hb.left - 12, hb.width - 292))}px`;
         mega.hidden = false;
         requestAnimationFrame(() => mega.classList.add('is-open'));
       } else {
@@ -588,8 +596,8 @@ class App {
     };
     const later = () => { clearTimeout(timer); timer = setTimeout(() => setOpen(false), 140); };
     triggers.forEach(t => {
-      t.addEventListener('mouseenter', () => setOpen(true));
-      t.addEventListener('focus', () => setOpen(true));
+      t.addEventListener('mouseenter', () => { current = t; setOpen(true); });
+      t.addEventListener('focus', () => { current = t; setOpen(true); });
       t.addEventListener('mouseleave', later);
     });
     mega.addEventListener('mouseenter', () => clearTimeout(timer));

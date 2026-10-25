@@ -906,9 +906,9 @@ body.menu-open {
 /* Vùng an toàn của iPhone (tai thỏ / thanh home) */
 /* Header kính nổi (giữ bảng màu trắng của web) */
 .site-header { padding-top: calc(6px + env(safe-area-inset-top)); padding-bottom: 6px; background: transparent; pointer-events: none; }
-.nav-pill, .mega-menu { pointer-events: auto; max-width: 1240px; }
+.nav-pill, .mega-menu { pointer-events: auto; }
 .nav-pill {
-  height: 52px; padding: 0 10px 0 18px; border-radius: 999px;
+  max-width: 1240px; height: 52px; padding: 0 10px 0 18px; border-radius: 999px;
   background: rgba(255, 255, 255, 0.78);
   -webkit-backdrop-filter: blur(18px) saturate(180%); backdrop-filter: blur(18px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.9);
@@ -916,7 +916,7 @@ body.menu-open {
   transition: background .2s, box-shadow .2s;
 }
 .site-header.is-scrolled .nav-pill { background: rgba(255, 255, 255, 0.92); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.07), 0 10px 28px rgba(0, 0, 0, 0.12); }
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .nav-pill, .mega-menu { background: #fff; } }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .nav-pill, .mega-menu::before { background: #fff; } }
 #mainNav { gap: 2px; }
 #mainNav a { height: 34px; padding: 0 9px; border-radius: 999px; transition: background .15s, color .15s; }
 #mainNav a:hover { background: rgba(0, 0, 0, 0.05); }
@@ -926,26 +926,28 @@ body.menu-open {
 #mainNav a[data-mega][aria-expanded="true"]::after { transform: rotate(225deg) translate(-1px, -1px); }
 
 .mega-menu {
-  margin: 8px auto 0; border-radius: 28px; padding: 22px 26px;
-  background: rgba(255, 255, 255, 0.9);
-  -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 24px 48px rgba(0, 0, 0, 0.16);
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 28px;
+  position: absolute; top: calc(100% + 4px); width: 280px; max-width: calc(100vw - 24px);
+  padding: 10px 6px; isolation: isolate;
   opacity: 0; transform: translateY(-6px); transition: opacity .18s ease, transform .18s ease;
+}
+/* Không có khung: nền mờ chỉ là lớp tan dần ra mép, chữ vẫn đọc được trên mọi nền */
+.mega-menu::before {
+  content: ''; position: absolute; inset: -18px -22px; z-index: -1; pointer-events: none;
+  background: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(16px) saturate(160%); backdrop-filter: blur(16px) saturate(160%);
+  -webkit-mask-image: radial-gradient(ellipse closest-side, #000 62%, transparent 100%);
+  mask-image: radial-gradient(ellipse closest-side, #000 62%, transparent 100%);
 }
 .mega-menu[hidden] { display: none; }
 .mega-menu.is-open { opacity: 1; transform: none; }
-.mega-col h3 { margin: 0 0 8px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #6E6E73; }
-.mega-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 9px 12px; border: 0; border-radius: 12px; background: transparent; font: inherit; font-size: 14px; font-weight: 500; color: #1D1D1F; text-align: left; cursor: pointer; transition: background .15s; }
-.mega-link:hover, .mega-link:focus-visible { background: rgba(0, 0, 0, 0.05); outline: none; }
+.mega-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 8px 14px; border: 0; background: transparent; font: inherit; font-size: 15px; font-weight: 500; color: #1D1D1F; text-align: left; cursor: pointer; transition: transform .15s, color .15s; }
+.mega-link:hover, .mega-link:focus-visible { transform: translateX(4px); color: #000; outline: none; }
 .mega-link small { font-size: 12px; font-weight: 500; color: #6E6E73; }
-.mega-tags { display: flex; gap: 8px; margin-bottom: 12px; }
-.mega-tag { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border: 0; border-radius: 999px; background: #1D1D1F; color: #fff; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
-.mega-tag:nth-child(2) { background: #F5F5F7; color: #1D1D1F; }
-.mega-tag span { font-size: 12px; opacity: .65; }
-.mega-tag:hover { filter: brightness(.94); }
-.mega-sub { margin: 4px 12px 2px; font-size: 12px; color: #6E6E73; }
+.mega-tags { display: flex; gap: 22px; padding: 4px 14px 10px; }
+.mega-tag { position: relative; padding: 2px 0; border: 0; background: transparent; font: inherit; font-size: 15px; font-weight: 600; color: #1D1D1F; cursor: pointer; }
+.mega-tag span { margin-left: 4px; font-size: 12px; font-weight: 500; color: #6E6E73; }
+.mega-tag::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2px; height: 2px; background: #1D1D1F; transform: scaleX(0); transform-origin: left; transition: transform .2s; }
+.mega-tag:hover::after, .mega-tag:focus-visible::after { transform: scaleX(1); }
 .mega-link:disabled, .mega-tag:disabled { opacity: .4; cursor: default; pointer-events: none; }
 .mobile-quick { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 0 6px; }
 .mobile-quick .mega-chip { padding: 9px 16px; border: 0; border-radius: 999px; background: #F5F5F7; font: inherit; font-size: 14px; font-weight: 500; color: #1D1D1F; cursor: pointer; }
