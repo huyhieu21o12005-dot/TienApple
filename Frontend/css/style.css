@@ -931,7 +931,7 @@ body.menu-open {
   -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.9);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 24px 48px rgba(0, 0, 0, 0.16);
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px 28px;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 28px;
   opacity: 0; transform: translateY(-6px); transition: opacity .18s ease, transform .18s ease;
 }
 .mega-menu[hidden] { display: none; }
@@ -940,6 +940,13 @@ body.menu-open {
 .mega-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 9px 12px; border: 0; border-radius: 12px; background: transparent; font: inherit; font-size: 14px; font-weight: 500; color: #1D1D1F; text-align: left; cursor: pointer; transition: background .15s; }
 .mega-link:hover, .mega-link:focus-visible { background: rgba(0, 0, 0, 0.05); outline: none; }
 .mega-link small { font-size: 12px; font-weight: 500; color: #6E6E73; }
+.mega-tags { display: flex; gap: 8px; margin-bottom: 12px; }
+.mega-tag { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border: 0; border-radius: 999px; background: #1D1D1F; color: #fff; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.mega-tag:nth-child(2) { background: #F5F5F7; color: #1D1D1F; }
+.mega-tag span { font-size: 12px; opacity: .65; }
+.mega-tag:hover { filter: brightness(.94); }
+.mega-sub { margin: 4px 12px 2px; font-size: 12px; color: #6E6E73; }
+.mega-link:disabled, .mega-tag:disabled { opacity: .4; cursor: default; pointer-events: none; }
 .mobile-quick { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 0 6px; }
 .mobile-quick .mega-chip { padding: 9px 16px; border: 0; border-radius: 999px; background: #F5F5F7; font: inherit; font-size: 14px; font-weight: 500; color: #1D1D1F; cursor: pointer; }
 @media (max-width: 1279px) { .mega-menu { display: none !important; } .nav-pill { height: 48px; padding-left: 14px; } }

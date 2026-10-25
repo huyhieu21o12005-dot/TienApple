@@ -320,7 +320,7 @@ export function planUsedProducts(existingProducts, usedRows, { visible = false }
     out.items.push({
       key: r.id, brand: r.group, line: r.line,
       product: {
-        id: r.id, name, kind: isPhone ? 'phone' : 'accessory', category: isPhone ? null : 'other',
+        id: r.id, name, kind: isPhone ? 'phone' : 'accessory', category: isPhone ? null : /^ipad/i.test(r.model) ? 'tablet' : /watch/i.test(r.model) ? 'watch' : 'other',
         brand: 'apple', brand_name: isPhone ? 'Apple iPhone' : 'Apple',
         condition: 'like_new', condition_label: r.condition || 'Máy cũ', badge: 'Máy cũ',
         price: r.finalPrice, base_price: r.finalPrice, old_price: null,

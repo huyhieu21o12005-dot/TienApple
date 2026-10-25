@@ -14,7 +14,7 @@ import { lookupWarranty } from './warrantyApi.js';
 import { validateTradeIn, buildTradeInBooking } from './tradeIn.js';
 import { calcInstallment, INSTALLMENT_REFERENCE_RATE } from './installment.js';
 
-const ACCESSORY_LABELS = { charger: 'Củ sạc & Cáp', audio: 'Tai nghe AirPods', case: 'Ốp lưng & Cường lực', tablet: 'iPad', watch: 'Apple Watch', other: 'Phụ kiện khác' };
+const ACCESSORY_LABELS = { charger: 'Sạc & Cáp', audio: 'Tai nghe', case: 'Cường lực & Ốp lưng', tablet: 'iPad', watch: 'Đồng hồ', other: 'Phụ kiện khác' };
 import { validateZaloOffer, buildZaloMessage, buildOfferBooking, ZALO_URL } from './zalo.js';
 import { enhanceSelects } from './customSelect.js';
 import { safeUrl, partitionProducts, escapeHtml } from './utils.js';
@@ -529,20 +529,31 @@ class App {
     const phones = [...brands.values()].sort((a, b) => (b.key === 'apple') - (a.key === 'apple') || b.count - a.count);
     const cats = new Map();
     for (const a of this.accessories) cats.set(a.category || 'other', (cats.get(a.category || 'other') || 0) + 1);
-    const devices = ['tablet', 'watch'].filter(k => cats.has(k));
-    const rest = [...cats.keys()].filter(k => !devices.includes(k));
-    const link = (kind, key, label, n) => `<button type="button" class="mega-link" data-mm="${kind}" data-key="${escapeHtml(key)}"><span>${escapeHtml(label)}</span><small>${n}</small></button>`;
-    const col = (title, links) => links ? `<div class="mega-col"><h3>${title}</h3>${links}</div>` : '';
+    const link = (kind, key, label, n, off) => `<button type="button" class="mega-link" data-mm="${kind}" data-key="${escapeHtml(key)}"${off ? ' disabled' : ''}><span>${escapeHtml(label)}</span><small>${n}</small></button>`;
+    const tablets = cats.get('tablet') || 0;
+    const accOrder = ['charger', 'case', 'watch', 'audio'];
+    const accKeys = [...accOrder, ...[...cats.keys()].filter(k => !accOrder.includes(k) && k !== 'tablet')];
     if (mega) {
-      mega.innerHTML =
-        col('Điện thoại', link('phone', 'all', 'Tất cả điện thoại', this.products.length) + phones.map(b => link('phone', b.key, b.label, b.count)).join(''))
-        + col('iPad & Apple Watch', devices.map(k => link('acc', k, ACCESSORY_LABELS[k], cats.get(k))).join(''))
-        + col('Phụ kiện', link('acc', 'all', 'Tất cả phụ kiện', this.accessories.length) + rest.map(k => link('acc', k, ACCESSORY_LABELS[k] || 'Phụ kiện khác', cats.get(k))).join(''));
+      mega.innerHTML = `
+        <div class="mega-col">
+          <h3>Điện thoại &amp; iPad</h3>
+          <div class="mega-tags">
+            <button type="button" class="mega-tag" data-mm="phone" data-key="all">Điện thoại <span>${this.products.length}</span></button>
+            <button type="button" class="mega-tag" data-mm="acc" data-key="tablet"${tablets ? '' : ' disabled'}>iPad <span>${tablets}</span></button>
+          </div>
+          <div class="mega-sub">Theo hãng</div>
+          ${phones.map(b => link('phone', b.key, b.label, b.count)).join('')}
+        </div>
+        <div class="mega-col">
+          <h3>Phụ kiện</h3>
+          ${accKeys.map(k => link('acc', k, ACCESSORY_LABELS[k] || 'Phụ kiện khác', cats.get(k) || 0, !cats.get(k))).join('')}
+          ${link('acc', 'all', 'Tất cả phụ kiện', this.accessories.length)}
+        </div>`;
     }
     if (quick) {
       const chip = (kind, key, label) => `<button type="button" class="mega-chip" data-mm="${kind}" data-key="${escapeHtml(key)}">${escapeHtml(label)}</button>`;
-      quick.innerHTML = phones.map(b => chip('phone', b.key, b.label)).join('') + devices.map(k => chip('acc', k, ACCESSORY_LABELS[k])).join('')
-        + rest.filter(k => k !== 'other').map(k => chip('acc', k, ACCESSORY_LABELS[k])).join('');
+      quick.innerHTML = phones.map(b => chip('phone', b.key, b.label)).join('')
+        + accKeys.filter(k => cats.get(k) && k !== 'other').map(k => chip('acc', k, ACCESSORY_LABELS[k])).join('');
     }
   }
 
