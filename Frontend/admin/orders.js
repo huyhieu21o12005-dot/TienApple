@@ -7,7 +7,7 @@
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
 import { escapeHtml } from '../js/utils.js';
 import { normalizePhone } from '../js/warranty.js';
-import { formatCurrency } from './adminHelpers.js';
+import { formatCurrency, canDeleteProducts } from './adminHelpers.js';
 import {
   statusesFor,
   statusLabel,
@@ -24,6 +24,7 @@ const REFRESH_MS = 60000;
 let supabase = null;
 const state = {
   user: null,
+  role: null,
   kind: 'orders',
   status: 'all',
   query: '',
@@ -59,6 +60,8 @@ async function init() {
       return;
     }
 
+    const { data: role } = await supabase.rpc('current_admin_role');
+    state.role = typeof role === 'string' ? role : 'staff';
     state.user = session.user;
     $('gateSection').classList.add('hidden');
     $('ordersApp').classList.remove('hidden');
@@ -185,6 +188,24 @@ function collectEdit(id) {
   return { patch, errors, box };
 }
 
+function deleteButton(record) {
+  return canDeleteProducts(state.role)
+    ? `<button type="button" class="btn btn-danger btn-sm" data-action="delete" data-id="${escapeHtml(record.id)}">Xóa</button>`
+    : '';
+}
+
+async function removeRecord(id) {
+  if (!canDeleteProducts(state.role)) return showToast('Nhân viên không có quyền xóa.', 'error');
+  const list = state.data[state.kind];
+  const record = list.find(r => r.id === id);
+  if (!record || !confirm(`Xóa vĩnh viễn ${record.code} của ${record.customer_name}? Không thể khôi phục.`)) return;
+  const { error } = await supabase.from(TABLES[state.kind]).delete().eq('id', id);
+  if (error) return showToast(error.message || 'Không xóa được.', 'error');
+  state.data[state.kind] = list.filter(r => r.id !== id);
+  render();
+  showToast(`Đã xóa ${record.code}`);
+}
+
 function editButton(record) {
   return `<button type="button" class="btn btn-secondary btn-sm" data-action="edit" data-id="${escapeHtml(record.id)}">Sửa thông tin</button>`;
 }
@@ -207,7 +228,7 @@ function orderCard(o) {
       ${o.note && state.editingId !== o.id ? `<p class="ord-line ord-muted">Khách ghi chú: ${escapeHtml(o.note)}</p>` : ''}
       <p class="ord-line">Tổng: <span class="ord-total">${escapeHtml(formatCurrency(o.total))}</span>
         ${o.voucher ? `<span class="ord-muted"> · mã ${escapeHtml(o.voucher)}</span>` : ''}</p>
-      <div class="ord-actions">${statusSelect(o)}${editButton(o)}${printLink('order', o)}${contractLink('order', o)}</div>
+      <div class="ord-actions">${statusSelect(o)}${editButton(o)}${printLink('order', o)}${contractLink('order', o)}${deleteButton(o)}</div>
       ${noteBlock(o)}
     </article>`;
 }
@@ -222,7 +243,7 @@ function bookingCard(b) {
       ${state.editingId === b.id ? editForm(b, 'bookings') : `${phoneLine(b)}
       <p class="ord-line">${escapeHtml(b.device)} · ${escapeHtml(b.service)}</p>`}
       ${b.note && state.editingId !== b.id ? `<p class="ord-line ord-muted">Khách ghi chú: ${escapeHtml(b.note)}</p>` : ''}
-      <div class="ord-actions">${statusSelect(b)}${editButton(b)}${printLink('booking', b)}</div>
+      <div class="ord-actions">${statusSelect(b)}${editButton(b)}${printLink('booking', b)}${deleteButton(b)}</div>
       ${noteBlock(b)}
     </article>`;
 }
@@ -290,6 +311,8 @@ function bindEvents() {
   });
 
   $('ordList').addEventListener('click', (e) => {
+    const del = e.target.closest('[data-action="delete"]');
+    if (del) { removeRecord(del.dataset.id); return; }
     const edit = e.target.closest('[data-action="edit"], [data-action="cancel-edit"], [data-action="save-edit"]');
     if (edit) {
       const act = edit.dataset.action;
