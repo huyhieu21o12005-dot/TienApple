@@ -71,7 +71,7 @@ function saveShop() {
 function render() {
   $('sheet').innerHTML = isContractDoc
     ? contractHtml(buildContract(docType, record, extra))
-    : invoiceHtml(buildInvoice(docType, record));
+    : invoiceHtml(buildInvoice(docType, record, extra));
 }
 
 function buildInfoForm() {
@@ -88,6 +88,14 @@ function buildInfoForm() {
       ['Đại diện bên bán', () => extra.rep || '', v => { extra.rep = v; }],
       ['CCCD/CMND khách', () => extra.cccd || '', v => { extra.cccd = v; }],
       ['Bảo hành (tháng)', () => extra.warrantyMonths || '', v => { extra.warrantyMonths = v; }]
+    );
+  }
+  fields.push(['Số seri / IMEI máy', () => extra.imei || '', v => { extra.imei = v; }]);
+  if (!isContractDoc && docType !== 'installment' && docType !== 'warranty') {
+    if (docType === 'booking') fields.push(['Chi phí dịch vụ (đ)', () => extra.price || '', v => { extra.price = v; }]);
+    fields.push(
+      ['Giảm giá thêm (đ)', () => extra.discount || '', v => { extra.discount = v; }],
+      ['VAT (%)', () => extra.vat || '', v => { extra.vat = v; }]
     );
   }
   const box = $('infoFields');

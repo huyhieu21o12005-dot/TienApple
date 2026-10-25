@@ -111,3 +111,31 @@ describe('contract - buildContract / contractHtml', () => {
     assert.match(contractHtml(null), /Không tìm thấy/);
   });
 });
+
+describe('invoice - seri/IMEI, giảm giá thêm, VAT', () => {
+  it('không nhập thêm thì giữ tổng đã lưu', () => {
+    const inv = buildInvoice('order', order, {});
+    assert.equal(inv.totals.at(-1)[1], buildInvoice('order', order).totals.at(-1)[1]);
+    assert.equal(inv.sections.length, 0);
+  });
+
+  it('thêm IMEI, giảm giá và VAT cộng trên số sau giảm giá', () => {
+    const inv = buildInvoice('order', order, { imei: '356938035643809', discount: '700.000', vat: '10' });
+    assert.deepEqual(inv.sections[0].rows, [['Số seri / IMEI', '356938035643809']]);
+    const labels = inv.totals.map(t => t[0]);
+    assert.ok(labels.some(l => l.startsWith('Thuế VAT (10%')));
+    // (40.000.000 - 300.000 - 700.000) = 39.000.000; x1,1 + 30.000 = 42.930.000
+    assert.match(inv.totals.at(-1)[1].replace(/\D/g, ''), /^42930000/);
+  });
+
+  it('phiếu sửa chữa có chi phí thì tính tổng, không thì để trống', () => {
+    assert.equal(buildInvoice('booking', booking).totals[0][0], 'Chi phí');
+    const inv = buildInvoice('booking', booking, { price: '500000', vat: '8' });
+    assert.match(inv.totals.at(-1)[1].replace(/\D/g, ''), /^540000/);
+  });
+
+  it('IMEI hiện ở phiếu bảo hành và trả góp', () => {
+    assert.ok(buildInvoice('warranty', warranty, { imei: '123' }).sections[0].rows.some(r => r[0] === 'Số seri / IMEI'));
+    assert.ok(buildInvoice('installment', installment, { imei: '123' }).sections[0].rows.some(r => r[0] === 'Số seri / IMEI'));
+  });
+});

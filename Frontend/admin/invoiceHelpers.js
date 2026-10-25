@@ -7,7 +7,7 @@ import { escapeHtml } from '../js/utils.js';
 import { formatDate, addMonths } from '../js/warranty.js';
 import { formatCurrency } from './adminHelpers.js';
 import { formatDateTime } from './ordersHelpers.js';
-import { installmentStatusLabel, nextDueDate } from '../js/installment.js';
+import { installmentStatusLabel, nextDueDate, parseMoney, parseRate } from '../js/installment.js';
 
 export const SHOP = {
   name: 'TIEN MOBILE THU DUC',
@@ -37,6 +37,35 @@ const SIGNATURES = {
 
 const pct = (n) => `${String(Number(n) || 0).replace('.', ',')}%`;
 
+function imeiRows(extra) {
+  const v = String(extra?.imei ?? '').trim();
+  return v ? [['Số seri / IMEI', v]] : [];
+}
+
+function deviceSection(extra) {
+  const rows = imeiRows(extra);
+  return rows.length ? [{ heading: 'Thông tin máy', rows }] : [];
+}
+
+/**
+ * Bảng tiền: tạm tính, giảm giá (đã có + nhập thêm), phí vận chuyển, VAT cộng thêm trên số sau giảm giá.
+ * Không nhập thêm gì thì giữ nguyên tổng đã lưu của đơn.
+ */
+function totalsWithExtras(o, extra = {}) {
+  const extraDiscount = Math.max(0, parseMoney(extra.discount) || 0);
+  const vat = parseRate(extra.vat) || 0;
+  const rows = [[o.subtotalLabel, formatCurrency(o.subtotal)]];
+  const discount = o.discount + extraDiscount;
+  if (discount > 0) rows.push([o.discountLabel, `-${formatCurrency(discount)}`]);
+  const afterDiscount = Math.max(0, o.subtotal - discount);
+  const vatAmount = vat > 0 ? Math.round((afterDiscount * vat) / 100) : 0;
+  if (o.shipping > 0) rows.push(['Phí vận chuyển', formatCurrency(o.shipping)]);
+  if (vatAmount > 0) rows.push([`Thuế VAT (${pct(vat)})`, formatCurrency(vatAmount)]);
+  const touched = extraDiscount > 0 || vatAmount > 0;
+  rows.push([o.totalLabel, formatCurrency(touched ? afterDiscount + vatAmount + o.shipping : o.recordTotal), true]);
+  return rows;
+}
+
 function customerRows(r) {
   const rows = [['Khách hàng', r.customer_name], ['Điện thoại', r.phone]];
   if (r.address) rows.push(['Địa chỉ', r.address]);
@@ -46,9 +75,10 @@ function customerRows(r) {
 /**
  * @param {'order'|'booking'|'warranty'|'installment'} type
  * @param {object} r bản ghi lấy từ Supabase
+ * @param {{ imei?: string, discount?: string, vat?: string, price?: string }} [extra] thông tin nhập thêm lúc in (seri/IMEI, giảm giá thêm, VAT %, giá dịch vụ)
  * @returns {{ title: string, code: string, dateText: string, customer: string[][], items: object[], sections: Array<{ heading: string, rows: string[][] }>, totals: Array<[string, string, boolean?]>, notes: string[], signatures: string[] } | null}
  */
-export function buildInvoice(type, r) {
+export function buildInvoice(type, r, extra = {}) {
   if (!INVOICE_TYPES.includes(type) || !r || typeof r !== 'object') return null;
   const base = {
     code: String(r.code || ''),
@@ -73,19 +103,22 @@ export function buildInvoice(type, r) {
         amount: formatCurrency(price * qty)
       };
     });
-    const totals = [['Tạm tính', formatCurrency(r.subtotal)]];
-    if (Number(r.discount) > 0) totals.push([r.voucher ? `Giảm giá (${r.voucher})` : 'Giảm giá', `-${formatCurrency(r.discount)}`]);
-    if (Number(r.shipping_fee) > 0) totals.push(['Phí vận chuyển', formatCurrency(r.shipping_fee)]);
-    totals.push(['TỔNG CỘNG', formatCurrency(r.total), true]);
-    return { ...base, title: 'HÓA ĐƠN BÁN HÀNG', items, totals, notes: r.note ? [`Ghi chú: ${r.note}`] : [] };
+    const totals = totalsWithExtras({
+      subtotalLabel: 'Tạm tính', subtotal: Number(r.subtotal) || 0,
+      discount: Number(r.discount) || 0, discountLabel: r.voucher ? `Giảm giá (${r.voucher})` : 'Giảm giá',
+      shipping: Number(r.shipping_fee) || 0, recordTotal: Number(r.total) || 0, totalLabel: 'TỔNG CỘNG'
+    }, extra);
+    return { ...base, title: 'HÓA ĐƠN BÁN HÀNG', items, sections: deviceSection(extra), totals, notes: r.note ? [`Ghi chú: ${r.note}`] : [] };
   }
 
   if (type === 'booking') {
     return {
       ...base,
       title: 'PHIẾU TIẾP NHẬN SỬA CHỮA',
-      sections: [{ heading: 'Thông tin máy', rows: [['Thiết bị', r.device], ['Dịch vụ', r.service]] }],
-      totals: [['Chi phí', '.............................', true]],
+      sections: [{ heading: 'Thông tin máy', rows: [['Thiết bị', r.device], ['Dịch vụ', r.service], ...imeiRows(extra)] }],
+      totals: parseMoney(extra.price) > 0
+        ? totalsWithExtras({ subtotalLabel: 'Chi phí dịch vụ', subtotal: parseMoney(extra.price), discount: 0, discountLabel: 'Giảm giá', shipping: 0, recordTotal: parseMoney(extra.price), totalLabel: 'TỔNG CỘNG' }, extra)
+        : [['Chi phí', '.............................', true]],
       notes: [r.note ? `Khách ghi chú: ${r.note}` : '', 'Vui lòng mang phiếu này khi đến nhận máy.'].filter(Boolean)
     };
   }
@@ -100,6 +133,7 @@ export function buildInvoice(type, r) {
         heading: 'Nội dung bảo hành',
         rows: [
           ['Thiết bị', r.device],
+          ...imeiRows(extra),
           ['Sửa chữa', r.service],
           ['Thời hạn', `${Number(r.warranty_months)} tháng`],
           ['Từ ngày', formatDate(r.start_date)],
@@ -117,7 +151,7 @@ export function buildInvoice(type, r) {
     title: 'HÓA ĐƠN TRẢ GÓP',
     dateText: formatDate(r.start_date) || base.dateText,
     sections: [
-      { heading: 'Máy', rows: [['Sản phẩm', r.product], ['Giá gốc', formatCurrency(r.original_price)], ['Trả trước', formatCurrency(r.down_payment)]] },
+      { heading: 'Máy', rows: [['Sản phẩm', r.product], ...imeiRows(extra), ['Giá gốc', formatCurrency(r.original_price)], ['Trả trước', formatCurrency(r.down_payment)]] },
       {
         heading: 'Điều khoản góp',
         rows: [
