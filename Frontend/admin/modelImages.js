@@ -80,7 +80,77 @@ export function modelOf(name) {
   return text.split(/\s\d{2,4}\s?(?:GB|TB)\b/i)[0].split(' - ')[0].replace(/\s+/g, ' ').trim();
 }
 
-/** URL ảnh minh họa cho một tên sản phẩm hoặc tên mẫu, rỗng nếu không có trong bảng. */
-export function imageFor(nameOrModel) {
-  return MODEL_IMAGES[modelKey(modelOf(nameOrModel))] || '';
+
+/** Ảnh theo MÀU của mẫu: khóa mẫu -> { màu chuẩn hóa: URL }. Mẫu có bảng này thì chỉ dùng ảnh đúng màu, không dùng ảnh khác màu. */
+const fam = (pattern, map) => Object.fromEntries(Object.entries(map).map(([vn, c]) => [vn, apple(pattern.replace('{c}', c))]));
+const TGDD_CDN2 = 'https://cdnv2.tgdd.vn/mwg-static/';
+export const MODEL_COLOR_IMAGES = {
+  iphone17pro: fam('iphone-17-pro-finish-select-202509-6-3inch-{c}', { cam: 'cosmicorange', xanh: 'deepblue', trang: 'silver', bac: 'silver' }),
+  iphone17promax: fam('iphone-17-pro-finish-select-202509-6-9inch-{c}', { cam: 'cosmicorange', xanh: 'deepblue', trang: 'silver', bac: 'silver' }),
+  iphone16pro: fam('iphone-16-pro-finish-select-202409-6-3inch-{c}', { titantunhien: 'naturaltitanium', den: 'blacktitanium', trang: 'whitetitanium', vang: 'deserttitanium', vangsamac: 'deserttitanium' }),
+  iphone16promax: fam('iphone-16-pro-finish-select-202409-6-9inch-{c}', { titantunhien: 'naturaltitanium', den: 'blacktitanium', trang: 'whitetitanium', vang: 'deserttitanium', vangsamac: 'deserttitanium' }),
+  iphone16: fam('iphone-16-finish-select-202409-6-1inch-{c}', { hong: 'pink', den: 'black', trang: 'white', xanh: 'ultramarine' }),
+  iphone16plus: fam('iphone-16-finish-select-202409-6-7inch-{c}', { hong: 'pink', den: 'black', trang: 'white', xanh: 'ultramarine' }),
+  iphone15: fam('iphone-15-finish-select-202309-6-1inch-{c}', { hong: 'pink', xanh: 'blue', xanhduong: 'blue', den: 'black', vang: 'yellow', xanhla: 'green' }),
+  iphone15plus: fam('iphone-15-finish-select-202309-6-7inch-{c}', { hong: 'pink', xanh: 'blue', xanhduong: 'blue', den: 'black', vang: 'yellow', xanhla: 'green' }),
+  iphone15pro: fam('iphone-15-pro-finish-select-202309-6-1inch-{c}', { titantunhien: 'naturaltitanium', xanh: 'bluetitanium', den: 'blacktitanium', trang: 'whitetitanium' }),
+  iphone15promax: fam('iphone-15-pro-finish-select-202309-6-7inch-{c}', { titantunhien: 'naturaltitanium', xanh: 'bluetitanium', den: 'blacktitanium', trang: 'whitetitanium' }),
+  iphone14: fam('iphone-14-finish-select-202209-6-1inch-{c}', { den: 'midnight', trang: 'starlight', tim: 'purple', xanh: 'blue', xanhduong: 'blue', vang: 'yellow' }),
+  iphone14plus: fam('iphone-14-finish-select-202209-6-7inch-{c}', { den: 'midnight', trang: 'starlight', tim: 'purple', xanh: 'blue', xanhduong: 'blue', vang: 'yellow' }),
+  iphone14pro: fam('iphone-14-pro-finish-select-202209-6-1inch-{c}', { den: 'spaceblack', tim: 'deeppurple', vang: 'gold', trang: 'silver', bac: 'silver' }),
+  iphone14promax: fam('iphone-14-pro-finish-select-202209-6-7inch-{c}', { den: 'spaceblack', tim: 'deeppurple', vang: 'gold', trang: 'silver', bac: 'silver' }),
+  iphone12: { ...fam('iphone-12-{c}-select-2020', { den: 'black', trang: 'white', do: 'red', xanhla: 'green', xanh: 'blue' }), tim: apple('iphone-12-purple-select-2021') },
+  iphone12pro: Object.fromEntries(Object.entries({ vang: 'vang', bac: 'bac', trang: 'bac', den: 'xam', xam: 'xam', xanh: 'xanh' }).map(([k, c]) => [k, `${TGDD}213032/iphone-12-pro-${c}-1-org.jpg`])),
+  iphone12promax: { vang: `${TGDD}213033/iphone-12-pro-max-1-org.jpg`, bac: `${TGDD}213033/iphone-12-pro-max-bac-1-org.jpg`, trang: `${TGDD}213033/iphone-12-pro-max-bac-1-org.jpg`, den: `${TGDD}213033/iphone-12-pro-max-xam-1-org.jpg`, xam: `${TGDD}213033/iphone-12-pro-max-xam-1-org.jpg` },
+  iphone17: {
+    tim: `${TGDD}342667/iphone-17-tim-thumb-0.jpg`,
+    den: `${TGDD_CDN2}tgdd/Products/Images/42/342667/iphone-17-black-1-639175100100723535.jpg`,
+    trang: `${TGDD_CDN2}tgdd/Products/Images/42/342667/iphone-17-white-1-639175100360167216.jpg`,
+    xanh: `${TGDD_CDN2}tgdd/Products/Images/42/342667/iphone-17-blue-1-639175101085458067.jpg`
+  },
+  iphone17air: { vang: `${TGDD}342670/iphone-air-vang-thumb.jpg`, xanh: `${TGDD_CDN2}dmx/Products/Images/42/342670/iphone-air-xanh-1-639175328099726265.jpg` },
+  iphoneair: { vang: `${TGDD}342670/iphone-air-vang-thumb.jpg`, xanh: `${TGDD_CDN2}dmx/Products/Images/42/342670/iphone-air-xanh-1-639175328099726265.jpg` },
+  iphone18promax: { xanh: `${TGDD}370982/iphone-18-pro-max-xanh-thumb.jpg`, do: `${TGDD}370983/iphone-18-pro-max-512gb-do-thumb.jpg` },
+  iphonexsmax: { vang: apple('iphone-xs-max-gold-select-2018') }
+};
+
+const COLOR_WORDS = new Set(['den', 'trang', 'tim', 'vang', 'hong', 'cam', 'do', 'xanh', 'xanhduong', 'xanhla', 'bac', 'xam', 'titantunhien', 'vangsamac']);
+
+/** Màu chuẩn hóa ("Titan tự nhiên" -> titantunhien, "Đen / Tím" -> den); rỗng nếu không phải màu ("40mm", "Wifi"). */
+export function colorKey(text) {
+  const first = String(text ?? '').split(/[\/,]/)[0];
+  const k = first.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z]/g, '');
+  return COLOR_WORDS.has(k) ? k : '';
+}
+
+/** Màu ghi trong tên sản phẩm: "iPhone 14 Pro 128GB - Tím - 99% Like New" -> tim */
+export function colorOfName(name) {
+  const parts = String(name ?? '').split(' - ');
+  return parts.length > 1 ? colorKey(parts[1]) : '';
+}
+
+/**
+ * Khóa ảnh của một sản phẩm: "mẫu-màu" khi mẫu có ảnh theo màu và đúng màu đó, khóa mẫu khi mẫu chỉ có một ảnh
+ * hoặc tên không ghi màu, rỗng khi mẫu có ảnh theo màu nhưng KHÔNG có đúng màu này (không dùng ảnh sai màu).
+ */
+export function imageKeyFor(nameOrModel, color = '') {
+  const key = modelKey(modelOf(nameOrModel));
+  const colors = MODEL_COLOR_IMAGES[key];
+  const ck = colorOfName(nameOrModel) || colorKey(color);
+  if (colors && ck) return colors[ck] ? `${key}-${ck}` : '';
+  return MODEL_IMAGES[key] ? key : '';
+}
+
+/** Tất cả nguồn ảnh theo khóa (khóa mẫu hoặc "mẫu-màu"). */
+export const IMAGE_SOURCES = {
+  ...MODEL_IMAGES,
+  ...Object.fromEntries(Object.entries(MODEL_COLOR_IMAGES).flatMap(([m, cs]) => Object.entries(cs).map(([c, u]) => [`${m}-${c}`, u])))
+};
+const KNOWN_URLS = new Set(Object.values(IMAGE_SOURCES));
+/** Link này là ảnh mặc định do hệ thống tự gắn (không phải ảnh bạn tải lên). */
+export const isKnownSource = (url) => KNOWN_URLS.has(String(url ?? ''));
+
+/** URL ảnh minh họa cho tên sản phẩm (đúng màu nếu mẫu có ảnh theo màu), rỗng nếu không có. */
+export function imageFor(nameOrModel, color = '') {
+  return IMAGE_SOURCES[imageKeyFor(nameOrModel, color)] || '';
 }

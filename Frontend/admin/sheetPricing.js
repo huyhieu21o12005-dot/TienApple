@@ -315,7 +315,7 @@ export function planUsedProducts(existingProducts, usedRows, { visible = false }
     const isPhone = /^iphone/i.test(r.model);
     const color = colorOf(r.description);
     const name = [r.model, r.storage, color && `- ${color}`, r.condition && `- ${r.condition}`].filter(Boolean).join(' ').replace(/\s+-\s+/g, ' - ');
-    const image = imageFor(r.model);
+    const image = imageFor(r.model, color);
     const battery = /pin\s*(new|\d+%|\d+x%)/i.exec(r.description);
     out.items.push({
       key: r.id, brand: r.group, line: r.line,

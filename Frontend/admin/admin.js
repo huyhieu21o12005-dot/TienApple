@@ -1230,7 +1230,7 @@ function renderSheetModal() {
       <td><input type="checkbox" class="sheet-price-check" data-i="${sheetState.items.indexOf(i)}" ${i.checked ? 'checked' : ''} aria-label="Chọn ${escapeHtml(i.name)}"></td>
       <td>${escapeHtml(i.name)}${i.warn ? '<br><small>Lệch hơn 30%, hãy kiểm tra trước khi tick.</small>' : ''}</td>
       ${isImages
-        ? `<td><img src="${escapeHtml(i.image)}" alt="" class="sheet-thumb" loading="lazy"><br><small>${i.source === 'kho' ? 'Có trong kho' : 'Tải vào kho'}</small></td>`
+        ? (i.source === 'clear' ? '<td><small>Chưa có ảnh đúng màu: bỏ ảnh sai màu</small></td>' : `<td><img src="${escapeHtml(i.image)}" alt="" class="sheet-thumb" loading="lazy"><br><small>${i.source === 'kho' ? 'Có trong kho' : 'Tải vào kho'}</small></td>`)
         : isNew
         ? `<td>${price(i.newPrice)}</td><td>${Number(i.stock) || 0}</td>`
         : `<td>${price(i.oldPrice)}</td><td><strong>${price(i.newPrice)}</strong>${i.newList ? `<br><small>gạch: ${price(i.newList)}</small>` : ''}</td>`}
@@ -1442,9 +1442,9 @@ async function applySheetChanges() {
     }
     for (const c of picked) {
       const image = c.source === 'upload' ? urlOf.get(c.key) : c.image;
-      if (!image) continue;
+      if (!image && c.source !== 'clear') continue;
       const description = c.used && !c.description.includes(USED_IMAGE_NOTE) ? [c.description, USED_IMAGE_NOTE].filter(Boolean).join(' • ') : c.description;
-      const { error } = await supabase.from('products').update({ image_url: image, description, updated_at: new Date().toISOString() }).eq('id', c.id);
+      const { error } = await supabase.from('products').update({ image_url: image || null, description, updated_at: new Date().toISOString() }).eq('id', c.id);
       if (error) console.error('[Admin] Lỗi gắn ảnh', c.id, error);
       else ok++;
     }
