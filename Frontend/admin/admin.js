@@ -4,7 +4,7 @@
  * Visibility Toggle, Bulk Operations, Image Upload with Client Resize, and Filters.
  */
 
-import { planPricing, normalizeRule } from './pricing.js';
+import { planPricing } from './pricing.js';
 import { imageFor } from './modelImages.js';
 import { buildFacetGroups, matchByFacets } from './bulkSelect.js';
 import { USED_IMAGE_NOTE } from './sheetPricing.js';
