@@ -1090,3 +1090,9 @@ body.menu-open {
   #cart-drawer-panel { max-height: 94vh; border-radius: 18px; }
   #cart-drawer-panel img { max-width: 100%; }
 }
+
+/* Ảnh Apple có nhiều khoảng trắng quanh máy: phóng to để máy to bằng các ảnh khác (khung đã cắt phần thừa) */
+img.tm-zoom { transform: scale(2.3); transform-origin: center 52%; transition: transform .3s ease; }
+.group:hover img.tm-zoom { transform: scale(2.45); }
+.tm-product-img.tm-zoom { transform: scale(1.7); }
+.search-item img.tm-zoom { transform: none; object-fit: cover; object-position: center; }

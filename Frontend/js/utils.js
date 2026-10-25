@@ -92,3 +92,34 @@ export function discountPercent(price, oldPrice) {
   if (!isFinite(p) || !isFinite(o) || o <= 0 || p >= o || p < 0) return 0;
   return Math.round((1 - p / o) * 100);
 }
+
+/**
+ * Ảnh Apple "finish-select" có nhiều khoảng trắng quanh máy nên máy rất nhỏ trong thẻ: thêm lớp phóng to cho các ảnh đó.
+ * @param {string} url
+ * @returns {string} class CSS, rỗng nếu không cần
+ */
+export function imageZoomClass(url) {
+  return /finish-select/.test(String(url ?? '')) ? 'tm-zoom' : '';
+}
+
+const CATEGORY_RULES = [
+  ['watch', /\b(watch|dong ho|đồng hồ)\b/i],
+  ['tablet', /\b(ipad|tablet|may tinh bang|máy tính bảng)\b/i],
+  ['audio', /(airpods|tai nghe|earbud|headphone|\bbuds\b|\bloa\b)/i],
+  ['case', /(ốp|\bop lung|cường lực|cuong luc|dán màn|dan man|bao da|\bcase\b)/i],
+  ['charger', /(sạc|\bsac\b|cáp|\bcap\b|charger|cable|adapter|magsafe|pin dự phòng)/i]
+];
+
+/**
+ * Nhóm phụ kiện: dùng nhóm đã lưu nếu cụ thể, còn không thì đoán theo từ khóa trong tên
+ * (Apple Watch, iPad, AirPods, ốp, cường lực, sạc, cáp...).
+ * @param {{ name?: string, category?: string|null }} product
+ * @returns {string}
+ */
+export function inferCategory(product) {
+  const saved = String(product?.category ?? '').trim();
+  if (saved && saved !== 'other') return saved;
+  const name = String(product?.name ?? '');
+  const hit = CATEGORY_RULES.find(([, re]) => re.test(name));
+  return hit ? hit[0] : 'other';
+}

@@ -4,7 +4,7 @@
  */
 
 import { CartManager } from './store.js';
-import { escapeHtml, jsArg, safeUrl, safeColor, discountPercent } from './utils.js';
+import { escapeHtml, jsArg, safeUrl, safeColor, discountPercent, imageZoomClass } from './utils.js';
 import { formatDate } from './warranty.js';
 
 /** Ảnh tạm khi sản phẩm chưa có ảnh. */
@@ -40,7 +40,7 @@ export function productCardHtml(p, opts = {}) {
           <div class="h-44 w-full flex items-center justify-center p-3 mb-2 bg-[#F5F5F7] rounded-xl cursor-pointer overflow-hidden group" onclick="window.tienApp.openProductModalById(${idArg})">
             <img
               alt="${escapeHtml(p.name)}"
-              class="h-full object-contain group-hover:scale-105 transition-transform duration-300"
+              class="h-full object-contain transition-transform duration-300 ${imageZoomClass(p.image) || 'group-hover:scale-105'}"
               src="${escapeHtml(safeUrl(p.image) || NO_IMAGE)}"
               loading="lazy"
             />
@@ -124,7 +124,7 @@ export function cartItemHtml(item, index) {
   return `
         <div class="p-3.5 rounded-2xl bg-[#F5F5F7] flex gap-3.5 relative">
           <div class="w-[72px] h-[72px] rounded-xl bg-white flex-shrink-0 p-1 flex items-center justify-center border border-[#D2D2D7]/50">
-            <img class="max-h-full max-w-full object-contain" src="${escapeHtml(safeUrl(product.image) || NO_IMAGE)}" alt="${escapeHtml(product.name)}" />
+            <img class="max-h-full max-w-full object-contain ${imageZoomClass(product.image)}" src="${escapeHtml(safeUrl(product.image) || NO_IMAGE)}" alt="${escapeHtml(product.name)}" />
           </div>
           <div class="flex-1 min-w-0 flex flex-col justify-between">
             <div>

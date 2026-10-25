@@ -520,42 +520,17 @@ class App {
     const mega = document.getElementById('megaMenu');
     const quick = document.getElementById('mobileQuick');
     if (!mega && !quick) return;
-    const brands = new Map();
-    for (const p of this.products) {
-      const key = String(p.brand || 'other').toLowerCase();
-      const e = brands.get(key) || { key, label: p.brandName || p.brand || 'Khác', count: 0 };
-      e.count += 1;
-      brands.set(key, e);
-    }
-    const phones = [...brands.values()].sort((a, b) => (b.key === 'apple') - (a.key === 'apple') || b.count - a.count);
-    const cats = new Map();
-    for (const a of this.accessories) cats.set(a.category || 'other', (cats.get(a.category || 'other') || 0) + 1);
-    const link = (kind, key, label, n, off) => `<button type="button" class="mega-link" data-mm="${kind}" data-key="${escapeHtml(key)}"${off ? ' disabled' : ''}><span>${escapeHtml(label)}</span><small>${n}</small></button>`;
-    const tablets = cats.get('tablet') || 0;
-    const accOrder = ['charger', 'case', 'watch', 'audio'];
-    const accKeys = [...accOrder, ...[...cats.keys()].filter(k => !accOrder.includes(k) && k !== 'tablet')];
+    const tablets = this.accessories.filter(p => p.category === 'tablet').length;
+    const link = (kind, key, label, n) => `<button type="button" class="mega-tag" data-mm="${kind}" data-key="${escapeHtml(key)}"${n ? '' : ' disabled'}>${escapeHtml(label)} <span>${n}</span></button>`;
     if (mega) {
       this.megaHtml = {
-        phone: `
-          <div class="mega-col">
-            <div class="mega-tags">
-              <button type="button" class="mega-tag" data-mm="phone" data-key="all">Điện thoại <span>${this.products.length}</span></button>
-              <button type="button" class="mega-tag" data-mm="acc" data-key="tablet"${tablets ? '' : ' disabled'}>iPad <span>${tablets}</span></button>
-            </div>
-            ${phones.map(b => link('phone', b.key, b.label, b.count)).join('')}
-          </div>`,
-        acc: `
-          <div class="mega-col">
-            ${accKeys.map(k => link('acc', k, ACCESSORY_LABELS[k] || 'Phụ kiện khác', cats.get(k) || 0, !cats.get(k))).join('')}
-            ${link('acc', 'all', 'Tất cả phụ kiện', this.accessories.length)}
-          </div>`
+        phone: `<div class="mega-col"><div class="mega-tags">${link('phone', 'all', 'Điện thoại', this.products.length)}${link('acc', 'tablet', 'iPad', tablets)}</div></div>`
       };
-      if (!mega.hidden && mega.dataset.kind) mega.innerHTML = this.megaHtml[mega.dataset.kind];
+      if (!mega.hidden && mega.dataset.kind) mega.innerHTML = this.megaHtml[mega.dataset.kind] || '';
     }
     if (quick) {
       const chip = (kind, key, label) => `<button type="button" class="mega-chip" data-mm="${kind}" data-key="${escapeHtml(key)}">${escapeHtml(label)}</button>`;
-      quick.innerHTML = phones.map(b => chip('phone', b.key, b.label)).join('')
-        + accKeys.filter(k => cats.get(k) && k !== 'other').map(k => chip('acc', k, ACCESSORY_LABELS[k])).join('');
+      quick.innerHTML = chip('phone', 'all', 'Điện thoại') + (tablets ? chip('acc', 'tablet', 'iPad') : '');
     }
   }
 
