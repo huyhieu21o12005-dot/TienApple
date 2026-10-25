@@ -4,9 +4,8 @@
  * Visibility Toggle, Bulk Operations, Image Upload with Client Resize, and Filters.
  */
 
-import { baseOf, formatThousands, markupPrice, matchPricing, parseAmount, planRules, pricingGroups } from './pricing.js';
+import { allFilterGroups, baseOf, formatThousands, markupPrice, matchPricing, parseAmount, planRules, pricingGroups } from './pricing.js';
 import { imageFor } from './modelImages.js';
-import { buildFacetGroups, matchByFacets } from './bulkSelect.js';
 import { USED_IMAGE_NOTE } from './sheetPricing.js';
 import { SHEET_CSV_URL, SHEET_TAB, SHEET_USED_CSV_URL, SHEET_USED_TAB, parseSheetRows, parseSheetDate, parseUsedRows, planPriceUpdates, planNewProducts, planUsedProducts } from './sheetPricing.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
@@ -664,15 +663,21 @@ async function executeBulkDiscount(percent) {
   }
 }
 
-// ===== Xóa hàng loạt: bảng tích theo hãng / tình trạng / loại / trạng thái / nhãn. Chỉ xóa sản phẩm, KHÔNG xóa ảnh trong kho. =====
-const bulkDel = { picked: new Set(), selected: new Set(), query: '' };
+// ===== Xóa hàng loạt: lọc bằng thẻ, tích chọn tất cả hoặc từng máy. Chỉ xóa sản phẩm, KHÔNG xóa ảnh trong kho. =====
+const bulkDel = { facets: new Set(), selected: new Set(), query: '' };
+
+function bdShown() {
+  const ids = new Set(matchPricing(state.products, [...bulkDel.facets]));
+  const q = bulkDel.query.trim().toLowerCase();
+  return state.products.filter(p => ids.has(p.id) && (!q || `${p.name} ${p.id}`.toLowerCase().includes(q)));
+}
 
 function openBulkDeleteModal() {
   if (!canDeleteProducts(state.role)) {
     showToast('Nhân viên không có quyền xóa sản phẩm.', 'error');
     return;
   }
-  bulkDel.picked = new Set();
+  bulkDel.facets.clear();
   bulkDel.selected = new Set(state.selectedIds);
   bulkDel.query = '';
   document.getElementById('bdSearch').value = '';
@@ -685,13 +690,11 @@ function closeBulkDeleteModal() {
 }
 
 function renderBulkDelete() {
-  const groups = buildFacetGroups(state.products);
-  document.getElementById('bdFacets').innerHTML = groups.map(g => `
-    <fieldset class="bd-group"><legend>${escapeHtml(g.label)}</legend>
-      ${g.options.map(o => `<label class="bd-opt"><input type="checkbox" data-facet="${escapeHtml(o.id)}" ${bulkDel.picked.has(o.id) ? 'checked' : ''}> ${escapeHtml(o.label)} <span>${o.count}</span></label>`).join('')}
-    </fieldset>`).join('');
-  const q = bulkDel.query.trim().toLowerCase();
-  const list = state.products.filter(p => !q || `${p.name} ${p.id}`.toLowerCase().includes(q));
+  renderFacetBar('bdFacets', allFilterGroups(state.products), bulkDel.facets);
+  const list = bdShown();
+  // chỉ giữ lựa chọn của máy đang hiện để không xóa nhầm máy đã bị lọc ẩn
+  const shownIds = new Set(list.map(p => p.id));
+  bulkDel.selected = new Set([...bulkDel.selected].filter(id => shownIds.has(id)));
   document.getElementById('bdList').innerHTML = list.length === 0 ? '<p class="dialog-subtext">Không có sản phẩm nào.</p>' : list.map(p => `
     <label class="bd-row"><input type="checkbox" data-pid="${escapeHtml(p.id)}" ${bulkDel.selected.has(p.id) ? 'checked' : ''}>
       <span class="bd-name">${escapeHtml(p.name)}</span><span class="bd-price">${escapeHtml(formatCurrency(p.price))}</span></label>`).join('');
@@ -699,8 +702,14 @@ function renderBulkDelete() {
 }
 
 function updateBulkDeleteCount() {
+  const shown = bdShown().length;
   const n = bulkDel.selected.size;
-  document.getElementById('bdCount').textContent = `Đã chọn ${n} / ${state.products.length} sản phẩm`;
+  const all = document.getElementById('bdAll');
+  all.checked = shown > 0 && n === shown;
+  all.indeterminate = n > 0 && n < shown;
+  all.disabled = shown === 0;
+  document.getElementById('bdAllLabel').textContent = `Chọn tất cả ${shown} sản phẩm đang hiện`;
+  document.getElementById('bdCount').textContent = `Đã chọn ${n} / ${shown} đang hiện (tổng ${state.products.length} sản phẩm)`;
   const btn = document.getElementById('bdConfirm');
   btn.disabled = n === 0;
   btn.textContent = n ? `Xóa ${n} sản phẩm` : 'Xóa sản phẩm đã chọn';
@@ -749,15 +758,37 @@ function spDirty() {
   return state.products.filter(p => setPrice.edits.has(p.id) && setPrice.edits.get(p.id) !== p.price);
 }
 
-function renderSetPriceFacets() {
-  const groups = pricingGroups(state.products);
+// Thanh lọc dạng xổ xuống + thẻ có ✕ (dùng cho Set giá và Xóa hàng loạt).
+function renderFacetBar(elId, groups, facets) {
   const label = new Map(groups.flatMap(g => g.options.map(o => [o.id, `${g.label}: ${o.label}`])));
   const selects = groups.map(g => {
-    const left = g.options.filter(o => !setPrice.facets.has(o.id));
+    const left = g.options.filter(o => !facets.has(o.id));
     return `<select class="form-input sp-filter" data-addfacet aria-label="Lọc theo ${spEsc(g.label)}"><option value="">${spEsc(g.label)} ▾</option>${left.map(o => `<option value="${spEsc(o.id)}">${spEsc(o.label)} (${o.count})</option>`).join('')}</select>`;
   }).join('');
-  const chips = [...setPrice.facets].filter(id => label.has(id)).map(id => `<span class="sp-chip">${spEsc(label.get(id))}<button type="button" data-rmfacet="${spEsc(id)}" aria-label="Bỏ thẻ">✕</button></span>`).join('');
-  document.getElementById('spFacets').innerHTML = `<div class="sp-filter-row">${selects}${chips ? '<button type="button" class="btn btn-ghost btn-sm" data-clearfacets>Xóa hết thẻ</button>' : ''}</div>${chips ? `<div class="sp-chips">${chips}</div>` : ''}`;
+  const chips = [...facets].filter(id => label.has(id)).map(id => `<span class="sp-chip">${spEsc(label.get(id))}<button type="button" data-rmfacet="${spEsc(id)}" aria-label="Bỏ thẻ">✕</button></span>`).join('');
+  document.getElementById(elId).innerHTML = `<div class="sp-filter-row">${selects}${chips ? '<button type="button" class="btn btn-ghost btn-sm" data-clearfacets>Xóa hết thẻ</button>' : ''}</div>${chips ? `<div class="sp-chips">${chips}</div>` : ''}`;
+}
+
+/** Gắn sự kiện thêm/bỏ thẻ cho thanh lọc; facets phải là Set cố định (dùng .clear(), không gán lại). */
+function bindFacetBar(elId, facets, onChange) {
+  const bar = document.getElementById(elId);
+  bar.addEventListener('change', (e) => {
+    const sel = e.target.closest('[data-addfacet]');
+    if (!sel || !sel.value) return;
+    facets.add(sel.value);
+    onChange();
+  });
+  bar.addEventListener('click', (e) => {
+    const rm = e.target.closest('[data-rmfacet]');
+    if (rm) facets.delete(rm.dataset.rmfacet);
+    else if (e.target.closest('[data-clearfacets]')) facets.clear();
+    else return;
+    onChange();
+  });
+}
+
+function renderSetPriceFacets() {
+  renderFacetBar('spFacets', pricingGroups(state.products), setPrice.facets);
 }
 
 function renderSetPriceList() {
@@ -850,7 +881,7 @@ function openSetPriceModal() {
   if (!setPrice.rules.length) setPrice.rules = [{ brand: '', from: '', to: '', keyword: '', mode: 'fixed', value: '' }];
   showSetPriceTab('pick');
   renderSetPriceRules();
-  setPrice.facets = new Set(); setPrice.picked = new Set(); setPrice.edits = new Map(); setPrice.query = '';
+  setPrice.facets.clear(); setPrice.picked = new Set(); setPrice.edits = new Map(); setPrice.query = '';
   document.getElementById('spSearch').value = '';
   document.getElementById('spValue').value = '';
   setPrice.mode = 'fixed';
@@ -920,20 +951,7 @@ function bindSetPriceModal() {
   });
   document.getElementById('spApplyPicked').addEventListener('click', () => applySetPricePicked(false));
   document.getElementById('spResetPicked').addEventListener('click', () => applySetPricePicked(true));
-  const facets = document.getElementById('spFacets');
-  facets.addEventListener('change', (e) => {
-    const sel = e.target.closest('[data-addfacet]');
-    if (!sel || !sel.value) return;
-    setPrice.facets.add(sel.value);
-    renderSetPriceFacets(); renderSetPriceList();
-  });
-  facets.addEventListener('click', (e) => {
-    const rm = e.target.closest('[data-rmfacet]');
-    if (rm) setPrice.facets.delete(rm.dataset.rmfacet);
-    else if (e.target.closest('[data-clearfacets]')) setPrice.facets.clear();
-    else return;
-    renderSetPriceFacets(); renderSetPriceList();
-  });
+  bindFacetBar('spFacets', setPrice.facets, () => { renderSetPriceFacets(); renderSetPriceList(); });
   document.querySelectorAll('[data-spmode]').forEach(b => b.addEventListener('click', () => {
     setPrice.mode = b.dataset.spmode;
     document.getElementById('spValue').value = '';
@@ -990,12 +1008,9 @@ function bindBulkDeleteModal() {
   document.getElementById('bdCancel').addEventListener('click', closeBulkDeleteModal);
   document.getElementById('bdConfirm').addEventListener('click', confirmBulkDelete);
   document.getElementById('bdSearch').addEventListener('input', (e) => { bulkDel.query = e.target.value; renderBulkDelete(); });
-  document.getElementById('bdClear').addEventListener('click', () => { bulkDel.picked.clear(); bulkDel.selected.clear(); renderBulkDelete(); });
-  document.getElementById('bdFacets').addEventListener('change', (e) => {
-    const box = e.target.closest('[data-facet]');
-    if (!box) return;
-    if (box.checked) bulkDel.picked.add(box.dataset.facet); else bulkDel.picked.delete(box.dataset.facet);
-    bulkDel.selected = new Set(matchByFacets(state.products, [...bulkDel.picked]));
+  bindFacetBar('bdFacets', bulkDel.facets, renderBulkDelete);
+  document.getElementById('bdAll').addEventListener('change', (e) => {
+    bulkDel.selected = e.target.checked ? new Set(bdShown().map(p => p.id)) : new Set();
     renderBulkDelete();
   });
   document.getElementById('bdList').addEventListener('change', (e) => {

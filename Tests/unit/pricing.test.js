@@ -89,3 +89,12 @@ test('formatThousands thêm dấu chấm hàng nghìn', () => {
   assert.equal(formatThousands(''), '');
   assert.equal(formatThousands('500'), '500');
 });
+
+import { allFilterGroups } from '../../Frontend/admin/pricing.js';
+test('allFilterGroups gồm giá gốc ngay sau hãng và khớp được bằng matchPricing', () => {
+  const ids = allFilterGroups(list).map(g => g.id);
+  assert.equal(ids[0], 'brand');
+  assert.equal(ids[1], 'price');
+  assert.ok(ids.includes('state'));
+  assert.deepEqual(matchPricing(list, ['state:visible', 'brand:samsung']), ['c']);
+});

@@ -156,3 +156,12 @@ export function formatThousands(value) {
   if (!digits) return neg ? '-' : '';
   return (neg ? '-' : '') + digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
+
+/** Mọi nhóm lọc (hãng, giá gốc, tình trạng, loại, trạng thái, nhãn) dùng cho xóa hàng loạt; khớp bằng matchPricing. */
+export function allFilterGroups(products) {
+  const all = buildFacetGroups(Array.isArray(products) ? products : []);
+  const price = pricingGroups(products).find(g => g.id === 'price');
+  if (!price) return all;
+  const at = all.findIndex(g => g.id === 'brand') + 1;
+  return [...all.slice(0, at), price, ...all.slice(at)];
+}

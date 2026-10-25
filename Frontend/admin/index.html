@@ -536,12 +536,12 @@
         <button type="button" id="closeBulkDeleteBtn" class="btn-icon-close" aria-label="Đóng">✕</button>
       </div>
       <div class="modal-body">
-        <p class="dialog-subtext">Tích theo nhóm để chọn nhanh (cùng nhóm là "hoặc", khác nhóm là "và"), rồi bỏ tích từng sản phẩm nếu cần. Chỉ xóa sản phẩm, <strong>ảnh trong kho được giữ lại</strong>.</p>
-        <div id="bdFacets" class="bd-facets"></div>
+        <p class="dialog-subtext">Chọn thẻ lọc (hãng, giá, tình trạng, trạng thái...) để thu hẹp danh sách, rồi tích chọn tất cả hoặc từng máy và bấm <strong>Xóa</strong>. Chỉ xóa sản phẩm, <strong>ảnh trong kho được giữ lại</strong>.</p>
+        <div id="bdFacets" class="sp-filters"></div>
         <div class="bd-toolbar">
-          <input type="search" id="bdSearch" class="form-input" placeholder="Lọc danh sách theo tên..." aria-label="Lọc danh sách">
-          <button type="button" id="bdClear" class="btn btn-ghost btn-sm">Bỏ chọn hết</button>
+          <input type="search" id="bdSearch" class="form-input" placeholder="Tìm theo tên..." aria-label="Lọc danh sách">
         </div>
+        <label class="bd-all"><input type="checkbox" id="bdAll"> <span id="bdAllLabel">Chọn tất cả</span></label>
         <div id="bdList" class="bd-list"></div>
         <p id="bdCount" class="dialog-subtext"></p>
       </div>

@@ -292,9 +292,9 @@ Trang **Sản phẩm** có hai nút. Cả hai đọc tab `TONG_HOP` của Google
 
 ### Xóa hàng loạt
 
-Nút **Xóa hàng loạt** (trang Sản phẩm; nút "Xóa đã chọn" trên thanh chọn cũng mở bảng này) mở bảng tích:
-- **Nhóm tích có sẵn:** Hãng, Tình trạng (hàng mới / Like New), Loại (điện thoại / phụ kiện), Trạng thái (đang hiện, đang ẩn, hết hàng, chưa có ảnh), Nhãn. Mỗi ô ghi số sản phẩm. Cùng nhóm là "hoặc", khác nhóm là "và" (ví dụ tích Apple + Like New + Đang ẩn = máy cũ Apple đang ẩn).
-- Danh sách sản phẩm bên dưới tự tích theo nhóm; bỏ tích từng sản phẩm hoặc lọc theo tên nếu cần. Nút **Xóa N sản phẩm** hỏi xác nhận lần cuối.
+Nút **Xóa hàng loạt** (trang Sản phẩm; nút "Xóa đã chọn" trên thanh chọn cũng mở bảng này):
+- **Thẻ lọc dạng xổ xuống:** Hãng, Giá gốc, Tình trạng, Loại, Trạng thái (đang hiện, đang ẩn, hết hàng, chưa có ảnh), Nhãn. Chọn xong hiện thành thẻ có nút ✕ để bỏ; chọn được nhiều thẻ. Cùng nhóm là "hoặc", khác nhóm là "và" (ví dụ Apple + Đang ẩn). Có ô tìm theo tên.
+- Danh sách chỉ hiện máy khớp thẻ. Tích **Chọn tất cả N sản phẩm đang hiện** hoặc tích từng máy, rồi bấm **Xóa N sản phẩm** (hỏi xác nhận lần cuối). Đổi thẻ lọc thì máy bị ẩn khỏi danh sách tự bỏ khỏi lựa chọn, nên không xóa nhầm máy không nhìn thấy.
 - **Chỉ xóa sản phẩm, ảnh trong kho ảnh (product-images) được giữ lại** để dùng lại khi đăng hàng (cả khi xóa từng sản phẩm). Chỉ chủ shop và quản lý được xóa.
 
 ## Set giá (cộng thêm lên giá gốc)
