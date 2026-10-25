@@ -7,8 +7,9 @@
  */
 
 export const SHEET_ID = '1Ta3iJAafT8pnm4kuqSvPUqnJO-HLHq7s3Dk_clkIyQE';
-export const SHEET_GID = '0';
-export const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${SHEET_GID}`;
+/** Tab tổng hợp (gộp các tab dòng máy / hãng) mà web đọc. Đổi tên tab thì sửa ở đây. */
+export const SHEET_TAB = 'TONG_HOP';
+export const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_TAB)}`;
 /** Đổi giá lệch quá mức này (so với giá cũ) thì không tự chọn, chờ người dùng tick. */
 export const BIG_CHANGE_RATIO = 0.3;
 
@@ -88,7 +89,8 @@ export function parseSheetRows(csvText) {
     idx = {
       brand: col('Hãng'), model: col('Mẫu Sản Phẩm'), storage: col('Phiên Bản / Bộ Nhớ'),
       list: col('Giá Bán'), sale: col('Sale (%)'), final: col('Giá Sau Sale'),
-      ram: col('RAM'), stock: col('Tồn Kho'), status: col('Trạng Thái')
+      ram: col('RAM'), stock: col('Tồn Kho'), status: col('Trạng Thái'),
+      code: col('Mã SP'), show: col('Hiển Thị Web'), warranty: col('Bảo Hành')
     };
     for (const k of ['brand', 'model', 'storage', 'list', 'sale', 'final']) if (idx[k] < 0) errors.push(`Thiếu cột: ${k}`);
     if (errors.length) return { rows: [], errors };
@@ -97,7 +99,7 @@ export function parseSheetRows(csvText) {
     const labelRow = table.findIndex(r => norm(r[2]) === norm('Mẫu Sản Phẩm') && norm(r[3]) === norm('Phiên Bản / Bộ Nhớ'));
     if (labelRow < 0) return { rows: [], errors: ['Không tìm thấy dòng tiêu đề (Mẫu Sản Phẩm, Giá Sau Sale) trong sheet.'] };
     headerIndex = labelRow;
-    idx = { brand: 1, model: 2, storage: 3, ram: 4, list: 6, sale: 7, final: 8, stock: 10, status: 11 };
+    idx = { brand: 1, model: 2, storage: 3, ram: 4, list: 6, sale: 7, final: 8, stock: 10, status: 11, code: -1, show: -1, warranty: -1 };
   }
   const rows = [];
   for (let i = headerIndex + 1; i < table.length; i++) {
@@ -117,6 +119,9 @@ export function parseSheetRows(csvText) {
       salePercent: parsePercent(r[idx.sale]) || 0,
       finalPrice,
       ram: idx.ram >= 0 ? String(r[idx.ram] ?? '').trim() : '',
+      code: idx.code >= 0 ? String(r[idx.code] ?? '').trim() : '',
+      show: idx.show < 0 || normalizeKey(r[idx.show]) !== 'khong',
+      warranty: idx.warranty >= 0 ? String(r[idx.warranty] ?? '').trim() : '',
       stock: stockOf(idx.stock >= 0 ? r[idx.stock] : '', idx.status >= 0 ? r[idx.status] : ''),
       key: normalizeKey(`${model} ${storage}`)
     });
@@ -146,6 +151,9 @@ export function planPriceUpdates(products, sheetRows) {
   }
   return out;
 }
+
+/** Không phải điện thoại (đồng hồ, máy tính bảng, tai nghe...): không tự tạo vào mục điện thoại. */
+const NOT_PHONE = /\b(watch|ipad|macbook|airpods|tai nghe|sac|cap)\b/i;
 
 const BRAND_NAMES = { apple: 'Apple iPhone', samsung: 'Samsung Galaxy', xiaomi: 'Xiaomi', oppo: 'OPPO', vivo: 'Vivo', realme: 'Realme' };
 
@@ -179,12 +187,14 @@ export function brandsOf(rows) {
 export function planNewProducts(existingProducts, sheetRows, { visible = false } = {}) {
   const have = new Set((Array.isArray(existingProducts) ? existingProducts : []).map(p => normalizeKey(p?.name)));
   const usedIds = new Set((Array.isArray(existingProducts) ? existingProducts : []).map(p => p?.id));
-  const out = { items: [], duplicates: 0 };
+  const out = { items: [], duplicates: 0, hiddenInSheet: 0, notPhone: 0 };
   for (const r of Array.isArray(sheetRows) ? sheetRows : []) {
     if (have.has(r.key)) { out.duplicates++; continue; }
+    if (!r.show) { out.hiddenInSheet++; continue; }
+    if (NOT_PHONE.test(r.model)) { out.notPhone++; continue; }
     have.add(r.key);
     const name = productNameFor(r);
-    const base = slugify(name) || 'san-pham';
+    const base = slugify(r.code) || slugify(name) || 'san-pham';
     let id = base;
     for (let n = 2; usedIds.has(id); n++) id = `${base}-${n}`;
     usedIds.add(id);
@@ -197,7 +207,7 @@ export function planNewProducts(existingProducts, sheetRows, { visible = false }
         price: r.finalPrice, old_price: r.salePercent > 0 && r.listPrice > r.finalPrice ? r.listPrice : null,
         colors: [], default_color: '', storages: r.storage ? [r.storage] : [],
         chip: '', camera: '', battery: '', screen: '',
-        description: [r.ram && `RAM ${r.ram}`, r.storage && `Bộ nhớ ${r.storage}`].filter(Boolean).join(' • '),
+        description: [r.ram && r.ram !== '--' && `RAM ${r.ram}`, r.storage && `Bộ nhớ ${r.storage}`, r.warranty && `Bảo hành ${r.warranty}`].filter(Boolean).join(' • '),
         rating: 5, review_count: 0, image_url: '', stock: r.stock, is_visible: Boolean(visible), sort_order: 0
       }
     });

@@ -4,7 +4,7 @@
  * Visibility Toggle, Bulk Operations, Image Upload with Client Resize, and Filters.
  */
 
-import { SHEET_CSV_URL, parseSheetRows, parseSheetDate, planPriceUpdates, planNewProducts } from './sheetPricing.js';
+import { SHEET_CSV_URL, SHEET_TAB, parseSheetRows, parseSheetDate, planPriceUpdates, planNewProducts } from './sheetPricing.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
 import {
   formatCurrency,
@@ -762,18 +762,19 @@ async function openSheetModal(mode) {
     const text = await res.text();
     const { rows, errors } = parseSheetRows(text);
     if (rows.length === 0) throw new Error(errors[0] || 'Sheet không có dữ liệu giá.');
-    const date = parseSheetDate(text);
+    const now = new Date();
+    const stamp = `Đọc từ tab ${SHEET_TAB} lúc ${now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} ${now.toLocaleDateString('vi-VN')}${parseSheetDate(text) ? ` (sheet ghi cập nhật ${parseSheetDate(text)})` : ''}`;
     const extra = errors.length ? ` · Bỏ qua ${errors.length} dòng lỗi trong sheet.` : '';
     if (mode === 'new') {
       const plan = planNewProducts(state.products, rows);
       sheetState.items = plan.items.map(i => ({ name: i.product.name, brand: i.brand, newPrice: i.product.price, stock: i.product.stock, product: i.product, checked: true }));
-      sheetState.info = `Bảng giá cập nhật ngày ${date || 'không rõ'} · Đã có trên web (bỏ qua): ${plan.duplicates}${extra}`;
+      sheetState.info = `${stamp} · Đã có trên web (bỏ qua): ${plan.duplicates}${plan.hiddenInSheet ? ` · Sheet đặt "Không" hiển thị: ${plan.hiddenInSheet}` : ''}${plan.notPhone ? ` · Không phải điện thoại (bỏ qua): ${plan.notPhone}` : ''}${extra}`;
     } else {
       const plan = planPriceUpdates(state.products, rows);
       const brandOf = new Map(rows.map(r => [r.key, r.brand]));
       sheetState.items = plan.changes.map(c => ({ ...c, brand: brandOf.get(c.sheetKey) || '', warn: c.bigChange, checked: !c.bigChange }));
       const missing = plan.unmatched.length ? ` · Không có trong sheet (giữ giá): ${plan.unmatched.map(u => u.name).join(', ')}` : '';
-      sheetState.info = `Bảng giá cập nhật ngày ${date || 'không rõ'} · Không đổi: ${plan.same.length} · Bỏ qua (hàng cũ, phụ kiện): ${plan.skipped}${missing}${extra}`;
+      sheetState.info = `${stamp} · Không đổi: ${plan.same.length} · Bỏ qua (hàng cũ, phụ kiện): ${plan.skipped}${missing}${extra}`;
     }
   } catch (err) {
     console.error('[Admin] Lỗi đọc Google Sheet:', err);
