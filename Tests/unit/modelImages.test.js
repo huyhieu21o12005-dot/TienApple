@@ -18,7 +18,7 @@ describe('modelImages', () => {
     assert.match(imageFor('iPhone 16 Pro Max 256GB'), /^https:\/\/store\.storeimages\.cdn-apple\.com\//);
     assert.notEqual(imageFor('iPhone 16 Pro 128GB'), imageFor('iPhone 16 Pro Max 256GB'));
     assert.notEqual(imageFor('iPhone 16 Plus 128GB'), imageFor('iPhone 16 128GB'));
-    assert.equal(imageFor('iPhone 12 Pro Max 256GB'), '');
+    assert.equal(imageFor('iPhone 11 Pro Max 256GB'), '');
     assert.ok(imageFor('iPhone 17 Air 256GB'));
     assert.match(imageFor('Samsung Galaxy S24 Ultra 256GB'), /images\.samsung\.com/);
     assert.match(imageFor('Xiaomi 14 5G 256GB'), /appmifile\.com/);
@@ -38,7 +38,7 @@ describe('modelImages', () => {
     const nd = [
       '"","Hãng","Mẫu Sản Phẩm","Phiên Bản / Bộ Nhớ","RAM","Tình Trạng","Mô Tả"',
       '1,Apple,iPhone 16 Pro Max,256GB,8GB,99% Like New,"Vàng, bản VN/A, pin 90%","1 ₫","1 ₫",0%,"23.500.000 ₫","0 ₫",1,Còn hàng',
-      '2,Apple,iPhone 12 Pro Max,256GB,6GB,98% Phẩy nhẹ,"Vàng, 98%, pin new","1 ₫","1 ₫",0%,"19.000.000 ₫","0 ₫",1,Còn hàng'
+      '2,Apple,iPhone 11 Pro Max,256GB,6GB,98% Phẩy nhẹ,"Vàng, 98%, pin new","1 ₫","1 ₫",0%,"19.000.000 ₫","0 ₫",1,Còn hàng'
     ].join('\n');
     const plan = planUsedProducts([], parseUsedRows(nd).rows);
     assert.ok(plan.items[0].product.image_url);
