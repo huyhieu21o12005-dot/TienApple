@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Hợp đồng thu máy - Tien Mobile Thu Duc</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <style>
+    :root { --paper: 80mm; --ink: #1D1D1F; --muted: #6E6E73; --line: #D2D2D7; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #F5F5F7; color: var(--ink); font-family: "Times New Roman", Times, "Liberation Serif", serif; font-weight: 400; -webkit-font-smoothing: antialiased; }
+    .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; padding: 12px; background: #fff; border-bottom: 1px solid var(--line); }
+    .bar button, .bar a { font-family: "Inter", -apple-system, "Segoe UI", Arial, sans-serif; min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: #F5F5F7; font: inherit; font-size: 14px; cursor: pointer; color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; }
+    .bar button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .bar button.active { outline: 2px solid #0071E3; }
+    #msg { text-align: center; padding: 24px; font-size: 14px; color: var(--muted); }
+    .sheet { width: var(--paper); margin: 16px auto; padding: 5mm; background: #fff; font-size: 12px; line-height: 1.45; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+    body.a5 { --paper: 148mm; }
+    body.a5 .sheet { font-size: 13px; padding: 12mm; }
+    body.a4 { --paper: 210mm; }
+    body.a4 .sheet { font-size: 13px; padding: 18mm 18mm; line-height: 1.55; }
+    .inv-head { text-align: center; margin-bottom: 6px; }
+    .inv-shop { font-size: 15px; font-weight: 600; letter-spacing: .06em; }
+    .inv-small { font-size: 11px; color: var(--muted); }
+    body.a5 .inv-small { font-size: 12px; }
+    .inv-title { text-align: center; font-weight: 500; font-size: 13px; letter-spacing: .08em; margin: 10px 0 8px; padding: 6px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .inv-block { margin: 8px 0; }
+    .inv-h { font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: .06em; font-size: 10px; color: var(--muted); }
+    .inv-row { display: flex; justify-content: space-between; gap: 8px; padding: 1px 0; }
+    .inv-k { color: var(--muted); flex: 0 0 auto; }
+    .inv-v { text-align: right; font-weight: 400; overflow-wrap: anywhere; }
+    .inv-code { font-size: 14px; font-weight: 700; }
+    .inv-items { width: 100%; border-collapse: collapse; margin: 6px 0; }
+    .inv-items th { text-align: left; border-bottom: 1px solid var(--ink); font-size: 10px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; padding: 2px 0; }
+    .inv-items td { padding: 4px 0; vertical-align: top; border-bottom: 1px solid var(--line); }
+    .inv-items small { display: block; font-size: 10px; color: var(--muted); }
+    .inv-r { text-align: right; white-space: nowrap; }
+    .inv-totals { border-top: 1px solid var(--ink); margin-top: 6px; padding-top: 4px; }
+    .inv-total { display: flex; justify-content: space-between; padding: 1px 0; }
+    .inv-strong { font-size: 15px; font-weight: 700; }
+    .inv-note { margin: 8px 0 0; font-size: 11px; color: var(--muted); }
+    .inv-signs { display: flex; justify-content: space-between; gap: 8px; margin-top: 16px; text-align: center; }
+    .inv-sign { flex: 1; font-size: 11px; min-height: 56px; border-top: 0; color: var(--muted); }
+    .inv-sign span { display: block; font-weight: 400; }
+    .inv-thanks { text-align: center; margin: 12px 0 0; font-size: 11px; color: var(--muted); }
+    .inv-empty { text-align: center; padding: 20px; }
+    /* Hợp đồng (A4) */
+    .ct-nation { text-align: center; font-size: 12px; font-weight: 600; letter-spacing: .03em; }
+    .ct-nation div:last-child { font-weight: 400; margin-top: 1px; padding-bottom: 6px; display: inline-block; border-bottom: 1px solid var(--ink); }
+    .ct-title { text-align: center; font-size: 18px; font-weight: 700; letter-spacing: .04em; margin: 18px 0 4px; }
+    .ct-meta { text-align: center; color: var(--muted); font-size: 12px; }
+    .ct-intro { margin: 14px 0 8px; }
+    .ct-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 8px; }
+    .ct-h { font-weight: 600; margin: 10px 0 3px; }
+    .ct-party .ct-h { margin-top: 0; }
+    .ct-row { display: flex; gap: 6px; padding: 1px 0; }
+    .ct-k { color: var(--muted); flex: 0 0 auto; }
+    .ct-v { overflow-wrap: anywhere; }
+    .ct-article p { margin: 3px 0; }
+    .ct-rows { margin: 4px 0 4px 12px; max-width: 360px; }
+    .ct-items { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 12px; }
+    .ct-items th { text-align: left; font-weight: 500; color: var(--muted); border-bottom: 1px solid var(--ink); padding: 3px 4px; }
+    .ct-items td { padding: 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .ct-r { text-align: right !important; white-space: nowrap; }
+    .ct-signs { display: flex; justify-content: space-between; gap: 24px; margin-top: 26px; text-align: center; page-break-inside: avoid; }
+    .ct-sign { flex: 1; min-height: 110px; color: var(--ink); font-weight: 500; }
+    .ct-article { page-break-inside: avoid; }
+    body.editing .sheet { outline: 2px dashed #0071E3; outline-offset: 4px; cursor: text; }
+    body.editing .sheet:focus { outline-style: solid; }
+    .info { max-width: 820px; margin: 12px auto 0; padding: 12px; background: #fff; border: 1px solid var(--line); border-radius: 12px; font-family: "Inter", -apple-system, Arial, sans-serif; }
+    .info-t { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    .info-g { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px; }
+    .info label { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--muted); }
+    .info input { height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; font: inherit; font-size: 14px; color: var(--ink); }
+    #hint { text-align: center; font-size: 13px; color: var(--muted); margin: 8px 12px 0; }
+
+    /* Bố cục hóa đơn cửa hàng: chữ Times New Roman, tiêu đề in hoa, bảng có viền */
+    .sheet { font-size: 13px; line-height: 1.4; }
+    body.a5 .sheet { font-size: 14px; }
+    body.a4 .sheet { font-size: 15px; }
+    .inv-shop { font-size: 18px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+    .inv-small { font-size: 12px; color: var(--ink); }
+    .inv-title { font-size: 16px; font-weight: 700; letter-spacing: .05em; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--ink); }
+    .inv-h { font-size: 12px; font-weight: 700; color: var(--ink); letter-spacing: .03em; border-bottom: 1px solid var(--ink); padding-bottom: 1px; }
+    .inv-k { color: var(--ink); }
+    .inv-items { border: 1px solid var(--ink); }
+    .inv-items th { font-size: 12px; font-weight: 700; color: var(--ink); text-transform: none; letter-spacing: 0; border: 1px solid var(--ink); padding: 3px 4px; }
+    .inv-items td { border: 1px solid var(--ink); padding: 3px 4px; }
+    .inv-items small, .inv-note, .inv-thanks, .inv-sign { color: var(--ink); }
+    .inv-thanks { font-style: italic; }
+    .inv-sign span { font-weight: 700; }
+    .ct-items { border: 1px solid var(--ink); }
+    .ct-items th, .ct-items td { border: 1px solid var(--ink); }
+    .ct-items th { font-weight: 700; color: var(--ink); }
+    .ct-k, .ct-meta { color: var(--ink); }
+    .ct-nation { font-weight: 700; text-transform: uppercase; font-size: 13px; }
+    .ct-title { font-size: 20px; }
+    .ct-h { font-weight: 700; }
+    .ct-sign { font-weight: 700; }
+    .ct-intro, .ct-article p { text-align: justify; }
+    @media print {
+      #hint, .info { display: none !important; }
+      .sheet { outline: none !important; }
+      body { background: #fff; }
+      .bar, #msg { display: none !important; }
+      .sheet { width: 100%; margin: 0; padding: 3mm; box-shadow: none; }
+      body.a5 .sheet { padding: 12mm; }
+      body.a4 .sheet { padding: 16mm 18mm; }
+    }
+  
+    @page { size: A4; margin: 0; }
+    body { --paper: 210mm; }
+    .sheet { font-size: 13px; padding: 18mm; line-height: 1.55; }
+    .wrap { display: grid; grid-template-columns: minmax(280px, 380px) 1fr; gap: 16px; align-items: start; max-width: 1280px; margin: 0 auto; padding: 12px; }
+    .form { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 16px; font-family: "Inter", -apple-system, "Segoe UI", Arial, sans-serif; font-size: 14px; position: sticky; top: 8px; }
+    .form h1 { font-size: 16px; margin: 0 0 4px; }
+    .form p.note { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
+    .form h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 0 6px; }
+    .form label { display: block; margin: 8px 0 3px; font-size: 12px; color: var(--muted); }
+    .form input, .form select, .form textarea { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; font: inherit; background: #F5F5F7; }
+    .form textarea { min-height: 56px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .err { color: #C0392B; font-size: 13px; margin: 8px 0 0; }
+    .sheet { margin: 0 auto; }
+    @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } .form { position: static; } .sheet { width: 100%; padding: 12mm 8mm; } }
+    @media print { .wrap { display: block; padding: 0; } .form { display: none !important; } .sheet { padding: 16mm 18mm; } }
+  </style>
+</head>
+<body class="a4">
+  <div class="bar" id="bar">
+    <button type="button" id="printBtn" class="primary">In hợp đồng</button>
+    <button type="button" id="clearBtn">Làm mới biểu mẫu</button>
+    <a href="./index.html">← Quản trị</a>
+  </div>
+  <div class="wrap">
+    <form class="form" id="form" autocomplete="off">
+      <h1>Hợp đồng thu máy</h1>
+      <p class="note">Điền thông tin khách bán máy, hợp đồng bên phải cập nhật ngay. Dữ liệu chỉ nằm trên trình duyệt này, không gửi đi đâu.</p>
+      <h2>Người bán (khách)</h2>
+      <label for="sellerName">Họ và tên *</label><input id="sellerName" name="sellerName">
+      <div class="row2"><div><label for="sellerBirth">Năm sinh</label><input id="sellerBirth" name="sellerBirth" inputmode="numeric"></div><div><label for="sellerPhone">Điện thoại</label><input id="sellerPhone" name="sellerPhone" inputmode="tel"></div></div>
+      <label for="sellerCccd">CCCD/CMND số *</label><input id="sellerCccd" name="sellerCccd" inputmode="numeric">
+      <div class="row2"><div><label for="cccdDate">Ngày cấp</label><input id="cccdDate" name="cccdDate" placeholder="dd/mm/yyyy"></div><div><label for="cccdPlace">Nơi cấp</label><input id="cccdPlace" name="cccdPlace"></div></div>
+      <label for="sellerAddress">Địa chỉ</label><input id="sellerAddress" name="sellerAddress">
+      <h2>Máy thu</h2>
+      <label for="model">Tên máy *</label><input id="model" name="model" placeholder="iPhone 15 Pro Max">
+      <div class="row2"><div><label for="storage">Dung lượng</label><input id="storage" name="storage" placeholder="256GB"></div><div><label for="color">Màu</label><input id="color" name="color"></div></div>
+      <label for="imei">IMEI / Serial *</label><input id="imei" name="imei" inputmode="numeric">
+      <label for="condition">Tình trạng</label><textarea id="condition" name="condition" placeholder="Ví dụ: Máy đẹp 98%, màn zin, không trầy xước"></textarea>
+      <div class="row2"><div><label for="battery">Sức khỏe pin</label><input id="battery" name="battery" placeholder="90%"></div><div><label for="accessories">Phụ kiện kèm</label><input id="accessories" name="accessories" placeholder="Sạc, hộp"></div></div>
+      <h2>Giá và thanh toán</h2>
+      <div class="row2"><div><label for="price">Giá thu (đồng) *</label><input id="price" name="price" inputmode="numeric" placeholder="9.700.000"></div><div><label for="payMethod">Hình thức</label><select id="payMethod" name="payMethod"><option value="">Chưa chọn</option><option value="cash">Tiền mặt</option><option value="transfer">Chuyển khoản</option></select></div></div>
+      <label for="shopRep">Đại diện cửa hàng</label><input id="shopRep" name="shopRep" placeholder="Họ tên, chức vụ">
+      <p class="err" id="err" hidden></p>
+    </form>
+    <main class="sheet" id="sheet"></main>
+  </div>
+  <script type="module" src="./buyback.js"></script>
+</body>
+</html>

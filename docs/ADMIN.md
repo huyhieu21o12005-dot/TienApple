@@ -358,3 +358,7 @@ Nút **Phụ kiện từ Sheet** (đầu trang sản phẩm) đọc tab `PHU_KIE
 Bấm nút sẽ liệt kê: **món chưa có** (thêm mới, mặc định ẩn, có ô "Hiện ngay" và "Chỉ thêm máy có ảnh") và **món đã có** (đổi giá nếu khác giá gốc; phần cộng thêm đã Set giá được giữ). Tích chọn rồi bấm Áp dụng.
 
 **Trang khách không dùng hàng mẫu:** khi kết nối được cơ sở dữ liệu, web chỉ hiện sản phẩm thật đang bật hiển thị; chưa có sản phẩm nào thì hiện "Cửa hàng đang cập nhật sản phẩm". Dữ liệu mẫu (`data/products.json`) chỉ dùng khi không kết nối được máy chủ.
+
+## Hợp đồng thu máy
+
+Nút **Hợp đồng thu máy** (thanh trên cùng trang quản trị) mở `/admin/buyback.html`: nhập họ tên, CCCD, địa chỉ khách bán; tên máy, dung lượng, màu, IMEI/serial, tình trạng, pin, phụ kiện; giá thu và hình thức thanh toán. Hợp đồng A4 cập nhật ngay bên phải (kèm số tiền bằng chữ), bấm **In hợp đồng**. Cửa hàng là Bên mua, khách là Bên bán. Nội dung gồm: đối tượng, giá và thanh toán, cam kết của người bán (chủ sở hữu hợp pháp, không báo mất/chặn IMEI/nợ trả góp, đã đăng xuất iCloud/Google và tắt Find My/FRP, xóa dữ liệu), bàn giao kiểm tra, chuyển quyền sở hữu, điều khoản chung; căn cứ Bộ luật Dân sự 2015 và Luật Bảo vệ quyền lợi người tiêu dùng. Thông tin khách chỉ nằm trên trình duyệt, không lưu lên máy chủ. Địa chỉ cửa hàng lấy từ `SHOP.address` trong `invoiceHelpers.js` (đang trống thì để chỗ chấm điền tay). Mẫu mang tính tham khảo, giao dịch giá trị lớn nên hỏi thêm luật sư hoặc công chứng.
