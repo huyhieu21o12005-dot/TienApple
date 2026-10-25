@@ -1186,7 +1186,7 @@ function renderSyncModal() {
     <table class="sheet-price-table"><thead><tr><th></th><th>Sản phẩm</th><th>Thay đổi</th></tr></thead><tbody>
     ${shown.map(i => `<tr class="${i.warn ? 'sheet-price-warn' : ''}">
       <td><input type="checkbox" class="sheet-price-check" data-i="${sheetState.items.indexOf(i)}" ${i.checked ? 'checked' : ''} aria-label="Chọn ${escapeHtml(i.name)}"></td>
-      <td>${escapeHtml(i.name)}<br><small>${escapeHtml(i.sourceLabel)}</small></td>
+      <td>${i.action === 'add' && i.product?.image_url ? `<img src="${escapeHtml(i.product.image_url)}" alt="" class="sheet-thumb" loading="lazy" style="float:left;margin-right:8px">` : ''}${escapeHtml(i.name)}<br><small>${escapeHtml(i.sourceLabel)}${i.action === 'add' ? (i.product?.image_url ? ' · ảnh đúng mẫu và màu' : ' · chưa có ảnh phù hợp') : ''}</small></td>
       <td>${i.lines.map(l => escapeHtml(l)).join('<br>')}${i.warn ? '<br><small>Lệch hơn 30%, hãy kiểm tra trước khi tick.</small>' : ''}</td>
     </tr>`).join('')}</tbody></table>`;
   const noImage = sheetState.items.filter(i => !sheetHasImage(i)).length;
