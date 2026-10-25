@@ -52,7 +52,7 @@
       <svg class="w-5 h-5 text-[#1D1D1F]" fill="currentColor" viewBox="0 0 24 24">
         <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 3.5c.62-.75 1.04-1.8 1.01-2.85-.9.04-1.99.6-2.61 1.34-.55.63-1.03 1.68-.9 2.71 1 .08 1.88-.45 2.5-1.2z"/>
       </svg>
-      <span class="brand-two-lines"><span class="brand-l1">Tien Mobile</span> <span class="brand-l2">Thu Duc</span></span>
+      <span class="brand-two-lines"><span class="brand-l1">Tien Mobile</span><span class="brand-l2">Thu Duc</span></span>
     </a>
 
     <!-- Center Navigation Links (Chỉ 1 dòng duy nhất, có thanh ngang dưới mục được chọn, chữ đen khi chọn, chữ xám khi chưa chọn) -->
@@ -96,9 +96,9 @@
       <button type="button" id="searchOpenBtn" class="nav-search-btn" aria-label="Tìm kiếm sản phẩm" title="Tìm kiếm (phím /)">
         <span class="material-symbols-outlined text-[19px]">search</span>
       </button>
-      <button class="cart-open-trigger inline-flex items-center gap-1.5 text-[13px] font-normal text-[#1D1D1F] hover:text-black transition-colors cursor-pointer bg-transparent border-0 p-0 min-h-[44px] header-item whitespace-nowrap" type="button" aria-label="Mở giỏ hàng">
-        <span class="material-symbols-outlined text-[19px]">shopping_bag</span>
-        <span><span class="hidden sm:inline">Giỏ hàng </span><span class="text-[#1D1D1F] font-semibold">(<span class="cart-badge-number">0</span>)</span></span>
+      <button class="cart-open-trigger cart-chip" type="button" aria-label="Mở giỏ hàng">
+        <span class="cart-ico"><span class="material-symbols-outlined text-[20px]">shopping_bag</span><span class="cart-count cart-badge-number">0</span></span>
+        <span class="cart-total" hidden></span>
       </button>
 
       <button class="booking-trigger hidden sm:inline-flex items-center justify-center h-9 px-5 whitespace-nowrap bg-[#1D1D1F] text-white text-[13px] font-medium rounded-full hover:bg-black transition-all cursor-pointer header-item" data-service-context="Đặt lịch sửa tổng quát" type="button">

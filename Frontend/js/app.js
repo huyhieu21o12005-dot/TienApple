@@ -1435,6 +1435,12 @@ class App {
     document.querySelectorAll('.cart-badge-number').forEach(el => {
       el.innerText = count;
     });
+    const subtotal = this.cart.getSubtotal();
+    const short = subtotal >= 1e6 ? `${(subtotal / 1e6).toFixed(1).replace(/\.0$/, '')}tr` : `${Math.round(subtotal / 1e3)}k`;
+    document.querySelectorAll('.cart-total').forEach(el => {
+      el.hidden = subtotal <= 0;
+      el.textContent = short;
+    });
   }
 
   async handleCheckout(e) {
