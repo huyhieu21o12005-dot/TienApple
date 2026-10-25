@@ -317,3 +317,5 @@ Nút **Hiện / ẩn hàng loạt** (đầu trang sản phẩm): lọc bằng th
 Thanh nút nhanh phía trên danh sách sản phẩm: **Chọn tất cả** (tích mọi máy đang lọc), **Hiện tất cả** (hiện mọi máy đang ẩn, có hỏi xác nhận), **Hiện theo thẻ đã chọn** (mở popup hiện/ẩn với thẻ hãng/loại/trạng thái đang chọn ở danh sách, tích sẵn mọi máy khớp; đổi thẻ rồi bấm Hiện lên web).
 
 Mọi hộp thoại xác nhận, thông báo và nhập số (xóa, đăng xuất, hiện tất cả, ghi sổ thu, đặt hàng/đặt lịch trên web...) dùng popup của trang (`Frontend/js/dialog.js`) thay cho hộp thoại mặc định của trình duyệt. Enter = đồng ý, Esc hoặc bấm ra ngoài = hủy.
+
+Khi thêm máy từ Sheet (mới hoặc cũ) có ô tích **Chỉ thêm máy có ảnh**: máy chưa có ảnh được ẩn khỏi danh sách và không được thêm (ghi rõ số máy bị bỏ). Ô "Hiện ngay trên web" giữ nguyên lựa chọn khi đổi hãng hoặc đổi ô tích.
