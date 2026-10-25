@@ -6,6 +6,7 @@
 
 import { allFilterGroups, baseOf, formatThousands, markupPrice, matchPricing, parseAmount, planRules } from './pricing.js';
 import { imageFor } from './modelImages.js';
+import { SHEET_ACC_CSV_URL, SHEET_ACC_TAB, parseAccessoryRows, planAccessories } from './accessorySheet.js';
 import { USED_IMAGE_NOTE } from './sheetPricing.js';
 import { SHEET_CSV_URL, SHEET_TAB, SHEET_USED_CSV_URL, SHEET_USED_TAB, parseSheetRows, parseSheetDate, parseUsedRows, planPriceUpdates, planNewProducts, planUsedProducts } from './sheetPricing.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
@@ -1151,7 +1152,7 @@ function bindBulkDeleteModal() {
 // 7. DELETE SINGLE PRODUCT (WITH IMAGE CLEANUP)
 // ==============================================================================
 const sheetState = { mode: 'price', tab: 'all', items: [], date: '', info: '', error: '', onlyImage: false, visibleNow: false };
-const sheetHasImage = (i) => Boolean(String(i.product?.image_url || '').trim());
+const sheetHasImage = (i) => i.action === 'price' || Boolean(String(i.product?.image_url || '').trim());
 
 function closeSheetPriceModal() {
   document.getElementById('sheetPriceModal').classList.add('hidden');
@@ -1160,11 +1161,13 @@ function closeSheetPriceModal() {
 function renderSheetModal() {
   const body = document.getElementById('sheetPriceBody');
   const applyBtn = document.getElementById('applySheetPriceBtn');
-  const isNew = sheetState.mode === 'new' || sheetState.mode === 'used';
+  const isNew = sheetState.mode === 'new' || sheetState.mode === 'used' || sheetState.mode === 'acc';
   const isImages = sheetState.mode === 'images';
-  document.getElementById('sheetPriceTitle').textContent = isImages ? 'Gắn ảnh minh họa cho sản phẩm chưa có ảnh' :  sheetState.mode === 'used' ? 'Thêm máy cũ (tab 2ND) từ Google Sheet' : (isNew ? 'Thêm sản phẩm mới từ Google Sheet' : 'Cập nhật giá từ Google Sheet');
+  document.getElementById('sheetPriceTitle').textContent = isImages ? 'Gắn ảnh minh họa cho sản phẩm chưa có ảnh' :  sheetState.mode === 'used' ? 'Thêm máy cũ (tab 2ND) từ Google Sheet' : sheetState.mode === 'acc' ? 'Phụ kiện từ Google Sheet (tab PHU_KIEN)' : (isNew ? 'Thêm sản phẩm mới từ Google Sheet' : 'Cập nhật giá từ Google Sheet');
   document.getElementById('sheetPriceIntro').innerHTML = isImages
     ? 'Ảnh sản phẩm chính thức của hãng, ghép theo <strong>tên mẫu máy</strong>. Chỉ gắn cho sản phẩm <strong>chưa có ảnh</strong>; máy cũ được thêm dòng "ảnh minh họa" vào mô tả. Bạn thay bằng ảnh máy thật sau ở trang sửa sản phẩm.'
+    : sheetState.mode === 'acc'
+    ? 'Phụ kiện trong tab <strong>PHU_KIEN</strong>: món chưa có trên web được <strong>thêm mới</strong> (mặc định ẩn), món đã có thì <strong>đổi giá</strong> nếu khác (phần cộng thêm đã Set giá được giữ). Ảnh lấy từ cột Link Ảnh nếu có.'
     : sheetState.mode === 'used'
     ? 'Mỗi máy cũ là <strong>một sản phẩm riêng</strong> (Like New, tồn kho theo sheet). Máy đã có trên web hoặc đã hết hàng trong sheet được bỏ qua. Giá gốc trong sheet không được đọc.'
     : isNew
@@ -1197,7 +1200,7 @@ function renderSheetModal() {
   body.innerHTML = `${chips}${rows}${visibleOpt}<p class="dialog-subtext">${escapeHtml(sheetState.info)}</p>`;
   const checked = sheetState.items.filter(i => i.checked && pool.includes(i)).length;
   applyBtn.disabled = checked === 0;
-  applyBtn.textContent = isImages ? `Gắn ảnh (${checked})` : isNew ? `Thêm ${checked} sản phẩm` : `Áp dụng giá (${checked})`;
+  applyBtn.textContent = isImages ? `Gắn ảnh (${checked})` : sheetState.mode === 'acc' ? `Áp dụng ${checked} phụ kiện` : isNew ? `Thêm ${checked} sản phẩm` : `Áp dụng giá (${checked})`;
 }
 
 function openImageModal() {
@@ -1224,15 +1227,22 @@ async function openSheetModal(mode) {
   document.getElementById('sheetPriceBody').textContent = 'Đang tải bảng giá...';
   document.getElementById('applySheetPriceBtn').disabled = true;
   try {
-    const res = await fetch(mode === 'used' ? SHEET_USED_CSV_URL : SHEET_CSV_URL, { cache: 'no-store' });
+    const res = await fetch(mode === 'used' ? SHEET_USED_CSV_URL : mode === 'acc' ? SHEET_ACC_CSV_URL : SHEET_CSV_URL, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
-    const { rows, errors } = mode === 'used' ? parseUsedRows(text) : parseSheetRows(text);
+    const { rows, errors } = mode === 'used' ? parseUsedRows(text) : mode === 'acc' ? parseAccessoryRows(text) : parseSheetRows(text);
     if (rows.length === 0) throw new Error(errors[0] || 'Sheet không có dữ liệu giá.');
     const now = new Date();
-    const stamp = `Đọc từ tab ${mode === 'used' ? SHEET_USED_TAB : SHEET_TAB} lúc ${now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} ${now.toLocaleDateString('vi-VN')}${parseSheetDate(text) ? ` (sheet ghi cập nhật ${parseSheetDate(text)})` : ''}`;
+    const stamp = `Đọc từ tab ${mode === 'used' ? SHEET_USED_TAB : mode === 'acc' ? SHEET_ACC_TAB : SHEET_TAB} lúc ${now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} ${now.toLocaleDateString('vi-VN')}${parseSheetDate(text) ? ` (sheet ghi cập nhật ${parseSheetDate(text)})` : ''}`;
     const extra = errors.length ? ` · Bỏ qua ${errors.length} dòng lỗi trong sheet.` : '';
-    if (mode === 'used') {
+    if (mode === 'acc') {
+      const plan = planAccessories(state.products, rows);
+      sheetState.items = [
+        ...plan.items.map(i => ({ name: i.name, brand: i.brand, newPrice: i.product.price, stock: i.product.stock, product: i.product, action: 'new', checked: true })),
+        ...plan.changes.map(c => ({ name: `${c.name} (đổi giá từ ${formatCurrency(c.oldPrice)})`, brand: c.brand, newPrice: c.newPrice, stock: '—', change: c, action: 'price', checked: true }))
+      ];
+      sheetState.info = `${stamp} · Thêm mới: ${plan.items.length} · Đổi giá: ${plan.changes.length} · Không đổi: ${plan.same}${plan.hiddenInSheet ? ` · Sheet đặt "Không" hiển thị: ${plan.hiddenInSheet}` : ''}${extra}`;
+    } else if (mode === 'used') {
       const plan = planUsedProducts(state.products, rows);
       sheetState.items = plan.items.map(i => ({ name: i.product.name, brand: i.brand, newPrice: i.product.price, stock: i.product.stock, product: i.product, checked: true }));
       sheetState.info = `${stamp} · Đã có trên web (bỏ qua): ${plan.duplicates}${plan.soldOut ? ` · Hết hàng trong sheet: ${plan.soldOut}` : ''}${extra}`;
@@ -1255,7 +1265,7 @@ async function openSheetModal(mode) {
 }
 
 async function applySheetChanges() {
-  const onlyImage = sheetState.onlyImage && (sheetState.mode === 'new' || sheetState.mode === 'used');
+  const onlyImage = sheetState.onlyImage && (sheetState.mode === 'new' || sheetState.mode === 'used' || sheetState.mode === 'acc');
   const picked = sheetState.items.filter(i => i.checked && (!onlyImage || sheetHasImage(i)));
   if (picked.length === 0) return showToast('Chưa chọn sản phẩm nào.', 'error');
   const applyBtn = document.getElementById('applySheetPriceBtn');
@@ -1269,6 +1279,24 @@ async function applySheetChanges() {
       else ok++;
     }
     showToast(ok === picked.length ? `Đã gắn ảnh cho ${ok} sản phẩm` : `Gắn được ${ok}/${picked.length}, xem lại console`, ok === picked.length ? 'success' : 'error');
+  } else if (sheetState.mode === 'acc') {
+    const visible = Boolean(document.getElementById('sheetVisibleNow')?.checked);
+    const news = picked.filter(p => p.action !== 'price');
+    for (let i = 0; i < news.length; i += 25) {
+      const batch = news.slice(i, i + 25).map(p => ({ ...p.product, is_visible: visible }));
+      const { error } = await supabase.from('products').insert(batch);
+      if (error) console.error('[Admin] Lỗi thêm phụ kiện', error);
+      else ok += batch.length;
+    }
+    for (const p of picked.filter(x => x.action === 'price')) {
+      const c = p.change;
+      const { error } = await supabase.from('products')
+        .update({ base_price: c.newPrice, price: c.newPrice + (c.markup || 0), old_price: c.newList && (c.newList + (c.markup || 0)), updated_at: new Date().toISOString() })
+        .eq('id', c.id);
+      if (error) console.error('[Admin] Lỗi cập nhật giá phụ kiện', c.id, error);
+      else ok++;
+    }
+    showToast(ok === picked.length ? `Đã xử lý ${ok} phụ kiện (${news.length} thêm mới${visible ? '' : ', đang ẩn'}, ${picked.length - news.length} đổi giá)` : `Làm được ${ok}/${picked.length}, xem lại console`, ok === picked.length ? 'success' : 'error');
   } else if (sheetState.mode !== 'price') {
     const visible = Boolean(document.getElementById('sheetVisibleNow')?.checked);
     for (let i = 0; i < picked.length; i += 25) {
@@ -1295,6 +1323,7 @@ async function applySheetChanges() {
 function bindSheetModal() {
   document.getElementById('sheetNewBtn').addEventListener('click', () => openSheetModal('new'));
   document.getElementById('sheetImageBtn').addEventListener('click', openImageModal);
+  document.getElementById('sheetAccBtn').addEventListener('click', () => openSheetModal('acc'));
   document.getElementById('sheetUsedBtn').addEventListener('click', () => openSheetModal('used'));
   document.getElementById('sheetPriceBtn').addEventListener('click', () => openSheetModal('price'));
   document.getElementById('closeSheetPriceBtn').addEventListener('click', closeSheetPriceModal);
@@ -1319,7 +1348,7 @@ function bindSheetModal() {
     const checked = sheetState.items.filter(i => i.checked && pool.includes(i)).length;
     const btn = document.getElementById('applySheetPriceBtn');
     btn.disabled = checked === 0;
-    btn.textContent = sheetState.mode === 'images' ? `Gắn ảnh (${checked})` : sheetState.mode !== 'price' ? `Thêm ${checked} sản phẩm` : `Áp dụng giá (${checked})`;
+    btn.textContent = sheetState.mode === 'images' ? `Gắn ảnh (${checked})` : sheetState.mode === 'acc' ? `Áp dụng ${checked} phụ kiện` : sheetState.mode !== 'price' ? `Thêm ${checked} sản phẩm` : `Áp dụng giá (${checked})`;
   });
 }
 

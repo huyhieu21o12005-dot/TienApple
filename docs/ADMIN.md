@@ -330,3 +330,19 @@ Khi thêm máy từ Sheet (mới hoặc cũ) có ô tích **Chỉ thêm máy có
 
 - Thẻ hãng (Tất cả, Apple, Samsung...) và thẻ phụ kiện được dựng **từ sản phẩm thật** đang hiện trên web, kèm số máy đúng theo tình trạng, khoảng giá và tìm kiếm đang chọn. Hãng không còn máy thì tự biến mất.
 - Tên máy dài xuống 2 dòng thay vì bị cắt "…"; ảnh nền trắng hòa vào khung xám; nút Gọi/Zalo nhỏ lại trên điện thoại để không che nút "Giỏ hàng"; giỏ hàng và trang chi tiết đã chỉnh cho màn hình nhỏ (thanh nút mua cố định ở đáy).
+
+## Phụ kiện từ Google Sheet (tab PHU_KIEN)
+
+Nút **Phụ kiện từ Sheet** (đầu trang sản phẩm) đọc tab `PHU_KIEN` của Google Sheet, dòng 1 là tiêu đề:
+
+| Cột | Nội dung |
+| --- | --- |
+| Mã SP | Tùy chọn. Có thì dùng làm mã (viết thường, gạch nối); trống thì web tự đặt mã `pk-<tên>` |
+| Nhóm | Củ sạc & Cáp, Tai nghe, Ốp lưng & Cường lực (khác thì vào nhóm "Phụ kiện khác"). Quyết định thẻ lọc phụ kiện trên web |
+| Hãng, Tên Phụ Kiện, Phân Loại / Màu | Tên hiển thị = Hãng + Tên - Phân loại. **Tên Phụ Kiện bắt buộc** |
+| Giá Bán, Sale (%) | Giá niêm yết và phần trăm giảm (gõ `10%`). Cột Giá Sau Sale tự tính |
+| Tồn Kho | Số lượng; Trạng Thái tự ghi Còn hàng / Hết hàng |
+| Hiển Thị Web | Điền `Không` để bỏ qua dòng đó (trống = hiện) |
+| Bảo Hành, Link Ảnh, Ghi Chú | Link ảnh http/https tùy chọn; Ghi chú và bảo hành vào mô tả |
+
+Bấm nút sẽ liệt kê: **món chưa có** (thêm mới, mặc định ẩn, có ô "Hiện ngay" và "Chỉ thêm máy có ảnh") và **món đã có** (đổi giá nếu khác giá gốc; phần cộng thêm đã Set giá được giữ). Tích chọn rồi bấm Áp dụng.
