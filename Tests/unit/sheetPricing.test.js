@@ -37,6 +37,22 @@ describe('sheetPricing - đọc dữ liệu', () => {
   });
 });
 
+describe('sheetPricing - CSV dạng gviz (tiêu đề ô gộp bị mất)', () => {
+  it('dùng vị trí cột cố định khi dòng tiêu đề thiếu', () => {
+    const gviz = [
+      '"TIEN MOBILE - BẢNG BÁO GIÁ","","","","","","","","","","",""',
+      '"","Hãng","Mẫu Sản Phẩm","Phiên Bản / Bộ Nhớ","RAM","","","","","","","Trạng Thái"',
+      '"1","Apple","iPhone 15","128GB","6GB","14.000.000 ₫","17.490.000 ₫","6%","16.440.600 ₫","2.440.600 ₫","8","Còn hàng"'
+    ].join('\n');
+    const { rows, errors } = parseSheetRows(gviz);
+    assert.equal(errors.length, 0);
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].finalPrice, 16440600);
+    assert.equal(rows[0].listPrice, 17490000);
+    assert.equal(rows[0].salePercent, 6);
+  });
+});
+
 describe('sheetPricing - planPriceUpdates', () => {
   const { rows } = parseSheetRows(csv);
   const products = [

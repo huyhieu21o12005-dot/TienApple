@@ -67,17 +67,24 @@ export function parseSheetRows(csvText) {
   const table = parseCsv(csvText);
   const errors = [];
   const norm = (s) => normalizeKey(s);
-  const headerIndex = table.findIndex(r => r.some(c => norm(c) === norm('Mẫu Sản Phẩm')) && r.some(c => norm(c) === norm('Giá Sau Sale')));
-  if (headerIndex < 0) return { rows: [], errors: ['Không tìm thấy dòng tiêu đề (Mẫu Sản Phẩm, Giá Sau Sale) trong sheet.'] };
-  const header = table[headerIndex].map(norm);
-  const col = (name) => header.indexOf(norm(name));
-  const idx = {
-    brand: col('Hãng'), model: col('Mẫu Sản Phẩm'), storage: col('Phiên Bản / Bộ Nhớ'),
-    list: col('Giá Bán'), sale: col('Sale (%)'), final: col('Giá Sau Sale')
-  };
-  for (const [k, v] of Object.entries(idx)) if (v < 0) errors.push(`Thiếu cột: ${k}`);
-  if (errors.length) return { rows: [], errors };
-
+  let headerIndex = table.findIndex(r => r.some(c => norm(c) === norm('Mẫu Sản Phẩm')) && r.some(c => norm(c) === norm('Giá Sau Sale')));
+  let idx;
+  if (headerIndex >= 0) {
+    const header = table[headerIndex].map(norm);
+    const col = (name) => header.indexOf(norm(name));
+    idx = {
+      brand: col('Hãng'), model: col('Mẫu Sản Phẩm'), storage: col('Phiên Bản / Bộ Nhớ'),
+      list: col('Giá Bán'), sale: col('Sale (%)'), final: col('Giá Sau Sale')
+    };
+    for (const [k, v] of Object.entries(idx)) if (v < 0) errors.push(`Thiếu cột: ${k}`);
+    if (errors.length) return { rows: [], errors };
+  } else {
+    // Đường gviz (CSV qua trình duyệt) làm hỏng dòng tiêu đề ô gộp: dùng vị trí cột cố định của bảng giá.
+    const labelRow = table.findIndex(r => norm(r[2]) === norm('Mẫu Sản Phẩm') && norm(r[3]) === norm('Phiên Bản / Bộ Nhớ'));
+    if (labelRow < 0) return { rows: [], errors: ['Không tìm thấy dòng tiêu đề (Mẫu Sản Phẩm, Giá Sau Sale) trong sheet.'] };
+    headerIndex = labelRow;
+    idx = { brand: 1, model: 2, storage: 3, list: 6, sale: 7, final: 8 };
+  }
   const rows = [];
   for (let i = headerIndex + 1; i < table.length; i++) {
     const r = table[i];
