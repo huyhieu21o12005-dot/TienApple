@@ -9,6 +9,7 @@ import { imageFor } from './modelImages.js';
 import { SHEET_ACC_CSV_URL, SHEET_ACC_TAB, parseAccessoryRows, planAccessories } from './accessorySheet.js';
 import { USED_IMAGE_NOTE } from './sheetPricing.js';
 import { planSync } from './syncPlan.js';
+import { LIBRARY_BUCKET, buildLibraryMap, libraryFileName, planImageLinks } from './imageLibrary.js';
 import { SHEET_CSV_URL, SHEET_TAB, SHEET_USED_CSV_URL, SHEET_USED_TAB, parseSheetRows, parseSheetDate, parseUsedRows, planPriceUpdates, planNewProducts, planUsedProducts } from './sheetPricing.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
 
@@ -1202,9 +1203,9 @@ function renderSheetModal() {
   const applyBtn = document.getElementById('applySheetPriceBtn');
   const isNew = sheetState.mode === 'new' || sheetState.mode === 'used' || sheetState.mode === 'acc';
   const isImages = sheetState.mode === 'images';
-  document.getElementById('sheetPriceTitle').textContent = isImages ? 'Gắn ảnh minh họa cho sản phẩm chưa có ảnh' :  sheetState.mode === 'used' ? 'Thêm máy cũ (tab 2ND) từ Google Sheet' : sheetState.mode === 'acc' ? 'Phụ kiện từ Google Sheet (tab PHU_KIEN)' : (isNew ? 'Thêm sản phẩm mới từ Google Sheet' : 'Cập nhật giá từ Google Sheet');
+  document.getElementById('sheetPriceTitle').textContent = isImages ? 'Kho ảnh: gắn ảnh theo tên mẫu máy' :  sheetState.mode === 'used' ? 'Thêm máy cũ (tab 2ND) từ Google Sheet' : sheetState.mode === 'acc' ? 'Phụ kiện từ Google Sheet (tab PHU_KIEN)' : (isNew ? 'Thêm sản phẩm mới từ Google Sheet' : 'Cập nhật giá từ Google Sheet');
   document.getElementById('sheetPriceIntro').innerHTML = isImages
-    ? 'Ảnh sản phẩm chính thức của hãng, ghép theo <strong>tên mẫu máy</strong>. Chỉ gắn cho sản phẩm <strong>chưa có ảnh</strong>; máy cũ được thêm dòng "ảnh minh họa" vào mô tả. Bạn thay bằng ảnh máy thật sau ở trang sửa sản phẩm.'
+    ? 'Ảnh lưu trong <strong>kho ảnh</strong> (Supabase Storage) theo <strong>tên mẫu máy</strong>: mọi dung lượng, màu, tình trạng của cùng một mẫu dùng chung một ảnh. Mẫu chưa có trong kho sẽ được tải từ nguồn (trang hãng hoặc đại lý), cắt viền thừa rồi lưu vào kho. Chỉ thay ảnh trống hoặc link ngoài mặc định; ảnh chụp riêng của bạn được giữ nguyên.'
     : sheetState.mode === 'acc'
     ? 'Phụ kiện trong tab <strong>PHU_KIEN</strong>: món chưa có trên web được <strong>thêm mới</strong> (mặc định ẩn), món đã có thì <strong>đổi giá</strong> nếu khác (phần cộng thêm đã Set giá được giữ). Ảnh lấy từ cột Link Ảnh nếu có.'
     : sheetState.mode === 'used'
@@ -1229,7 +1230,7 @@ function renderSheetModal() {
       <td><input type="checkbox" class="sheet-price-check" data-i="${sheetState.items.indexOf(i)}" ${i.checked ? 'checked' : ''} aria-label="Chọn ${escapeHtml(i.name)}"></td>
       <td>${escapeHtml(i.name)}${i.warn ? '<br><small>Lệch hơn 30%, hãy kiểm tra trước khi tick.</small>' : ''}</td>
       ${isImages
-        ? `<td><img src="${escapeHtml(i.image)}" alt="" class="sheet-thumb" loading="lazy"></td>`
+        ? `<td><img src="${escapeHtml(i.image)}" alt="" class="sheet-thumb" loading="lazy"><br><small>${i.source === 'kho' ? 'Có trong kho' : 'Tải vào kho'}</small></td>`
         : isNew
         ? `<td>${price(i.newPrice)}</td><td>${Number(i.stock) || 0}</td>`
         : `<td>${price(i.oldPrice)}</td><td><strong>${price(i.newPrice)}</strong>${i.newList ? `<br><small>gạch: ${price(i.newList)}</small>` : ''}</td>`}
@@ -1239,20 +1240,62 @@ function renderSheetModal() {
   body.innerHTML = `${chips}${rows}${visibleOpt}<p class="dialog-subtext">${escapeHtml(sheetState.info)}</p>`;
   const checked = sheetState.items.filter(i => i.checked && pool.includes(i)).length;
   applyBtn.disabled = checked === 0;
-  applyBtn.textContent = isImages ? `Gắn ảnh (${checked})` : sheetState.mode === 'acc' ? `Áp dụng ${checked} phụ kiện` : isNew ? `Thêm ${checked} sản phẩm` : `Áp dụng giá (${checked})`;
+  applyBtn.textContent = isImages ? `Lưu kho và gắn ảnh (${checked})` : sheetState.mode === 'acc' ? `Áp dụng ${checked} phụ kiện` : isNew ? `Thêm ${checked} sản phẩm` : `Áp dụng giá (${checked})`;
 }
 
-function openImageModal() {
+async function openImageModal() {
   sheetState.mode = 'images';
   sheetState.tab = 'all';
   sheetState.error = '';
+  sheetState.items = [];
+  sheetState.uploads = [];
   document.getElementById('sheetPriceModal').classList.remove('hidden');
-  const withoutImage = state.products.filter(p => !p.image);
-  sheetState.items = withoutImage
-    .map(p => ({ id: p.id, name: p.name, brand: p.brandName || p.brand || 'Khác', image: imageFor(p.name), description: p.description || '', used: p.condition === 'likenew', checked: true }))
-    .filter(i => i.image);
-  sheetState.info = `Sản phẩm chưa có ảnh: ${withoutImage.length} · Có ảnh minh họa trong kho: ${sheetState.items.length} · Còn lại giữ ảnh tạm.`;
+  document.getElementById('sheetPriceBody').textContent = 'Đang đọc kho ảnh...';
+  document.getElementById('applySheetPriceBtn').disabled = true;
+  try {
+    const { data: files, error } = await supabase.storage.from(LIBRARY_BUCKET).list('', { limit: 1000 });
+    if (error) throw error;
+    const library = buildLibraryMap(files, (name) => supabase.storage.from(LIBRARY_BUCKET).getPublicUrl(name).data.publicUrl);
+    const plan = planImageLinks(state.products, library);
+    sheetState.uploads = plan.uploads;
+    sheetState.items = plan.items;
+    const fromKho = plan.items.filter(i => i.source === 'kho').length;
+    sheetState.info = `Kho đang có ${library.size} ảnh mẫu · Lấy từ kho: ${fromKho} sản phẩm · Cần tải ${plan.uploads.length} ảnh mới vào kho (${plan.items.length - fromKho} sản phẩm) · Giữ nguyên (đã đúng hoặc là ảnh chụp riêng): ${plan.keep}${plan.missing.length ? ` · Chưa có ảnh cho: ${plan.missing.join(', ')}` : ''}`;
+  } catch (err) {
+    console.error('[Admin] Lỗi đọc kho ảnh:', err);
+    sheetState.error = 'Không đọc được kho ảnh. Kiểm tra bucket "product-images" và quyền đăng nhập quản trị.';
+  }
   renderSheetModal();
+}
+
+/** Tải ảnh từ link ngoài về, cắt bỏ viền trắng thừa quanh máy rồi trả về PNG. */
+async function fetchTrimmedPng(url) {
+  // ảnh Apple lấy cỡ lớn để sau khi cắt viền thừa vẫn nét
+  const res = await fetch(url.replace('wid=800&hei=800', 'wid=1600&hei=1600'), { mode: 'cors' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const bmp = await createImageBitmap(await res.blob());
+  const full = document.createElement('canvas');
+  full.width = bmp.width; full.height = bmp.height;
+  const fctx = full.getContext('2d', { willReadFrequently: true });
+  fctx.drawImage(bmp, 0, 0);
+  const { data } = fctx.getImageData(0, 0, full.width, full.height);
+  let top = full.height, bottom = 0, left = full.width, right = 0;
+  for (let y = 0; y < full.height; y += 2) {
+    for (let x = 0; x < full.width; x += 2) {
+      const i = (y * full.width + x) * 4;
+      if (data[i + 3] > 24 && (data[i] < 238 || data[i + 1] < 238 || data[i + 2] < 238)) {
+        if (y < top) top = y; if (y > bottom) bottom = y; if (x < left) left = x; if (x > right) right = x;
+      }
+    }
+  }
+  if (bottom <= top || right <= left) { top = 0; left = 0; bottom = full.height; right = full.width; }
+  const pad = Math.round(Math.max(right - left, bottom - top) * 0.04);
+  const sx = Math.max(0, left - pad), sy = Math.max(0, top - pad);
+  const sw = Math.min(full.width - sx, right - left + pad * 2), sh = Math.min(full.height - sy, bottom - top + pad * 2);
+  const out = document.createElement('canvas');
+  out.width = sw; out.height = sh;
+  out.getContext('2d').drawImage(full, sx, sy, sw, sh, 0, 0, sw, sh);
+  return new Promise((resolve, reject) => out.toBlob(b => b ? resolve(b) : reject(new Error('Không tạo được ảnh')), 'image/png'));
 }
 
 async function fetchSheetText(url) {
@@ -1382,13 +1425,30 @@ async function applySheetChanges() {
   applyBtn.disabled = true;
   let ok = 0;
   if (sheetState.mode === 'images') {
+    const urlOf = new Map();
+    const needed = new Set(picked.filter(i => i.source === 'upload').map(i => i.key));
+    let failed = 0;
+    for (const u of sheetState.uploads.filter(x => needed.has(x.key))) {
+      try {
+        const blob = await fetchTrimmedPng(u.url);
+        const name = libraryFileName(u.key);
+        const { error } = await supabase.storage.from(LIBRARY_BUCKET).upload(name, blob, { contentType: 'image/png', upsert: true });
+        if (error) throw error;
+        urlOf.set(u.key, `${supabase.storage.from(LIBRARY_BUCKET).getPublicUrl(name).data.publicUrl}?v=${Date.now()}`);
+      } catch (err) {
+        failed++;
+        console.error('[Admin] Lỗi tải ảnh vào kho', u.key, err);
+      }
+    }
     for (const c of picked) {
+      const image = c.source === 'upload' ? urlOf.get(c.key) : c.image;
+      if (!image) continue;
       const description = c.used && !c.description.includes(USED_IMAGE_NOTE) ? [c.description, USED_IMAGE_NOTE].filter(Boolean).join(' • ') : c.description;
-      const { error } = await supabase.from('products').update({ image_url: c.image, description, updated_at: new Date().toISOString() }).eq('id', c.id);
+      const { error } = await supabase.from('products').update({ image_url: image, description, updated_at: new Date().toISOString() }).eq('id', c.id);
       if (error) console.error('[Admin] Lỗi gắn ảnh', c.id, error);
       else ok++;
     }
-    showToast(ok === picked.length ? `Đã gắn ảnh cho ${ok} sản phẩm` : `Gắn được ${ok}/${picked.length}, xem lại console`, ok === picked.length ? 'success' : 'error');
+    showToast(ok === picked.length ? `Đã lưu ảnh vào kho và gắn cho ${ok} sản phẩm` : `Gắn được ${ok}/${picked.length}${failed ? `, ${failed} ảnh không tải được (xem console)` : ''}`, ok === picked.length ? 'success' : 'error');
   } else if (sheetState.mode === 'acc') {
     const visible = Boolean(document.getElementById('sheetVisibleNow')?.checked);
     const news = picked.filter(p => p.action !== 'price');
@@ -1466,7 +1526,7 @@ function bindSheetModal() {
     const checked = sheetState.items.filter(i => i.checked && pool.includes(i)).length;
     const btn = document.getElementById('applySheetPriceBtn');
     btn.disabled = checked === 0;
-    btn.textContent = sheetState.mode === 'images' ? `Gắn ảnh (${checked})` : sheetState.mode === 'acc' ? `Áp dụng ${checked} phụ kiện` : sheetState.mode !== 'price' ? `Thêm ${checked} sản phẩm` : `Áp dụng giá (${checked})`;
+    btn.textContent = sheetState.mode === 'images' ? `Lưu kho và gắn ảnh (${checked})` : sheetState.mode === 'acc' ? `Áp dụng ${checked} phụ kiện` : sheetState.mode !== 'price' ? `Thêm ${checked} sản phẩm` : `Áp dụng giá (${checked})`;
   });
 }
 

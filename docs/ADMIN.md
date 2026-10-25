@@ -297,7 +297,7 @@ Nút **Đồng bộ Sheet** (đầu trang sản phẩm) đọc cùng lúc 3 tab 
 
 - Bảng ảnh nằm ở `Frontend/admin/modelImages.js` (khóa = tên mẫu, giá trị = ảnh sản phẩm chính thức trên CDN của hãng). Ưu tiên ảnh trang hãng (Apple, Samsung S24, Xiaomi, OPPO A79); mẫu hãng không có ảnh tiện dùng thì lấy ảnh đại lý thegioididong.com (Samsung A, OPPO Find X7 Ultra, Vivo, Realme 12/C67, iPhone 17/Air). Chưa có: Realme GT 6, OPPO Reno 12 Pro, iPhone 12 Pro/Pro Max, đồng hồ SE 3/6/4, iPad Pro 9.7 (giữ ảnh tạm "Đang cập nhật ảnh").
 - Hai nút **Thêm SP mới từ Sheet** và **Thêm máy cũ từ Sheet** tự gắn ảnh nếu có mẫu khớp. Máy cũ có ảnh minh họa được thêm dòng "Ảnh minh họa, ảnh máy thật vui lòng liên hệ cửa hàng" vào mô tả.
-- Nút **Gắn ảnh minh họa** gắn ảnh cho sản phẩm đã có trên web mà chưa có ảnh (chỉ những mẫu khớp trong bảng); xem trước ảnh rồi tick.
+- Nút **Kho ảnh** lưu ảnh mẫu máy vào kho ảnh (Supabase Storage, bucket `product-images`) thành file `model-<tên mẫu>.png` (ví dụ `model-iphone12promax.png`) và gắn cho sản phẩm **theo tên mẫu**: mọi dung lượng, màu, tình trạng của cùng một mẫu dùng chung một ảnh. Mẫu chưa có trong kho được tải từ nguồn (trang hãng, đại lý hoặc link bất kỳ trong `modelImages.js`), tự cắt viền trắng thừa rồi lưu vào kho. Chỉ thay sản phẩm chưa có ảnh hoặc đang dùng link ngoài mặc định; ảnh chụp riêng của bạn không bao giờ bị thay. Muốn đổi ảnh một mẫu: tải ảnh lên kho với đúng tên file `model-<tên mẫu>.png` (ghi đè) rồi bấm Kho ảnh. Thêm mẫu mới: thêm một dòng vào `MODEL_IMAGES` trong `Frontend/admin/modelImages.js`. Sau mỗi lần Đồng bộ Sheet thêm máy mới, bấm **Kho ảnh** một lần để gắn ảnh.
 - Ảnh máy thật: thay ở trang sửa sản phẩm, sau đó ảnh minh họa không bị ghi đè (nút chỉ gắn cho sản phẩm chưa có ảnh).
 
 ### Xóa hàng loạt
