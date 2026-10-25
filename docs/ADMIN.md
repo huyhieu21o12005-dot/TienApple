@@ -313,3 +313,5 @@ Nút **Set giá** ở trang sản phẩm. Giá bán = **giá gốc (`base_price`
 ### Hiện / ẩn hàng loạt
 
 Nút **Hiện / ẩn hàng loạt** (đầu trang sản phẩm): lọc bằng thẻ (hãng, giá gốc, tình trạng, trạng thái...), tích chọn tất cả hoặc từng máy rồi bấm **Hiện lên web** hoặc **Ẩn khỏi web**. Mỗi dòng ghi rõ đang hiện hay đang ẩn. Máy thêm từ Sheet mặc định ẩn, dùng nút này để đưa lên web sau khi đã có ảnh (ví dụ thẻ Trạng thái: Đang ẩn + Chưa có ảnh để kiểm tra trước).
+
+Thanh nút nhanh phía trên danh sách sản phẩm: **Chọn tất cả** (tích mọi máy đang lọc), **Hiện tất cả** (hiện mọi máy đang ẩn, có hỏi xác nhận), **Hiện theo thẻ đã chọn** (mở popup hiện/ẩn với thẻ hãng/loại/trạng thái đang chọn ở danh sách, tích sẵn mọi máy khớp; đổi thẻ rồi bấm Hiện lên web).

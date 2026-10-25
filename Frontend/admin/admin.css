@@ -1454,3 +1454,4 @@ body[data-role="staff"] [data-action="delete"] { display: none !important; }
 .bd-all + .bd-list { border-radius: 0 0 12px 12px; max-height: 38vh; }
 .card-markup { display: block; font-size: 11px; color: #1D7A3E; margin-top: 2px; }
 .card-markup.neg { color: #D70015; }
+.quick-bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }

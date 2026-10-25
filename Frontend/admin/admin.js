@@ -881,6 +881,18 @@ function runSetPriceRules() {
   showToast(`Đã tính giá cho ${plan.length} máy, kiểm tra bảng rồi bấm Lưu giá.`, 'success');
 }
 
+/** Thẻ lọc tương ứng với bộ lọc đang chọn ở danh sách ngoài trang (loại/trạng thái, hãng). */
+function outerFacets() {
+  const out = [];
+  const byFilter = { phone: 'kind:phone', accessory: 'kind:accessory', visible: 'state:visible', hidden: 'state:hidden', outofstock: 'state:outofstock' }[state.activeFilter];
+  if (byFilter) out.push(byFilter);
+  if (state.activeBrand !== 'all') {
+    const found = state.products.find(p => (p.brand || '').toLowerCase() === state.activeBrand);
+    if (found) out.push(`brand:${String(found.brandName || found.brand).toLowerCase()}`);
+  }
+  return out;
+}
+
 function openSetPriceModal() {
   try { const saved = JSON.parse(localStorage.getItem(SP_RULES_KEY) || '[]'); setPrice.rules = Array.isArray(saved) ? saved : []; } catch { setPrice.rules = []; }
   if (!setPrice.rules.length) setPrice.rules = [{ brand: '', from: '', to: '', keyword: '', mode: 'fixed', value: '' }];
@@ -888,12 +900,7 @@ function openSetPriceModal() {
   renderSetPriceRules();
   // Liên kết với trang ngoài: lấy máy đang tích, thẻ hãng/loại/trạng thái và ô tìm kiếm của danh sách
   setPrice.facets.clear(); setPrice.picked = new Set(state.selectedIds); setPrice.edits = new Map(); setPrice.query = state.searchQuery || '';
-  const outer = { phone: 'kind:phone', accessory: 'kind:accessory', visible: 'state:visible', hidden: 'state:hidden', outofstock: 'state:outofstock' }[state.activeFilter];
-  if (outer) setPrice.facets.add(outer);
-  if (state.activeBrand !== 'all') {
-    const found = state.products.find(p => (p.brand || '').toLowerCase() === state.activeBrand);
-    if (found) setPrice.facets.add(`brand:${String(found.brandName || found.brand).toLowerCase()}`);
-  }
+  outerFacets().forEach(f => setPrice.facets.add(f));
   document.getElementById('spSearch').value = setPrice.query;
   document.getElementById('spValue').value = '';
   setPrice.mode = 'fixed';
@@ -1074,11 +1081,34 @@ async function applyVis(visible) {
 
 function bindVisModal() {
   const close = () => document.getElementById('visModal').classList.add('hidden');
-  document.getElementById('visBtn').addEventListener('click', () => {
-    vis.facets.clear(); vis.selected = new Set(state.selectedIds); vis.query = '';
+  const open = (withOuterTags) => {
+    vis.facets.clear(); vis.query = '';
+    if (withOuterTags) outerFacets().forEach(f => vis.facets.add(f));
     document.getElementById('visSearch').value = '';
     document.getElementById('visModal').classList.remove('hidden');
+    // mở từ nút "theo thẻ": chọn sẵn mọi máy khớp thẻ để bấm Hiện ngay
+    vis.selected = withOuterTags ? new Set(visShown().map(p => p.id)) : new Set(state.selectedIds);
     renderVis();
+  };
+  document.getElementById('visBtn').addEventListener('click', () => open(false));
+  document.getElementById('quickShowTagBtn').addEventListener('click', () => open(true));
+  document.getElementById('quickSelectAllBtn').addEventListener('click', () => {
+    const list = getFilteredProducts();
+    list.forEach(p => state.selectedIds.add(p.id));
+    renderProducts();
+    showToast(`Đã chọn ${list.length} sản phẩm`, 'success');
+  });
+  document.getElementById('quickShowAllBtn').addEventListener('click', async () => {
+    const hidden = state.products.filter(p => p.is_visible === false);
+    if (!hidden.length) { showToast('Tất cả sản phẩm đã đang hiện.', 'info'); return; }
+    if (!confirm(`Hiện ${hidden.length} sản phẩm đang ẩn lên web? Máy chưa có ảnh sẽ hiện ảnh trống.`)) return;
+    const ids = hidden.map(p => p.id);
+    for (let i = 0; i < ids.length; i += 100) {
+      const { error } = await supabase.from('products').update({ is_visible: true, updated_at: new Date().toISOString() }).in('id', ids.slice(i, i + 100));
+      if (error) { console.error('[Admin] Lỗi hiện tất cả:', error); showToast('Lỗi khi hiện sản phẩm', 'error'); return; }
+    }
+    showToast(`Đã hiện ${ids.length} sản phẩm lên web`, 'success');
+    await loadProducts();
   });
   document.getElementById('visClose').addEventListener('click', close);
   document.getElementById('visCancel').addEventListener('click', close);
