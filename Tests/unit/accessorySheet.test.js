@@ -11,6 +11,8 @@ const CSV = [
 ].join('\n');
 
 test('categoryFor gom nhóm về thẻ lọc của web', () => {
+  assert.equal(categoryFor('iPad'), 'tablet');
+  assert.equal(categoryFor('Apple Watch'), 'watch');
   assert.equal(categoryFor('Củ sạc & Cáp'), 'charger');
   assert.equal(categoryFor('Tai nghe AirPods'), 'audio');
   assert.equal(categoryFor('Ốp lưng & Cường lực'), 'case');

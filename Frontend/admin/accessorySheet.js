@@ -16,6 +16,8 @@ export const SHEET_ACC_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET
 /** Nhóm trong sheet -> category của web (khớp thẻ lọc phụ kiện). */
 export function categoryFor(group) {
   const g = String(group ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase();
+  if (/ipad|may tinh bang|tablet/.test(g)) return 'tablet';
+  if (/watch|dong ho/.test(g)) return 'watch';
   if (/tai nghe|airpods|loa|headphone|earbud/.test(g)) return 'audio';
   if (/\bop\b|op lung|cuong luc|bao ve|case|dan man/.test(g)) return 'case';
   if (/\bsac\b|cu sac|\bcap\b|charger|cable|pin du phong|adapter/.test(g)) return 'charger';

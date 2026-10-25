@@ -13,6 +13,8 @@ import { lookupInstallment } from './installmentApi.js';
 import { lookupWarranty } from './warrantyApi.js';
 import { validateTradeIn, buildTradeInBooking } from './tradeIn.js';
 import { calcInstallment, INSTALLMENT_REFERENCE_RATE } from './installment.js';
+
+const ACCESSORY_LABELS = { charger: 'Củ sạc & Cáp', audio: 'Tai nghe AirPods', case: 'Ốp lưng & Cường lực', tablet: 'iPad', watch: 'Apple Watch', other: 'Phụ kiện khác' };
 import { validateZaloOffer, buildZaloMessage, buildOfferBooking, ZALO_URL } from './zalo.js';
 import { enhanceSelects } from './customSelect.js';
 import { safeUrl, partitionProducts, escapeHtml } from './utils.js';
@@ -368,6 +370,7 @@ class App {
     this.initLayerNavigation();
     this.openCartFromQuery();
     this.initMobileMenu();
+    this.initMegaMenu();
     this.initWarrantyLookup();
     this.initTradeInForm();
     this.initInstallmentForm();
@@ -509,6 +512,87 @@ class App {
         button.textContent = 'Tra cứu';
       }
     });
+  }
+
+  /** Bảng sổ ra trên thanh header (máy tính) và nút nhanh trong menu điện thoại, dựng theo sản phẩm thật. */
+  renderMegaMenu() {
+    const mega = document.getElementById('megaMenu');
+    const quick = document.getElementById('mobileQuick');
+    if (!mega && !quick) return;
+    const brands = new Map();
+    for (const p of this.products) {
+      const key = String(p.brand || 'other').toLowerCase();
+      const e = brands.get(key) || { key, label: p.brandName || p.brand || 'Khác', count: 0 };
+      e.count += 1;
+      brands.set(key, e);
+    }
+    const phones = [...brands.values()].sort((a, b) => (b.key === 'apple') - (a.key === 'apple') || b.count - a.count);
+    const cats = new Map();
+    for (const a of this.accessories) cats.set(a.category || 'other', (cats.get(a.category || 'other') || 0) + 1);
+    const devices = ['tablet', 'watch'].filter(k => cats.has(k));
+    const rest = [...cats.keys()].filter(k => !devices.includes(k));
+    const link = (kind, key, label, n) => `<button type="button" class="mega-link" data-mm="${kind}" data-key="${escapeHtml(key)}"><span>${escapeHtml(label)}</span><small>${n}</small></button>`;
+    const col = (title, links) => links ? `<div class="mega-col"><h3>${title}</h3>${links}</div>` : '';
+    if (mega) {
+      mega.innerHTML =
+        col('Điện thoại', link('phone', 'all', 'Tất cả điện thoại', this.products.length) + phones.map(b => link('phone', b.key, b.label, b.count)).join(''))
+        + col('iPad & Apple Watch', devices.map(k => link('acc', k, ACCESSORY_LABELS[k], cats.get(k))).join(''))
+        + col('Phụ kiện', link('acc', 'all', 'Tất cả phụ kiện', this.accessories.length) + rest.map(k => link('acc', k, ACCESSORY_LABELS[k] || 'Phụ kiện khác', cats.get(k))).join(''));
+    }
+    if (quick) {
+      const chip = (kind, key, label) => `<button type="button" class="mega-chip" data-mm="${kind}" data-key="${escapeHtml(key)}">${escapeHtml(label)}</button>`;
+      quick.innerHTML = phones.map(b => chip('phone', b.key, b.label)).join('') + devices.map(k => chip('acc', k, ACCESSORY_LABELS[k])).join('')
+        + rest.filter(k => k !== 'other').map(k => chip('acc', k, ACCESSORY_LABELS[k])).join('');
+    }
+  }
+
+  openFromMenu(kind, key) {
+    if (kind === 'phone') {
+      this.activeCategory = key;
+      this.switchLayer('layer-dienthoai');
+      this.renderProducts();
+    } else {
+      this.switchLayer('layer-phukien');
+      this.renderAccessories(key);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  initMegaMenu() {
+    const header = document.getElementById('mainHeader');
+    const mega = document.getElementById('megaMenu');
+    if (!header || !mega) return;
+    const triggers = [...document.querySelectorAll('#mainNav [data-mega]')];
+    let timer = null;
+    const setOpen = (open) => {
+      clearTimeout(timer);
+      triggers.forEach(t => t.setAttribute('aria-expanded', String(open)));
+      if (open) {
+        mega.hidden = false;
+        requestAnimationFrame(() => mega.classList.add('is-open'));
+      } else {
+        mega.classList.remove('is-open');
+        timer = setTimeout(() => { mega.hidden = true; }, 180);
+      }
+    };
+    const later = () => { clearTimeout(timer); timer = setTimeout(() => setOpen(false), 140); };
+    triggers.forEach(t => {
+      t.addEventListener('mouseenter', () => setOpen(true));
+      t.addEventListener('focus', () => setOpen(true));
+      t.addEventListener('mouseleave', later);
+    });
+    mega.addEventListener('mouseenter', () => clearTimeout(timer));
+    mega.addEventListener('mouseleave', later);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+    document.addEventListener('click', (e) => {
+      const item = e.target.closest('[data-mm]');
+      if (!item) return;
+      setOpen(false);
+      this.openFromMenu(item.dataset.mm, item.dataset.key);
+    });
+    const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 8);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
   }
 
   initMobileMenu() {
@@ -1055,6 +1139,7 @@ class App {
 
   renderProducts() {
     this.renderBrandTags();
+    this.renderMegaMenu();
     let filtered = [...this.products];
 
     // Filter by Brand
@@ -1095,7 +1180,7 @@ class App {
     const grid = document.getElementById('accessoryGrid');
     if (!grid) return;
 
-    const labels = { charger: 'Củ sạc & Cáp', audio: 'Tai nghe AirPods', case: 'Ốp lưng & Cường lực' };
+    const labels = ACCESSORY_LABELS;
     const counts = new Map();
     for (const a of this.accessories) counts.set(a.category || 'other', (counts.get(a.category || 'other') || 0) + 1);
     if (category !== 'all' && !counts.has(category)) category = 'all';
@@ -1110,6 +1195,7 @@ class App {
         + [...counts.entries()].map(([key, n]) => btn(key, labels[key] || 'Phụ kiện khác', n)).join('');
     }
 
+    this.renderMegaMenu();
     let items = this.accessories;
     if (category !== 'all') {
       items = items.filter(a => (a.category || 'other') === category);
