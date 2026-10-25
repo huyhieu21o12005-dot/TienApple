@@ -42,7 +42,7 @@ export const MODEL_IMAGES = {
   ipadair11m2air7: apple('ipad-air-finish-select-gallery-202405-11inch-blue-wifi'),
   watchseries9: apple('watch-card-40-s9-202309'),
   // Apple (ảnh bên thứ ba vì Apple chưa có ảnh cùng quy tắc)
-  iphone12pro: `${TGDD}213032/iphone-12-pro-01.jpg`,
+  iphone12pro: `${TGDD}213032/iphone-12-pro-vang-1-org.jpg`,
   iphone12promax: `${TGDD}213033/iphone-12-pro-max-1-org.jpg`,
   iphone18promax: `${TGDD}370982/iphone-18-pro-max-xanh-thumb.jpg`,
   // Apple Watch Series 4 (ảnh Wikimedia Commons, nền trong suốt)
