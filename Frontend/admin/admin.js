@@ -4,7 +4,7 @@
  * Visibility Toggle, Bulk Operations, Image Upload with Client Resize, and Filters.
  */
 
-import { allFilterGroups, baseOf, formatThousands, markupPrice, matchPricing, parseAmount, planRules, pricingGroups } from './pricing.js';
+import { allFilterGroups, baseOf, formatThousands, markupPrice, matchPricing, parseAmount, planRules } from './pricing.js';
 import { imageFor } from './modelImages.js';
 import { USED_IMAGE_NOTE } from './sheetPricing.js';
 import { SHEET_CSV_URL, SHEET_TAB, SHEET_USED_CSV_URL, SHEET_USED_TAB, parseSheetRows, parseSheetDate, parseUsedRows, planPriceUpdates, planNewProducts, planUsedProducts } from './sheetPricing.js';
@@ -341,6 +341,7 @@ function renderProducts() {
                 }
               </div>
               ${p.oldPrice ? `<span class="card-old-price">${formatCurrency(p.oldPrice)}</span>` : ''}
+              ${p.basePrice && p.basePrice !== p.price ? `<span class="card-markup${p.price < p.basePrice ? ' neg' : ''}" title="Giá gốc ${escapeHtml(formatCurrency(p.basePrice))}">Gốc ${escapeHtml(formatCurrency(p.basePrice))} · ${p.price > p.basePrice ? '+' : '−'}${escapeHtml(formatCurrency(Math.abs(p.price - p.basePrice)))}</span>` : ''}
             </div>
           </div>
 
@@ -460,7 +461,9 @@ function bindCardEvents() {
 
       // Optimistic update
       const prod = state.products.find(p => p.id === id);
+      const hadBase = Boolean(prod?.basePrice);
       if (prod) {
+        if (!hadBase) prod.basePrice = prevPrice;
         prod.price = newPrice;
       }
       renderProducts();
@@ -468,7 +471,7 @@ function bindCardEvents() {
       try {
         const { error } = await supabase
           .from('products')
-          .update({ price: newPrice, updated_at: new Date().toISOString() })
+          .update({ price: newPrice, ...(hadBase ? {} : { base_price: prevPrice }), updated_at: new Date().toISOString() })
           .eq('id', id);
 
         if (error) throw error;
@@ -639,9 +642,11 @@ async function executeBulkDiscount(percent) {
     if (prod) {
       const newPrice = applyBulkDiscount(prod.price, percent);
       const oldPrice = prod.oldPrice || prod.price;
+      const base = prod.basePrice || prod.price;
       prod.oldPrice = oldPrice;
+      prod.basePrice = base;
       prod.price = newPrice;
-      updates.push({ id, price: newPrice, old_price: oldPrice });
+      updates.push({ id, price: newPrice, old_price: oldPrice, base_price: base });
     }
   });
 
@@ -652,7 +657,7 @@ async function executeBulkDiscount(percent) {
     for (const u of updates) {
       await supabase
         .from('products')
-        .update({ price: u.price, old_price: u.old_price, updated_at: new Date().toISOString() })
+        .update({ price: u.price, old_price: u.old_price, base_price: u.base_price, updated_at: new Date().toISOString() })
         .eq('id', u.id);
     }
     showToast(`Đã giảm ${percent}% cho ${updates.length} sản phẩm`, 'success');
@@ -788,7 +793,7 @@ function bindFacetBar(elId, facets, onChange) {
 }
 
 function renderSetPriceFacets() {
-  renderFacetBar('spFacets', pricingGroups(state.products), setPrice.facets);
+  renderFacetBar('spFacets', allFilterGroups(state.products), setPrice.facets);
 }
 
 function renderSetPriceList() {
@@ -806,7 +811,8 @@ function renderSetPriceList() {
 }
 
 function updateSetPriceBars() {
-  const picked = [...setPrice.picked].filter(id => state.products.some(p => p.id === id)).length;
+  const shownIds = new Set(spShown().map(p => p.id));
+  const picked = [...setPrice.picked].filter(id => shownIds.has(id)).length;
   const dirty = spDirty().length;
   document.getElementById('spPickedCount').textContent = picked ? `Đã chọn ${picked} máy` : 'Chưa chọn máy';
   document.getElementById('spApplyPicked').disabled = picked === 0;
@@ -881,8 +887,15 @@ function openSetPriceModal() {
   if (!setPrice.rules.length) setPrice.rules = [{ brand: '', from: '', to: '', keyword: '', mode: 'fixed', value: '' }];
   showSetPriceTab('pick');
   renderSetPriceRules();
-  setPrice.facets.clear(); setPrice.picked = new Set(); setPrice.edits = new Map(); setPrice.query = '';
-  document.getElementById('spSearch').value = '';
+  // Liên kết với trang ngoài: lấy máy đang tích, thẻ hãng/loại/trạng thái và ô tìm kiếm của danh sách
+  setPrice.facets.clear(); setPrice.picked = new Set(state.selectedIds); setPrice.edits = new Map(); setPrice.query = state.searchQuery || '';
+  const outer = { phone: 'kind:phone', accessory: 'kind:accessory', visible: 'state:visible', hidden: 'state:hidden', outofstock: 'state:outofstock' }[state.activeFilter];
+  if (outer) setPrice.facets.add(outer);
+  if (state.activeBrand !== 'all') {
+    const found = state.products.find(p => (p.brand || '').toLowerCase() === state.activeBrand);
+    if (found) setPrice.facets.add(`brand:${String(found.brandName || found.brand).toLowerCase()}`);
+  }
+  document.getElementById('spSearch').value = setPrice.query;
   document.getElementById('spValue').value = '';
   setPrice.mode = 'fixed';
   renderSetPricePresets();
@@ -896,7 +909,8 @@ function applySetPricePicked(reset) {
   const value = document.getElementById('spValue').value;
   const step = Number(document.getElementById('spRound').value) || 0;
   if (!reset && markupPrice(1, mode, value) === null) { showToast('Nhập mức cộng thêm hợp lệ (số, âm là giảm).', 'error'); return; }
-  for (const p of state.products) {
+  // chỉ áp cho máy đang hiện trong bảng, tránh đổi giá máy đã bị lọc ẩn
+  for (const p of spShown()) {
     if (!setPrice.picked.has(p.id)) continue;
     setPriceEdit(p.id, reset ? baseOf(p) : markupPrice(baseOf(p), mode, value, step));
   }
@@ -1450,6 +1464,11 @@ async function handleProductFormSubmit(e) {
   try {
     const dbPayload = mapProductToDb(rawFormData);
 
+    // Giá gốc: sản phẩm mới lấy theo giá nhập; sản phẩm cũ chưa có giá gốc thì giữ giá trước khi sửa (để Set giá còn tính đúng)
+    const before = state.products.find(p => p.id === dbPayload.id);
+    if (!isEdit) dbPayload.base_price = dbPayload.price;
+    else if (before && !before.basePrice) dbPayload.base_price = before.price;
+
     if (isEdit) {
       dbPayload.updated_at = new Date().toISOString();
       const { error } = await supabase
@@ -1720,6 +1739,7 @@ function bindGlobalEvents() {
   });
 
   document.getElementById('bulkDeleteBtn').addEventListener('click', () => openBulkDeleteModal());
+  document.getElementById('bulkSetPriceBtn').addEventListener('click', openSetPriceModal);
   bindBulkDeleteModal();
 
   // Escape key closes modals

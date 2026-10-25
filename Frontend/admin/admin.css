@@ -1452,3 +1452,5 @@ body[data-role="staff"] [data-action="delete"] { display: none !important; }
 .sp-bulk-actions { display: flex; gap: 8px; flex-basis: 100%; }
 .bd-all { display: flex; align-items: center; gap: 8px; padding: 8px 10px; margin: 6px 0 0; font-weight: 600; font-size: 14px; background: #F5F5F7; border: 1px solid #E5E5EA; border-bottom: 0; border-radius: 12px 12px 0 0; cursor: pointer; }
 .bd-all + .bd-list { border-radius: 0 0 12px 12px; max-height: 38vh; }
+.card-markup { display: block; font-size: 11px; color: #1D7A3E; margin-top: 2px; }
+.card-markup.neg { color: #D70015; }
