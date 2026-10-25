@@ -182,3 +182,161 @@ export function invoiceHtml(inv) {
   <div class="inv-signs">${sign}</div>
   <p class="inv-thanks">Cảm ơn quý khách!</p>`;
 }
+
+// ===== Hợp đồng mua bán (đơn hàng và trả góp) =====
+
+export const CONTRACT_TYPES = ['order', 'installment'];
+
+const BLANK = '..............................';
+const BLANK_SHORT = '..................';
+
+function longDate(value) {
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return `ngày ${BLANK_SHORT} tháng ${BLANK_SHORT} năm ${BLANK_SHORT}`;
+  return `ngày ${d.getDate()} tháng ${d.getMonth() + 1} năm ${d.getFullYear()}`;
+}
+
+function sellerParty() {
+  return {
+    heading: 'BÊN A - BÊN BÁN',
+    rows: [
+      ['Đơn vị', SHOP.name],
+      ['Địa chỉ', BLANK],
+      ['Điện thoại', SHOP.hotline],
+      ['Đại diện', `${BLANK_SHORT} Chức vụ: ${BLANK_SHORT}`]
+    ]
+  };
+}
+
+function buyerParty(r) {
+  const rows = [['Họ và tên', r.customer_name], ['Điện thoại', r.phone]];
+  rows.push(['Địa chỉ', r.address || BLANK]);
+  rows.push(['CCCD/CMND số', `${BLANK_SHORT} cấp ngày ${BLANK_SHORT} nơi cấp ${BLANK_SHORT}`]);
+  return { heading: 'BÊN B - BÊN MUA', rows };
+}
+
+const GENERAL_ARTICLE = {
+  heading: 'Điều khoản chung',
+  paragraphs: [
+    'Hai bên cam kết thực hiện đúng các điều khoản đã thỏa thuận trong hợp đồng này.',
+    'Mọi tranh chấp phát sinh được hai bên thương lượng giải quyết; nếu không thương lượng được thì đưa ra Tòa án có thẩm quyền.',
+    'Hợp đồng lập thành 02 bản có giá trị như nhau, mỗi bên giữ 01 bản, có hiệu lực kể từ ngày ký.'
+  ]
+};
+
+/**
+ * Hợp đồng mua bán có chừa chỗ trống để cửa hàng điền tay (địa chỉ, CCCD, bảo hành, mức xử lý chậm thanh toán...).
+ * @param {'order'|'installment'} type
+ * @param {object} r bản ghi lấy từ Supabase
+ */
+export function buildContract(type, r) {
+  if (!CONTRACT_TYPES.includes(type) || !r || typeof r !== 'object') return null;
+  const base = {
+    place: 'Thủ Đức',
+    signatures: ['ĐẠI DIỆN BÊN BÁN (ký, ghi rõ họ tên, đóng dấu)', 'BÊN MUA (ký, ghi rõ họ tên)'],
+    parties: [sellerParty(), buyerParty(r)]
+  };
+
+  if (type === 'order') {
+    const items = (Array.isArray(r.items) ? r.items : []).map(i => {
+      const qty = Number(i.quantity) || 1;
+      const price = Number(i.price) || 0;
+      return {
+        name: [i.name || i.id, [i.color, i.storage].filter(Boolean).join(' / ')].filter(Boolean).join(' - '),
+        qty,
+        price: formatCurrency(price),
+        amount: formatCurrency(price * qty)
+      };
+    });
+    const pay = [['Tạm tính', formatCurrency(r.subtotal)]];
+    if (Number(r.discount) > 0) pay.push(['Giảm giá', `-${formatCurrency(r.discount)}`]);
+    if (Number(r.shipping_fee) > 0) pay.push(['Phí vận chuyển', formatCurrency(r.shipping_fee)]);
+    pay.push(['Tổng thanh toán', formatCurrency(r.total)]);
+    pay.push(['Bằng chữ', BLANK]);
+    return {
+      ...base,
+      title: 'HỢP ĐỒNG MUA BÁN ĐIỆN THOẠI',
+      number: `Số: HD-${r.code || ''}`,
+      dateText: longDate(r.created_at),
+      intro: 'Căn cứ Bộ luật Dân sự và nhu cầu, khả năng của hai bên, hôm nay hai bên cùng thỏa thuận ký hợp đồng mua bán với các điều khoản sau:',
+      articles: [
+        { heading: 'Điều 1. Hàng hóa', paragraphs: ['Bên A bán và Bên B mua các hàng hóa sau:'], items },
+        { heading: 'Điều 2. Giá và thanh toán', rows: pay, paragraphs: ['Hình thức thanh toán:   ☐ Tiền mặt     ☐ Chuyển khoản     ☐ Khác: ' + BLANK_SHORT] },
+        { heading: 'Điều 3. Giao nhận', paragraphs: [
+          `Địa điểm giao nhận: ${r.address || BLANK}.`,
+          'Bên A giao hàng đúng chủng loại, số lượng đã thỏa thuận. Bên B kiểm tra ngoại quan và tình trạng hoạt động của máy trước khi nhận.'
+        ] },
+        { heading: 'Điều 4. Bảo hành', paragraphs: [`Thời hạn bảo hành: ${BLANK_SHORT} tháng, theo phiếu bảo hành và chính sách của Bên A. Khách tra cứu bảo hành bằng số điện thoại tại ${SHOP.website}.`] },
+        GENERAL_ARTICLE
+      ]
+    };
+  }
+
+  const startDay = (() => { const d = new Date(r.start_date); return isNaN(d.getTime()) ? BLANK_SHORT : String(d.getUTCDate()); })();
+  const rate = `${String(Number(r.interest_rate) || 0).replace('.', ',')}%/tháng`;
+  return {
+    ...base,
+    title: 'HỢP ĐỒNG MUA BÁN TRẢ GÓP',
+    number: `Số: HD-${r.code || ''}`,
+    dateText: longDate(r.start_date),
+    intro: 'Căn cứ Bộ luật Dân sự và nhu cầu, khả năng của hai bên, hôm nay hai bên cùng thỏa thuận ký hợp đồng mua bán trả góp với các điều khoản sau:',
+    articles: [
+      { heading: 'Điều 1. Hàng hóa', paragraphs: [`Bên A bán và Bên B mua: ${r.product}.`] },
+      {
+        heading: 'Điều 2. Giá và phương thức trả góp',
+        rows: [
+          ['Giá gốc', formatCurrency(r.original_price)],
+          ['Trả trước', formatCurrency(r.down_payment)],
+          ['Khoản vay', formatCurrency(r.loan_amount)],
+          ['Lãi suất', rate],
+          ['Kỳ hạn', `${Number(r.term_months)} tháng`],
+          ['Góp mỗi tháng', formatCurrency(r.monthly_payment)],
+          ['Tiền lãi', formatCurrency(r.interest_amount)],
+          ['Thành tiền', formatCurrency(r.total_amount)],
+          ['Hình thức trả', r.pay_method],
+          ['Kỳ góp', `Hằng tháng, vào ngày ${startDay}, bắt đầu từ ${formatDate(addMonths(r.start_date, 1)) || BLANK_SHORT}`]
+        ]
+      },
+      { heading: 'Điều 3. Giấy tờ và giao nhận', paragraphs: [
+        `Giấy tờ Bên B đã cung cấp: ${r.documents || BLANK}.`,
+        'Bên A giao máy cho Bên B sau khi Bên B thanh toán khoản trả trước và ký hợp đồng này. Bên B kiểm tra tình trạng máy trước khi nhận.'
+      ] },
+      { heading: 'Điều 4. Nghĩa vụ thanh toán', paragraphs: [
+        'Bên B thanh toán đủ và đúng hạn các kỳ góp theo Điều 2.',
+        `Trường hợp chậm thanh toán, hai bên xử lý theo thỏa thuận: ${BLANK}.`
+      ] },
+      { heading: 'Điều 5. Bảo hành', paragraphs: [`Thời hạn bảo hành: ${BLANK_SHORT} tháng, theo phiếu bảo hành và chính sách của Bên A.`] },
+      GENERAL_ARTICLE
+    ]
+  };
+}
+
+function ctRows(rows) {
+  return rows.map(([k, v]) => `<div class="ct-row"><span class="ct-k">${escapeHtml(k)}:</span><span class="ct-v">${escapeHtml(v)}</span></div>`).join('');
+}
+
+/**
+ * HTML của hợp đồng (mọi dữ liệu đều được escape).
+ */
+export function contractHtml(c) {
+  if (!c) return '<p class="inv-empty">Không tìm thấy dữ liệu để in.</p>';
+  const parties = c.parties.map(p => `<div class="ct-party"><div class="ct-h">${escapeHtml(p.heading)}</div>${ctRows(p.rows)}</div>`).join('');
+  const articles = c.articles.map(a => {
+    const items = a.items && a.items.length ? `
+      <table class="ct-items"><thead><tr><th>Hàng hóa</th><th class="ct-r">SL</th><th class="ct-r">Đơn giá</th><th class="ct-r">Thành tiền</th></tr></thead><tbody>${a.items.map(i => `
+        <tr><td>${escapeHtml(i.name)}</td><td class="ct-r">${i.qty}</td><td class="ct-r">${escapeHtml(i.price)}</td><td class="ct-r">${escapeHtml(i.amount)}</td></tr>`).join('')}</tbody></table>` : '';
+    const rows = a.rows ? `<div class="ct-rows">${ctRows(a.rows)}</div>` : '';
+    const paragraphs = (a.paragraphs || []).map(t => `<p>${escapeHtml(t)}</p>`).join('');
+    return `<section class="ct-article"><div class="ct-h">${escapeHtml(a.heading)}</div>${paragraphs}${items}${rows}</section>`;
+  }).join('');
+  const sign = c.signatures.map(t => `<div class="ct-sign"><span>${escapeHtml(t)}</span></div>`).join('');
+  return `
+  <div class="ct-nation"><div>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div><div>Độc lập - Tự do - Hạnh phúc</div></div>
+  <div class="ct-title">${escapeHtml(c.title)}</div>
+  <div class="ct-meta">${escapeHtml(c.number)}</div>
+  <div class="ct-meta">${escapeHtml(c.place)}, ${escapeHtml(c.dateText)}</div>
+  <p class="ct-intro">${escapeHtml(c.intro)}</p>
+  <div class="ct-parties">${parties}</div>
+  ${articles}
+  <div class="ct-signs">${sign}</div>`;
+}

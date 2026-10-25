@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildInvoice, invoiceHtml, INVOICE_TYPES, INVOICE_TABLES } from '../../Frontend/admin/invoiceHelpers.js';
+import { buildInvoice, invoiceHtml, buildContract, contractHtml, CONTRACT_TYPES, INVOICE_TYPES, INVOICE_TABLES } from '../../Frontend/admin/invoiceHelpers.js';
 
 const order = {
   code: 'DH1001', created_at: '2026-10-24T08:30:00Z', customer_name: 'An <b>', phone: '0912345678', address: '12 Lê Lợi',
@@ -78,5 +78,36 @@ describe('invoice - invoiceHtml', () => {
       assert.match(invoiceHtml(buildInvoice(type, rec)), /inv-title/);
     }
     assert.match(invoiceHtml(null), /Không tìm thấy/);
+  });
+});
+
+describe('contract - buildContract / contractHtml', () => {
+  it('chỉ hỗ trợ đơn hàng và trả góp, dữ liệu sai trả null', () => {
+    assert.deepEqual(CONTRACT_TYPES, ['order', 'installment']);
+    assert.equal(buildContract('warranty', warranty), null);
+    assert.equal(buildContract('order', null), null);
+  });
+
+  it('hợp đồng đơn hàng có bên A, bên B, hàng hóa và điều khoản bảo hành', () => {
+    const c = buildContract('order', order);
+    assert.match(c.title, /MUA BÁN/);
+    assert.equal(c.number, `Số: HD-${order.code}`);
+    assert.equal(c.parties.length, 2);
+    assert.ok(c.articles[0].items.length >= 1);
+    assert.ok(c.articles.some(a => /Bảo hành/.test(a.heading)));
+  });
+
+  it('hợp đồng trả góp liệt kê điều khoản trả góp', () => {
+    const c = buildContract('installment', installment);
+    assert.match(c.title, /TRẢ GÓP/);
+    const labels = c.articles[1].rows.map(r => r[0]);
+    for (const k of ['Trả trước', 'Khoản vay', 'Lãi suất', 'Kỳ hạn', 'Góp mỗi tháng', 'Thành tiền']) assert.ok(labels.includes(k), k);
+  });
+
+  it('HTML escape dữ liệu khách nhập', () => {
+    const html = contractHtml(buildContract('order', { ...order, customer_name: '<script>x</script>' }));
+    assert.ok(!html.includes('<script>'));
+    assert.match(html, /ct-title/);
+    assert.match(contractHtml(null), /Không tìm thấy/);
   });
 });

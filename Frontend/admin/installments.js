@@ -103,6 +103,7 @@ function card(r) {
         ${active ? `<button type="button" class="btn btn-primary btn-sm" data-action="pay" data-id="${escapeHtml(r.id)}">+1 kỳ đã đóng</button>` : ''}
         <button type="button" class="btn btn-secondary btn-sm" data-action="edit" data-id="${escapeHtml(r.id)}">Sửa</button>
         <a class="btn btn-secondary btn-sm" href="./print.html?type=installment&id=${encodeURIComponent(r.id)}" target="_blank" rel="noopener">In hóa đơn</a>
+        <a class="btn btn-secondary btn-sm" href="./print.html?type=installment&doc=contract&id=${encodeURIComponent(r.id)}" target="_blank" rel="noopener">In hợp đồng</a>
         ${active ? `<button type="button" class="btn btn-ghost btn-sm" data-action="cancel" data-id="${escapeHtml(r.id)}">Hủy hồ sơ</button>` : ''}
         ${canDelete ? `<button type="button" class="btn btn-danger btn-sm" data-action="delete" data-id="${escapeHtml(r.id)}">Xóa</button>` : ''}
         <span class="ord-time">Tạo ${escapeHtml(formatDateTime(r.created_at))}</span>

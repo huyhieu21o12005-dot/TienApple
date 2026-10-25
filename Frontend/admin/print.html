@@ -5,56 +5,83 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <title>In hóa đơn - Tien Mobile Thu Duc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
   <style>
-    :root { --paper: 80mm; }
+    :root { --paper: 80mm; --ink: #1D1D1F; --muted: #6E6E73; --line: #D2D2D7; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: #E8E8ED; color: #000; font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
-    .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; padding: 12px; background: #fff; border-bottom: 1px solid #D2D2D7; }
-    .bar button, .bar a { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid #D2D2D7; background: #F5F5F7; font: inherit; font-size: 14px; cursor: pointer; color: #1D1D1F; text-decoration: none; display: inline-flex; align-items: center; }
-    .bar button.primary { background: #1D1D1F; color: #fff; border-color: #1D1D1F; }
+    body { margin: 0; background: #F5F5F7; color: var(--ink); font-family: "Inter", -apple-system, "Segoe UI", Roboto, Arial, sans-serif; font-weight: 400; -webkit-font-smoothing: antialiased; }
+    .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; padding: 12px; background: #fff; border-bottom: 1px solid var(--line); }
+    .bar button, .bar a { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: #F5F5F7; font: inherit; font-size: 14px; cursor: pointer; color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; }
+    .bar button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
     .bar button.active { outline: 2px solid #0071E3; }
-    #msg { text-align: center; padding: 24px; font-size: 14px; }
-    .sheet { width: var(--paper); margin: 16px auto; padding: 4mm; background: #fff; font-size: 12px; line-height: 1.35; box-shadow: 0 2px 12px rgba(0,0,0,.15); }
+    #msg { text-align: center; padding: 24px; font-size: 14px; color: var(--muted); }
+    .sheet { width: var(--paper); margin: 16px auto; padding: 5mm; background: #fff; font-size: 12px; line-height: 1.45; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
     body.a5 { --paper: 148mm; }
-    body.a5 .sheet { font-size: 14px; padding: 10mm; }
+    body.a5 .sheet { font-size: 13px; padding: 12mm; }
+    body.a4 { --paper: 210mm; }
+    body.a4 .sheet { font-size: 13px; padding: 18mm 18mm; line-height: 1.55; }
     .inv-head { text-align: center; margin-bottom: 6px; }
-    .inv-shop { font-size: 16px; font-weight: 800; letter-spacing: .04em; }
-    .inv-small { font-size: 11px; }
+    .inv-shop { font-size: 15px; font-weight: 600; letter-spacing: .06em; }
+    .inv-small { font-size: 11px; color: var(--muted); }
     body.a5 .inv-small { font-size: 12px; }
-    .inv-title { text-align: center; font-weight: 800; font-size: 14px; margin: 8px 0 6px; padding: 4px 0; border-top: 1px dashed #000; border-bottom: 1px dashed #000; }
-    .inv-block { margin: 6px 0; }
-    .inv-h { font-weight: 700; margin-bottom: 2px; text-transform: uppercase; font-size: 11px; }
+    .inv-title { text-align: center; font-weight: 500; font-size: 13px; letter-spacing: .08em; margin: 10px 0 8px; padding: 6px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .inv-block { margin: 8px 0; }
+    .inv-h { font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: .06em; font-size: 10px; color: var(--muted); }
     .inv-row { display: flex; justify-content: space-between; gap: 8px; padding: 1px 0; }
-    .inv-k { color: #333; flex: 0 0 auto; }
-    .inv-v { text-align: right; font-weight: 600; overflow-wrap: anywhere; }
-    .inv-code { font-size: 14px; font-weight: 800; }
+    .inv-k { color: var(--muted); flex: 0 0 auto; }
+    .inv-v { text-align: right; font-weight: 400; overflow-wrap: anywhere; }
+    .inv-code { font-size: 14px; font-weight: 700; }
     .inv-items { width: 100%; border-collapse: collapse; margin: 6px 0; }
-    .inv-items th { text-align: left; border-bottom: 1px solid #000; font-size: 11px; padding: 2px 0; }
-    .inv-items td { padding: 3px 0; vertical-align: top; border-bottom: 1px dotted #999; }
-    .inv-items small { display: block; font-size: 10px; color: #333; }
+    .inv-items th { text-align: left; border-bottom: 1px solid var(--ink); font-size: 10px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; padding: 2px 0; }
+    .inv-items td { padding: 4px 0; vertical-align: top; border-bottom: 1px solid var(--line); }
+    .inv-items small { display: block; font-size: 10px; color: var(--muted); }
     .inv-r { text-align: right; white-space: nowrap; }
-    .inv-totals { border-top: 1px dashed #000; margin-top: 6px; padding-top: 4px; }
+    .inv-totals { border-top: 1px solid var(--ink); margin-top: 6px; padding-top: 4px; }
     .inv-total { display: flex; justify-content: space-between; padding: 1px 0; }
-    .inv-strong { font-size: 15px; font-weight: 800; }
-    .inv-note { margin: 6px 0 0; font-size: 11px; }
-    .inv-signs { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; text-align: center; }
-    .inv-sign { flex: 1; font-size: 11px; min-height: 56px; border-top: 0; }
-    .inv-sign span { display: block; font-weight: 600; }
-    .inv-thanks { text-align: center; margin: 10px 0 0; font-size: 11px; }
+    .inv-strong { font-size: 15px; font-weight: 700; }
+    .inv-note { margin: 8px 0 0; font-size: 11px; color: var(--muted); }
+    .inv-signs { display: flex; justify-content: space-between; gap: 8px; margin-top: 16px; text-align: center; }
+    .inv-sign { flex: 1; font-size: 11px; min-height: 56px; border-top: 0; color: var(--muted); }
+    .inv-sign span { display: block; font-weight: 400; }
+    .inv-thanks { text-align: center; margin: 12px 0 0; font-size: 11px; color: var(--muted); }
     .inv-empty { text-align: center; padding: 20px; }
+    /* Hợp đồng (A4) */
+    .ct-nation { text-align: center; font-size: 12px; font-weight: 600; letter-spacing: .03em; }
+    .ct-nation div:last-child { font-weight: 400; margin-top: 1px; padding-bottom: 6px; display: inline-block; border-bottom: 1px solid var(--ink); }
+    .ct-title { text-align: center; font-size: 18px; font-weight: 700; letter-spacing: .04em; margin: 18px 0 4px; }
+    .ct-meta { text-align: center; color: var(--muted); font-size: 12px; }
+    .ct-intro { margin: 14px 0 8px; }
+    .ct-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 8px; }
+    .ct-h { font-weight: 600; margin: 10px 0 3px; }
+    .ct-party .ct-h { margin-top: 0; }
+    .ct-row { display: flex; gap: 6px; padding: 1px 0; }
+    .ct-k { color: var(--muted); flex: 0 0 auto; }
+    .ct-v { overflow-wrap: anywhere; }
+    .ct-article p { margin: 3px 0; }
+    .ct-rows { margin: 4px 0 4px 12px; max-width: 360px; }
+    .ct-items { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 12px; }
+    .ct-items th { text-align: left; font-weight: 500; color: var(--muted); border-bottom: 1px solid var(--ink); padding: 3px 4px; }
+    .ct-items td { padding: 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .ct-r { text-align: right !important; white-space: nowrap; }
+    .ct-signs { display: flex; justify-content: space-between; gap: 24px; margin-top: 26px; text-align: center; page-break-inside: avoid; }
+    .ct-sign { flex: 1; min-height: 110px; color: var(--ink); font-weight: 500; }
+    .ct-article { page-break-inside: avoid; }
     @page { size: 80mm auto; margin: 0; }
     @media print {
       body { background: #fff; }
       .bar, #msg { display: none !important; }
       .sheet { width: 100%; margin: 0; padding: 3mm; box-shadow: none; }
-      body.a5 .sheet { padding: 10mm; }
+      body.a5 .sheet { padding: 12mm; }
+      body.a4 .sheet { padding: 16mm 18mm; }
     }
   </style>
 </head>
 <body>
   <div class="bar" id="bar">
-    <button type="button" id="printBtn" class="primary">In hóa đơn</button>
+    <button type="button" id="printBtn" class="primary">In</button>
     <button type="button" id="p80" class="active">Giấy 80mm</button>
     <button type="button" id="pa5">Giấy A5</button>
     <a href="javascript:history.back()">← Quay lại</a>

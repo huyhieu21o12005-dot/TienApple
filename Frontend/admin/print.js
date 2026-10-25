@@ -1,10 +1,11 @@
 /**
  * Tien Mobile - Trang in hóa đơn: /admin/print.html?type=order|booking|warranty|installment&id=<uuid>
+ * Thêm &doc=contract (order|installment) để in hợp đồng mua bán khổ A4.
  * Cần đăng nhập quản trị (dùng phiên Supabase đã lưu). Khổ giấy 80mm cho máy in hóa đơn, hoặc A5.
  */
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
-import { buildInvoice, invoiceHtml, INVOICE_TABLES, INVOICE_TYPES } from './invoiceHelpers.js';
+import { buildInvoice, invoiceHtml, buildContract, contractHtml, CONTRACT_TYPES, INVOICE_TABLES, INVOICE_TYPES } from './invoiceHelpers.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -14,6 +15,7 @@ function fail(message) {
 }
 
 function setPaper(a5) {
+  document.body.classList.remove('a4');
   document.body.classList.toggle('a5', a5);
   $('p80').classList.toggle('active', !a5);
   $('pa5').classList.toggle('active', a5);
@@ -26,6 +28,21 @@ function setPaper(a5) {
   style.textContent = a5 ? '@page { size: A5; margin: 0; }' : '@page { size: 80mm auto; margin: 0; }';
 }
 
+function setContractMode() {
+  document.body.classList.remove('a5');
+  document.body.classList.add('a4');
+  $('p80').hidden = true;
+  $('pa5').hidden = true;
+  $('printBtn').textContent = 'In hợp đồng';
+  let style = document.getElementById('pageStyle');
+  if (!style) {
+    style = document.createElement('style');
+    style.id = 'pageStyle';
+    document.head.appendChild(style);
+  }
+  style.textContent = '@page { size: A4; margin: 0; }';
+}
+
 async function init() {
   $('printBtn').addEventListener('click', () => window.print());
   $('p80').addEventListener('click', () => setPaper(false));
@@ -34,8 +51,10 @@ async function init() {
   const params = new URLSearchParams(location.search);
   const type = params.get('type');
   const id = params.get('id');
-  if (!INVOICE_TYPES.includes(type) || !id) return fail('Đường dẫn in không hợp lệ.');
-  if (params.get('paper') === 'a5') setPaper(true);
+  const isContract = params.get('doc') === 'contract';
+  if (!(isContract ? CONTRACT_TYPES : INVOICE_TYPES).includes(type) || !id) return fail('Đường dẫn in không hợp lệ.');
+  if (isContract) setContractMode();
+  else if (params.get('paper') === 'a5') setPaper(true);
   if (!isSupabaseConfigured()) return fail('Chưa cấu hình Supabase.');
 
   try {
@@ -49,8 +68,8 @@ async function init() {
     const { data, error } = await supabase.from(INVOICE_TABLES[type]).select('*').eq('id', id).maybeSingle();
     if (error || !data) return fail('Không tìm thấy dữ liệu để in.');
 
-    document.title = `${data.code} - In hóa đơn`;
-    $('sheet').innerHTML = invoiceHtml(buildInvoice(type, data));
+    document.title = `${data.code} - ${isContract ? 'In hợp đồng' : 'In hóa đơn'}`;
+    $('sheet').innerHTML = isContract ? contractHtml(buildContract(type, data)) : invoiceHtml(buildInvoice(type, data));
     $('sheet').hidden = false;
     $('msg').hidden = true;
     if (params.get('auto') !== '0') setTimeout(() => window.print(), 400);

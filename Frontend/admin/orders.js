@@ -136,6 +136,10 @@ function noteBlock(record) {
     </div>`;
 }
 
+function contractLink(type, record) {
+  return `<a class="btn btn-secondary btn-sm" href="./print.html?type=${type}&doc=contract&id=${encodeURIComponent(record.id)}" target="_blank" rel="noopener">In hợp đồng</a>`;
+}
+
 function printLink(type, record) {
   return `<a class="btn btn-secondary btn-sm" href="./print.html?type=${type}&id=${encodeURIComponent(record.id)}" target="_blank" rel="noopener">In hóa đơn</a>`;
 }
@@ -158,7 +162,7 @@ function orderCard(o) {
       ${o.note ? `<p class="ord-line ord-muted">Khách ghi chú: ${escapeHtml(o.note)}</p>` : ''}
       <p class="ord-line">Tổng: <span class="ord-total">${escapeHtml(formatCurrency(o.total))}</span>
         ${o.voucher ? `<span class="ord-muted"> · mã ${escapeHtml(o.voucher)}</span>` : ''}</p>
-      <div class="ord-actions">${statusSelect(o)}${printLink('order', o)}</div>
+      <div class="ord-actions">${statusSelect(o)}${printLink('order', o)}${contractLink('order', o)}</div>
       ${noteBlock(o)}
     </article>`;
 }

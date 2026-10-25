@@ -988,3 +988,10 @@ body.menu-open {
 .contact-icon-call { background: #1D1D1F; }
 .contact-icon-zalo { background: #0068FF; }
 .contact-icon-map { background: #EA4335; }
+
+/* Tên thương hiệu trên thanh đầu trang: 2 dòng trên điện thoại để không đẩy mất logo/giỏ hàng */
+.brand-two-lines { display: inline-block; line-height: 1.15; }
+@media (max-width: 639px) {
+  .brand-two-lines .brand-l1, .brand-two-lines .brand-l2 { display: block; }
+  .brand-two-lines { font-size: 15px; line-height: 1.1; }
+}

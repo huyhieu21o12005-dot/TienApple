@@ -259,3 +259,9 @@ Mỗi mục có nút in: **Đơn hàng** (hóa đơn bán hàng), **Lịch sửa
 - Mặc định khổ **80mm** cho máy in hóa đơn nhiệt; nút **Giấy A5** chuyển sang khổ A5. Trong hộp thoại in chọn đúng máy in, lề **Không (None)**, tỷ lệ 100%.
 - Cần đăng nhập quản trị trong cùng trình duyệt. Thêm `&auto=0` vào đường dẫn nếu chỉ muốn xem trước, không tự bật hộp thoại in.
 - Phiếu sửa chữa có dòng "Chi phí" để điền tay. Thông tin cửa hàng trên đầu hóa đơn sửa trong `SHOP` ở `Frontend/admin/invoiceHelpers.js`.
+
+### Hợp đồng mua bán
+
+Thẻ **Đơn hàng** và **Trả góp** có nút **In hợp đồng** (khổ A4, `print.html?type=order|installment&doc=contract&id=...`). Hợp đồng tự điền tên, số điện thoại, hàng hóa, giá, và với trả góp là trả trước, lãi %/tháng, kỳ hạn, tiền góp mỗi tháng, thành tiền. Các chỗ chấm `....` (địa chỉ cửa hàng, người đại diện, CCCD khách, số tháng bảo hành, mức xử lý chậm thanh toán) điền tay sau khi in.
+
+Đây là mẫu tham khảo, không phải tư vấn pháp lý. Nên nhờ người am hiểu luật xem lại điều khoản trước khi dùng cho giao dịch lớn.

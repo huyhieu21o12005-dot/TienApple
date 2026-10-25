@@ -1353,3 +1353,9 @@ body[data-role="staff"] [data-action="delete"] { display: none !important; }
 .i-check { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 14px; cursor: pointer; }
 .i-check input { width: 18px; height: 18px; }
 .ord-total-bar { display: inline-flex; margin-top: 8px; padding: 8px 14px; border-radius: 12px; background: #1D1D1F; color: #fff; font-weight: 800; font-size: 17px; }
+
+/* Tên thương hiệu 2 dòng trên điện thoại */
+@media (max-width: 639px) {
+  .brand-name { line-height: 1.1; }
+  .brand-name .brand-name-l2 { display: block; }
+}
