@@ -32,7 +32,7 @@ describe('modelImages', () => {
     assert.equal(imageFor(''), '');
   });
   it('mọi ảnh trong bảng là https', () => {
-    for (const url of Object.values(MODEL_IMAGES)) assert.match(url, /^https:\/\//);
+    for (const url of Object.values(MODEL_IMAGES)) assert.match(url, /^(https:\/\/|\/assets\/models\/)/);
   });
   it('máy cũ có ảnh minh họa thì thêm ghi chú vào mô tả, không có ảnh thì không', () => {
     const nd = [

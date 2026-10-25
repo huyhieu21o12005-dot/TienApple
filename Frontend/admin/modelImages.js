@@ -40,6 +40,8 @@ export const MODEL_IMAGES = {
   iphone12: apple('iphone-12-purple-select-2021'),
   iphonexsmax: apple('iphone-xs-max-gold-select-2018'),
   ipadair11m2air7: apple('ipad-air-finish-select-gallery-202405-11inch-blue-wifi'),
+  watchseries6: '/assets/models/watchseries6-vang.jpg',
+  ipadpro97inch: '/assets/models/ipadpro97inch.png',
   watchseries9: apple('watch-card-40-s9-202309'),
   // Apple (ảnh bên thứ ba vì Apple chưa có ảnh cùng quy tắc)
   iphone12pro: `${TGDD}213032/iphone-12-pro-vang-1-org.jpg`,
@@ -111,7 +113,8 @@ export const MODEL_COLOR_IMAGES = {
   iphone17air: { vang: `${TGDD}342670/iphone-air-vang-thumb.jpg`, xanh: `${TGDD_CDN2}dmx/Products/Images/42/342670/iphone-air-xanh-1-639175328099726265.jpg` },
   iphoneair: { vang: `${TGDD}342670/iphone-air-vang-thumb.jpg`, xanh: `${TGDD_CDN2}dmx/Products/Images/42/342670/iphone-air-xanh-1-639175328099726265.jpg` },
   iphone18promax: { xanh: `${TGDD}370982/iphone-18-pro-max-xanh-thumb.jpg`, do: `${TGDD}370983/iphone-18-pro-max-512gb-do-thumb.jpg` },
-  iphonexsmax: { vang: apple('iphone-xs-max-gold-select-2018') }
+  iphonexsmax: { vang: apple('iphone-xs-max-gold-select-2018') },
+  watchseries6: { hong: '/assets/models/watchseries6-vang.jpg', vang: '/assets/models/watchseries6-vang.jpg', den: '/assets/models/watchseries6-den.jpg', do: '/assets/models/watchseries6-do.jpg' }
 };
 
 const COLOR_WORDS = new Set(['den', 'trang', 'tim', 'vang', 'hong', 'cam', 'do', 'xanh', 'xanhduong', 'xanhla', 'bac', 'xam', 'titantunhien', 'vangsamac']);
