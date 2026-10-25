@@ -273,3 +273,11 @@ Chạy `supabase/cashflow.sql` trong Supabase (một lần). Trang `/admin/cashf
 - **Thống kê theo tháng**: tổng thu, tổng chi, lợi nhuận (thu - chi), thu và chi theo nhóm; nút **In bảng thống kê**.
 - Ở trang in hóa đơn có nút **Ghi vào sổ thu**: ghi tổng tiền của phiếu vào sổ thu (mỗi mã phiếu chỉ ghi một lần, có thể sửa số tiền trước khi ghi).
 - Chỉ chủ shop (owner) được xóa khoản thu chi.
+
+## Cập nhật giá từ Google Sheet
+
+Trang **Sản phẩm** có nút **Cập nhật giá từ Sheet**. Bấm nút: web đọc bảng giá (sheet phải chia sẻ "bất kỳ ai có đường liên kết"), ghép với **điện thoại hàng mới** theo tên máy + dung lượng (ví dụ "iPhone 15 128GB"), hiện bảng giá cũ / giá mới, bạn tick rồi bấm **Áp dụng giá**.
+- Giá bán = cột "Giá Sau Sale"; giá gạch ngang = cột "Giá Bán" (chỉ khi có sale).
+- Hàng Like New, hàng cũ và phụ kiện không bao giờ bị đổi giá. Sản phẩm không có trong sheet giữ nguyên.
+- Giá lệch hơn 30% so với giá cũ được tô vàng và không tự tick.
+- Muốn một sản phẩm ăn theo sheet: đặt tên đúng dạng "<Mẫu> <Dung lượng>" như trong sheet (hãng và "5G" được bỏ qua khi so tên).

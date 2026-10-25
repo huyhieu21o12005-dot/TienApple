@@ -42,6 +42,7 @@ update public.products set
   screen = public.tm_fix_macroman(screen),
   description = public.tm_fix_macroman(description),
   default_color = public.tm_fix_macroman(default_color),
-  colors = public.tm_fix_macroman(colors::text)::jsonb;
+  colors = public.tm_fix_macroman(colors::text)::jsonb,
+  storages = public.tm_fix_macroman(storages::text)::jsonb;
 
 drop function public.tm_fix_macroman(text);

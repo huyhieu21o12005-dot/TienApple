@@ -105,6 +105,7 @@
           <a class="btn btn-secondary" href="./warranty.html">Bảo hành</a>
           <a class="btn btn-secondary" href="./installments.html">Trả góp</a>
           <a class="btn btn-ghost" href="./cashflow.html">Thu chi</a>
+          <button type="button" id="sheetPriceBtn" class="btn btn-secondary" title="Lấy giá hàng mới từ Google Sheet bảng giá">Cập nhật giá từ Sheet</button>
           <button type="button" id="addProductBtn" class="btn btn-primary">
             <span class="btn-icon">+</span>
             <span>Thêm sản phẩm</span>
@@ -446,6 +447,24 @@
   <!-- ========================================================================= -->
   <!-- 4. DELETE CONFIRMATION DIALOG                                             -->
   <!-- ========================================================================= -->
+  <!-- CẬP NHẬT GIÁ TỪ GOOGLE SHEET (chỉ hàng mới) -->
+  <div id="sheetPriceModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="sheetPriceTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 id="sheetPriceTitle" class="modal-title">Cập nhật giá từ Google Sheet</h2>
+        <button type="button" id="closeSheetPriceBtn" class="btn-icon-close" aria-label="Đóng">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="dialog-subtext">Chỉ áp dụng cho <strong>điện thoại hàng mới</strong>. Hàng Like New, hàng cũ và phụ kiện giữ nguyên giá. Giá bán = cột "Giá Sau Sale", giá gạch ngang = cột "Giá Bán".</p>
+        <div id="sheetPriceBody" class="sheet-price-body">Đang tải bảng giá...</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cancelSheetPriceBtn" class="btn btn-secondary">Đóng</button>
+        <button type="button" id="applySheetPriceBtn" class="btn btn-primary" disabled>Áp dụng giá</button>
+      </div>
+    </div>
+  </div>
+
   <div id="deleteModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
     <div class="modal-dialog modal-dialog-sm">
       <div class="modal-header">

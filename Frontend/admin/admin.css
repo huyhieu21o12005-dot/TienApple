@@ -1383,3 +1383,10 @@ body[data-role="staff"] [data-action="delete"] { display: none !important; }
   .admin-topbar, .cf-toolbar, #cChips, .ord-actions { display: none !important; }
   .cf-card, .cf-table { border-color: #000; }
 }
+
+/* Cập nhật giá từ Sheet */
+.sheet-price-body { max-height: 55vh; overflow: auto; margin-top: 8px; }
+.sheet-price-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.sheet-price-table th, .sheet-price-table td { padding: 8px 6px; border-bottom: 1px solid #E5E5EA; text-align: left; vertical-align: top; }
+.sheet-price-table small { color: #6E6E73; }
+.sheet-price-warn { background: #FFF4E5; }

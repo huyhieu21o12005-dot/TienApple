@@ -4,6 +4,7 @@
  * Visibility Toggle, Bulk Operations, Image Upload with Client Resize, and Filters.
  */
 
+import { SHEET_CSV_URL, parseSheetRows, planPriceUpdates } from './sheetPricing.js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
 import {
   formatCurrency,
@@ -709,6 +710,63 @@ async function executeBulkDelete() {
 // ==============================================================================
 // 7. DELETE SINGLE PRODUCT (WITH IMAGE CLEANUP)
 // ==============================================================================
+const sheetPlan = { changes: [] };
+
+function closeSheetPriceModal() {
+  document.getElementById('sheetPriceModal').classList.add('hidden');
+}
+
+async function openSheetPriceModal() {
+  const body = document.getElementById('sheetPriceBody');
+  const applyBtn = document.getElementById('applySheetPriceBtn');
+  document.getElementById('sheetPriceModal').classList.remove('hidden');
+  applyBtn.disabled = true;
+  body.textContent = 'Đang tải bảng giá...';
+  sheetPlan.changes = [];
+  try {
+    const res = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const { rows, errors } = parseSheetRows(await res.text());
+    if (rows.length === 0) throw new Error(errors[0] || 'Sheet không có dữ liệu giá.');
+    const plan = planPriceUpdates(state.products, rows);
+    sheetPlan.changes = plan.changes;
+
+    const price = (n) => escapeHtml(formatCurrency(n));
+    const list = plan.changes.length === 0 ? '<p>Không có giá nào cần đổi.</p>' : `
+      <table class="sheet-price-table"><thead><tr><th></th><th>Sản phẩm</th><th>Giá cũ</th><th>Giá mới</th></tr></thead><tbody>
+      ${plan.changes.map((c, i) => `<tr class="${c.bigChange ? 'sheet-price-warn' : ''}">
+        <td><input type="checkbox" class="sheet-price-check" data-i="${i}" ${c.bigChange ? '' : 'checked'} aria-label="Áp dụng ${escapeHtml(c.name)}"></td>
+        <td>${escapeHtml(c.name)}${c.bigChange ? '<br><small>Lệch hơn 30%, hãy kiểm tra trước khi tick.</small>' : ''}</td>
+        <td>${price(c.oldPrice)}</td><td><strong>${price(c.newPrice)}</strong>${c.newList ? `<br><small>gạch: ${price(c.newList)}</small>` : ''}</td></tr>`).join('')}
+      </tbody></table>`;
+    const unmatched = plan.unmatched.length ? `<p class="dialog-subtext">Không có trong sheet (giữ nguyên giá): ${plan.unmatched.map(u => escapeHtml(u.name)).join(', ')}</p>` : '';
+    const warn = errors.length ? `<p class="dialog-subtext">Bỏ qua ${errors.length} dòng lỗi trong sheet.</p>` : '';
+    body.innerHTML = `${list}<p class="dialog-subtext">Không đổi: ${plan.same.length} · Bỏ qua (hàng cũ, phụ kiện): ${plan.skipped}</p>${unmatched}${warn}`;
+    applyBtn.disabled = plan.changes.length === 0;
+  } catch (err) {
+    console.error('[Admin] Lỗi đọc Google Sheet:', err);
+    body.textContent = 'Không đọc được Google Sheet. Kiểm tra sheet còn chia sẻ "bất kỳ ai có đường liên kết" và thử lại.';
+  }
+}
+
+async function applySheetPrices() {
+  const picked = [...document.querySelectorAll('.sheet-price-check:checked')].map(el => sheetPlan.changes[Number(el.dataset.i)]).filter(Boolean);
+  if (picked.length === 0) return showToast('Chưa chọn sản phẩm nào.', 'error');
+  const applyBtn = document.getElementById('applySheetPriceBtn');
+  applyBtn.disabled = true;
+  let ok = 0;
+  for (const c of picked) {
+    const { error } = await supabase.from('products')
+      .update({ price: c.newPrice, old_price: c.newList, updated_at: new Date().toISOString() })
+      .eq('id', c.id);
+    if (error) console.error('[Admin] Lỗi cập nhật giá', c.id, error);
+    else ok++;
+  }
+  closeSheetPriceModal();
+  showToast(ok === picked.length ? `Đã cập nhật giá ${ok} sản phẩm từ Sheet` : `Cập nhật được ${ok}/${picked.length} sản phẩm, xem lại console`, ok === picked.length ? 'success' : 'error');
+  await loadProducts();
+}
+
 function openDeleteModal(prod) {
   if (!canDeleteProducts(state.role)) {
     showToast('Nhân viên không có quyền xóa sản phẩm.', 'error');
@@ -1192,6 +1250,10 @@ function bindGlobalEvents() {
   document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
 
   // Delete modal buttons
+  document.getElementById('sheetPriceBtn').addEventListener('click', openSheetPriceModal);
+  document.getElementById('closeSheetPriceBtn').addEventListener('click', closeSheetPriceModal);
+  document.getElementById('cancelSheetPriceBtn').addEventListener('click', closeSheetPriceModal);
+  document.getElementById('applySheetPriceBtn').addEventListener('click', applySheetPrices);
   document.getElementById('closeDeleteBtn').addEventListener('click', closeDeleteModal);
   document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
   document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDeleteProduct);
