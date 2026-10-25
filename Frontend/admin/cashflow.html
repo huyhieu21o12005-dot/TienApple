@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Tien Mobile Thu Duc - Thu Chi</title>
+  <link rel="stylesheet" href="./admin.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+</head>
+<body class="admin-body">
+
+  <main id="gateSection" class="login-section hidden">
+    <div class="login-card">
+      <div class="login-header">
+        <img class="brand-logo" src="../assets/logo.svg" width="56" height="56" alt="Tien Mobile Thu Duc">
+        <h1 class="login-title">Cần đăng nhập</h1>
+        <p id="gateMessage" class="login-subtitle">Vui lòng đăng nhập tài khoản quản trị.</p>
+      </div>
+      <a href="./index.html" class="btn btn-primary btn-block">Đến trang đăng nhập</a>
+    </div>
+  </main>
+
+  <div id="cApp" class="admin-app hidden">
+    <header class="admin-topbar">
+      <div class="topbar-inner ord-topbar">
+        <div class="brand-area">
+          <img class="brand-logo-small" src="../assets/logo.svg" width="28" height="28" alt="">
+          <div class="brand-text-group">
+            <span class="brand-name">Tien Mobile <span class="brand-name-l2">Thu Duc</span></span>
+            <span class="brand-tag">Thu chi</span>
+          </div>
+        </div>
+        <nav class="ord-nav" aria-label="Điều hướng quản trị">
+          <a class="btn btn-ghost btn-sm" href="../index.html" title="Về trang chủ Tien Mobile Thu Duc">← Trang chủ</a>
+          <a class="btn btn-ghost btn-sm" href="./index.html">Sản phẩm</a>
+          <a class="btn btn-ghost btn-sm" href="./orders.html">Đơn hàng</a>
+          <a class="btn btn-ghost btn-sm" href="./warranty.html">Bảo hành</a>
+          <a class="btn btn-ghost btn-sm" href="./installments.html">Trả góp</a>
+          <a class="btn btn-secondary btn-sm" href="./cashflow.html" aria-current="page">Thu chi</a>
+        </nav>
+        <div class="topbar-actions">
+          <button type="button" id="addInBtn" class="btn btn-primary btn-sm">+ Thu</button>
+          <button type="button" id="addOutBtn" class="btn btn-secondary btn-sm">+ Chi</button>
+          <button type="button" id="logoutBtn" class="btn btn-secondary btn-sm">Đăng xuất</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="ord-main">
+      <div class="ord-toolbar cf-toolbar">
+        <select id="cMonth" class="select-input" aria-label="Tháng"></select>
+        <button type="button" id="cPrint" class="btn btn-secondary btn-sm">In bảng thống kê</button>
+      </div>
+      <div id="cError" class="alert-box alert-error hidden" role="alert"></div>
+      <section id="cStats" class="cf-stats" aria-live="polite"></section>
+      <div id="cChips" class="ord-chips" role="group" aria-label="Lọc thu chi"></div>
+      <div id="cLoading" class="ord-empty hidden">Đang tải...</div>
+      <section id="cList" class="ord-list" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <dialog id="cDialog" class="w-dialog" aria-labelledby="cDialogTitle">
+    <form id="cForm" method="dialog" novalidate>
+      <h2 id="cDialogTitle" class="login-title">Ghi khoản thu</h2>
+      <div id="cFormError" class="alert-box alert-error hidden" role="alert"></div>
+      <div class="w-row">
+        <div class="form-group"><label class="form-label" for="eAmount">Số tiền (đ)</label>
+          <input class="form-input" id="eAmount" inputmode="numeric" autocomplete="off" required></div>
+        <div class="form-group"><label class="form-label" for="eDate">Ngày</label>
+          <input class="form-input" id="eDate" type="date" required></div>
+      </div>
+      <div class="form-group"><label class="form-label" for="eCategory">Nhóm</label>
+        <select class="select-input" id="eCategory"></select></div>
+      <div class="form-group"><label class="form-label" for="eNote">Ghi chú</label>
+        <input class="form-input" id="eNote" maxlength="300" autocomplete="off"></div>
+      <div class="ord-actions">
+        <button type="button" id="cCancel" class="btn btn-secondary">Hủy</button>
+        <button type="submit" class="btn btn-primary">Lưu</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+  <script type="module" src="./cashflow.js"></script>
+</body>
+</html>

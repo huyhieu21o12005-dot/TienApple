@@ -265,3 +265,11 @@ Mỗi mục có nút in: **Đơn hàng** (hóa đơn bán hàng), **Lịch sửa
 Thẻ **Đơn hàng** và **Trả góp** có nút **In hợp đồng** (khổ A4, `print.html?type=order|installment&doc=contract&id=...`). Hợp đồng tự điền tên, số điện thoại, hàng hóa, giá, và với trả góp là trả trước, lãi %/tháng, kỳ hạn, tiền góp mỗi tháng, thành tiền. Các chỗ chấm `....` (địa chỉ cửa hàng, người đại diện, CCCD khách, số tháng bảo hành, mức xử lý chậm thanh toán) điền tay sau khi in.
 
 Đây là mẫu tham khảo, không phải tư vấn pháp lý. Nên nhờ người am hiểu luật xem lại điều khoản trước khi dùng cho giao dịch lớn.
+
+## Thu chi
+
+Chạy `supabase/cashflow.sql` trong Supabase (một lần). Trang `/admin/cashflow.html` (nút **Thu chi** trên thanh điều hướng) có:
+- **+ Thu / + Chi**: ghi khoản có số tiền, ngày, nhóm, ghi chú.
+- **Thống kê theo tháng**: tổng thu, tổng chi, lợi nhuận (thu - chi), thu và chi theo nhóm; nút **In bảng thống kê**.
+- Ở trang in hóa đơn có nút **Ghi vào sổ thu**: ghi tổng tiền của phiếu vào sổ thu (mỗi mã phiếu chỉ ghi một lần, có thể sửa số tiền trước khi ghi).
+- Chỉ chủ shop (owner) được xóa khoản thu chi.

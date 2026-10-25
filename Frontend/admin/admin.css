@@ -1363,3 +1363,23 @@ body[data-role="staff"] [data-action="delete"] { display: none !important; }
 .ord-edit { margin: 8px 0; }
 .ord-edit .form-input { margin-bottom: 8px; }
 .ord-edit-err { color: #C0392B; font-size: 13px; margin: 0 0 8px; }
+
+/* Thu chi */
+.cf-toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.cf-toolbar .select-input { width: auto; min-width: 190px; }
+.cf-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 12px 0; }
+.cf-card { background: #fff; border: 1px solid var(--border, #D2D2D7); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.cf-card span { color: #6E6E73; font-size: 13px; }
+.cf-card b { font-size: 22px; }
+.cf-card small { color: #6E6E73; }
+.cf-in { color: #1E8E3E; }
+.cf-out { color: #C0392B; }
+.cf-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 12px; }
+.cf-h { font-size: 15px; margin: 8px 0; }
+.cf-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #D2D2D7; border-radius: 12px; }
+.cf-table td { padding: 8px 12px; border-bottom: 1px solid #E8E8ED; }
+.cf-r { text-align: right; white-space: nowrap; }
+@media print {
+  .admin-topbar, .cf-toolbar, #cChips, .ord-actions { display: none !important; }
+  .cf-card, .cf-table { border-color: #000; }
+}

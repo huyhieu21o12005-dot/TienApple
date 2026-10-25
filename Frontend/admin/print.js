@@ -5,6 +5,8 @@
  */
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from '../js/config.js';
+import { parseMoney } from '../js/installment.js';
+import { categoryForInvoice, validateEntry } from './cashflowHelpers.js';
 import { SHOP, buildInvoice, invoiceHtml, buildContract, contractHtml, CONTRACT_TYPES, INVOICE_TABLES, INVOICE_TYPES } from './invoiceHelpers.js';
 
 const $ = (id) => document.getElementById(id);
@@ -56,6 +58,7 @@ let record = null;
 let docType = '';
 let isContractDoc = false;
 const extra = {};
+let sb = null;
 
 function loadShop() {
   try {
@@ -113,7 +116,24 @@ function buildInfoForm() {
   $('info').hidden = false;
 }
 
+async function recordIncome() {
+  const inv = buildInvoice(docType, record, extra);
+  const suggested = inv ? parseMoney(inv.totals.at(-1)?.[1]) : NaN;
+  const input = prompt(`Ghi vào sổ thu phiếu ${record.code}. Số tiền thu (đ):`, Number.isFinite(suggested) ? String(suggested) : '');
+  if (input === null) return;
+  const result = validateEntry({
+    kind: 'in', amount: input, category: categoryForInvoice(docType), refCode: record.code,
+    date: new Date().toISOString().slice(0, 10), note: `Hóa đơn ${record.code} - ${record.customer_name || ''}`.slice(0, 300)
+  });
+  if (!result.valid) return alert(result.errors[0]);
+  const { error } = await sb.from('cashflow_entries').insert(result.row);
+  if (error) return alert(error.code === '23505' ? `Phiếu ${record.code} đã được ghi vào sổ thu trước đó.` : (error.message || 'Không ghi được.'));
+  $('ledgerBtn').textContent = 'Đã ghi vào sổ thu';
+  $('ledgerBtn').disabled = true;
+}
+
 async function init() {
+  $('ledgerBtn').addEventListener('click', recordIncome);
   $('editBtn').addEventListener('click', () => setEditing(!document.body.classList.contains('editing')));
   $('printBtn').addEventListener('click', () => window.print());
   $('p80').addEventListener('click', () => setPaper(false));
@@ -131,6 +151,7 @@ async function init() {
   try {
     const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm');
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true } });
+    sb = supabase;
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return fail('Vui lòng đăng nhập trang quản trị trước khi in.');
     const { data: isAdmin } = await supabase.rpc('is_admin');
@@ -146,6 +167,7 @@ async function init() {
     loadShop();
     render();
     buildInfoForm();
+    if (!isContract) $('ledgerBtn').hidden = false;
     $('sheet').hidden = false;
     $('msg').hidden = true;
     $('hint').hidden = false;
