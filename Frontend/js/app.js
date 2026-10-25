@@ -363,11 +363,22 @@ class App {
     this.initHero3DInteraction();
     this.initHeroMotion();
     this.initLayerNavigation();
+    this.openCartFromQuery();
     this.initMobileMenu();
     this.initWarrantyLookup();
     this.initTradeInForm();
     this.initInstallmentForm();
     enhanceSelects();
+  }
+
+  /** Từ trang chi tiết sản phẩm: index.html?cart=1 mở sẵn popup giỏ hàng rồi bỏ tham số khỏi URL. */
+  openCartFromQuery() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('cart') !== '1') return;
+    params.delete('cart');
+    const query = params.toString();
+    history.replaceState(history.state, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`);
+    setTimeout(() => this.openCartDrawer(), 150);
   }
 
   initTradeInForm() {
@@ -596,6 +607,11 @@ class App {
       btn.addEventListener('click', () => this.openCartDrawer());
     });
 
+    const cartBackBtn = document.getElementById('cart-back-btn');
+    if (cartBackBtn) {
+      cartBackBtn.addEventListener('click', () => this.closeCartDrawer());
+    }
+
     const closeCartBtn = document.getElementById('close-drawer-btn');
     if (closeCartBtn) {
       closeCartBtn.addEventListener('click', () => this.closeCartDrawer());
@@ -783,11 +799,15 @@ class App {
     window.addEventListener('hashchange', () => {
       this.handleHashChange();
     });
+    window.addEventListener('popstate', () => {
+      this.handleHashChange();
+    });
 
     // Handle initial hash on page load if present
     if (window.location.hash) {
       this.handleHashChange();
     }
+    this.updateBackButtons();
   }
 
   handleHashChange() {
@@ -803,11 +823,33 @@ class App {
       'lienhe': 'layer-lienhe'
     };
     if (hashMap[hash]) {
-      this.switchLayer(hashMap[hash]);
+      this.switchLayer(hashMap[hash], null, null, true);
+    } else if (!hash) {
+      this.switchLayer('layer-trangchu', null, null, true);
     }
   }
 
-  switchLayer(layerId, filter = null, trigger = null) {
+  /** Thêm nút "Quay lại" vào đầu mỗi mục (trừ Trang chủ) và ẩn/hiện theo mục đang xem. */
+  updateBackButtons(layerId) {
+    document.querySelectorAll('.app-layer').forEach(layer => {
+      let bar = layer.querySelector(':scope > .layer-back-bar');
+      if (layer.id === 'layer-trangchu') { if (bar) bar.remove(); return; }
+      if (!bar) {
+        bar = document.createElement('div');
+        bar.className = 'layer-back-bar w-full px-6 sm:px-10 lg:px-16 pt-4';
+        bar.innerHTML = '<button type="button" class="inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-[#F5F5F7] hover:bg-[#E5E5EA] text-[13px] font-medium text-[#1D1D1F] cursor-pointer border-0"><span class="material-symbols-outlined text-[18px]">arrow_back</span> Quay lại</button>';
+        bar.firstElementChild.addEventListener('click', () => this.goBackLayer());
+        layer.insertBefore(bar, layer.firstChild);
+      }
+    });
+  }
+
+  goBackLayer() {
+    if (history.state && history.state.tmLayer) history.back();
+    else this.switchLayer('layer-trangchu', null, null, true);
+  }
+
+  switchLayer(layerId, filter = null, trigger = null, fromHistory = false) {
     // Nếu là 'layer-lienhe' -> cuộn mượt xuống chân trang #lienhe
     if (layerId === 'layer-lienhe') {
       const footer = document.getElementById('lienhe');
@@ -876,9 +918,12 @@ class App {
       'layer-tragop': 'tragop',
       'layer-baohanh': 'baohanh'
     };
-    if (reverseHashMap[layerId] && history.replaceState) {
-      history.replaceState(null, null, `#${reverseHashMap[layerId]}`);
+    const newHash = reverseHashMap[layerId] ? `#${reverseHashMap[layerId]}` : '';
+    if (newHash && !fromHistory && history.pushState && window.location.hash !== newHash) {
+      // pushState để nút Quay lại của trình duyệt và nút "Quay lại" trên trang về đúng mục trước đó
+      history.pushState({ tmLayer: true }, '', newHash);
     }
+    this.updateBackButtons(layerId);
   }
 
   // 3D Studio Interaction: 18 Pro Max Three.js Engine & Chromatic Aura Flow
@@ -1052,7 +1097,14 @@ class App {
     this.openCartDrawer();
   }
 
+  /** Bấm vào sản phẩm: mở trang chi tiết riêng (có nút Quay lại). */
   openProductModalById(productId) {
+    if (productId === undefined || productId === null || productId === '') return;
+    window.location.href = `product.html?id=${encodeURIComponent(productId)}`;
+  }
+
+  /** Popup xem nhanh cũ, không còn dùng cho thẻ sản phẩm. */
+  openQuickViewModalById(productId) {
     const product = this.findProduct(productId);
     if (!product) return;
 

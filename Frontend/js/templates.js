@@ -121,7 +121,7 @@ export function cartItemHtml(item, index) {
   const qty = Number(item.quantity) || 1;
   return `
         <div class="p-3.5 rounded-2xl bg-[#F5F5F7] flex gap-3.5 relative">
-          <div class="w-18 h-18 rounded-xl bg-white flex-shrink-0 p-1 flex items-center justify-center border border-[#D2D2D7]/50">
+          <div class="w-[72px] h-[72px] rounded-xl bg-white flex-shrink-0 p-1 flex items-center justify-center border border-[#D2D2D7]/50">
             <img class="max-h-full max-w-full object-contain" src="${escapeHtml(safeUrl(product.image) || NO_IMAGE)}" alt="${escapeHtml(product.name)}" />
           </div>
           <div class="flex-1 min-w-0 flex flex-col justify-between">

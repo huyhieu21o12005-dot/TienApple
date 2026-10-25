@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chi tiết sản phẩm — Tien Mobile Thu Duc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="min-h-screen bg-white text-[#1D1D1F] font-sans antialiased" style="font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+
+  <header class="w-full h-16 bg-white/95 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between px-4 sm:px-10 lg:px-16 border-b border-[#D2D2D7]/60">
+    <button id="backBtn" type="button" class="inline-flex items-center gap-1.5 h-10 px-4 rounded-full bg-[#F5F5F7] hover:bg-[#E5E5EA] text-[13px] font-medium text-[#1D1D1F] cursor-pointer border-0">
+      <span class="material-symbols-outlined text-[18px]">arrow_back</span> Quay lại
+    </button>
+    <a href="index.html#trangchu" class="text-[16px] font-semibold text-[#1D1D1F] no-underline">Tien Mobile Thu Duc</a>
+    <a href="index.html?cart=1" class="inline-flex items-center gap-1.5 text-[13px] text-[#1D1D1F] no-underline" aria-label="Giỏ hàng">
+      <span class="material-symbols-outlined text-[22px]">shopping_bag</span>
+      <span>Giỏ hàng (<span id="cartCount">0</span>)</span>
+    </a>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+    <nav id="crumbs" class="text-[12px] text-[#6E6E73] mb-5" aria-label="Đường dẫn"></nav>
+    <div id="state" class="py-20 text-center text-[#6E6E73]">Đang tải sản phẩm...</div>
+    <article id="detail" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12"></article>
+  </main>
+
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden px-5 py-3 rounded-full bg-[#1D1D1F] text-white text-[13px] shadow-lg"></div>
+
+  <script type="module" src="js/product.js"></script>
+</body>
+</html>

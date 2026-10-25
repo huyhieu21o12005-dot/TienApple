@@ -319,3 +319,9 @@ Thanh nút nhanh phía trên danh sách sản phẩm: **Chọn tất cả** (tí
 Mọi hộp thoại xác nhận, thông báo và nhập số (xóa, đăng xuất, hiện tất cả, ghi sổ thu, đặt hàng/đặt lịch trên web...) dùng popup của trang (`Frontend/js/dialog.js`) thay cho hộp thoại mặc định của trình duyệt. Enter = đồng ý, Esc hoặc bấm ra ngoài = hủy.
 
 Khi thêm máy từ Sheet (mới hoặc cũ) có ô tích **Chỉ thêm máy có ảnh**: máy chưa có ảnh được ẩn khỏi danh sách và không được thêm (ghi rõ số máy bị bỏ). Ô "Hiện ngay trên web" giữ nguyên lựa chọn khi đổi hãng hoặc đổi ô tích.
+
+## Trang khách: giỏ hàng, chi tiết sản phẩm, nút Quay lại
+
+- Giỏ hàng là **popup giữa màn hình** (có nút "Quay lại"/✕, Esc và bấm nền để đóng).
+- Bấm vào sản phẩm mở **trang chi tiết riêng** `product.html?id=<mã>` (ảnh, giá, màu, dung lượng, thông số, mô tả, Đặt mua ngay / + Giỏ hàng). Nút **Quay lại** về đúng trang trước; mở trực tiếp thì về danh sách điện thoại. "Đặt mua ngay" mở trang chủ kèm popup giỏ hàng (`index.html?cart=1`).
+- Các mục ở trang chủ (Điện thoại, Sửa chữa, Phụ kiện, Cam kết, Trả góp, Bảo hành) có nút **← Quay lại** ở đầu mục; chuyển mục được lưu vào lịch sử nên nút Quay lại của trình duyệt cũng về đúng mục trước.

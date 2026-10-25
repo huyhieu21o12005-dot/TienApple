@@ -298,12 +298,14 @@ body {
 }
 
 .drawer-panel {
-  transform: translateX(100%);
-  transition: transform var(--transition-slow);
+  opacity: 0;
+  transform: translateY(16px) scale(0.96);
+  transition: opacity var(--transition-normal), transform var(--transition-normal);
 }
 
 .drawer-panel.open {
-  transform: translateX(0);
+  opacity: 1;
+  transform: none;
 }
 
 /* Toast Notifications */
