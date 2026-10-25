@@ -55,7 +55,7 @@
     </a>
 
     <!-- Center Navigation Links (Chỉ 1 dòng duy nhất, có thanh ngang dưới mục được chọn, chữ đen khi chọn, chữ xám khi chưa chọn) -->
-    <nav class="hidden lg:flex items-center gap-8 h-full" id="mainNav">
+    <nav class="hidden xl:flex items-center gap-6 2xl:gap-8 h-full whitespace-nowrap" id="mainNav">
       <a href="#trangchu" class="nav-layer-link active h-full flex items-center relative text-[13px] font-semibold text-[#1D1D1F] transition-colors header-item" data-layer="layer-trangchu">
         <span>Trang chủ</span>
         <span class="nav-active-bar absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#1D1D1F]"></span>
@@ -102,14 +102,14 @@
       </button>
 
       <!-- Nút menu cho điện thoại và máy tính bảng (menu ngang chỉ hiện từ 1024px) -->
-      <button id="mobileMenuBtn" class="lg:hidden inline-flex items-center justify-center w-11 h-11 -mr-2 rounded-full bg-transparent border-0 cursor-pointer text-[#1D1D1F]" type="button" aria-label="Mở menu" aria-expanded="false" aria-controls="mobileMenuPanel">
+      <button id="mobileMenuBtn" class="xl:hidden inline-flex items-center justify-center w-11 h-11 -mr-2 rounded-full bg-transparent border-0 cursor-pointer text-[#1D1D1F]" type="button" aria-label="Mở menu" aria-expanded="false" aria-controls="mobileMenuPanel">
         <span class="material-symbols-outlined text-[24px]" id="mobileMenuIcon">menu</span>
       </button>
     </div>
   </header>
 
   <!-- Menu điều hướng trên điện thoại / máy tính bảng -->
-  <nav id="mobileMenuPanel" class="lg:hidden hidden fixed inset-x-0 top-16 bottom-0 z-30 bg-white overflow-y-auto px-6 sm:px-10 pb-10" aria-label="Điều hướng chính">
+  <nav id="mobileMenuPanel" class="xl:hidden hidden fixed inset-x-0 top-16 bottom-0 z-30 bg-white overflow-y-auto px-6 sm:px-10 pb-10" aria-label="Điều hướng chính">
     <a href="#trangchu" class="nav-layer-link mobile-nav-link" data-layer="layer-trangchu">Trang chủ</a>
     <a href="#dienthoai" class="nav-layer-link mobile-nav-link" data-layer="layer-dienthoai">Điện thoại</a>
     <a href="#suachua" class="nav-layer-link mobile-nav-link" data-layer="layer-suachua">Sửa chữa</a>

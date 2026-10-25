@@ -906,7 +906,7 @@ body.menu-open {
   padding-top: env(safe-area-inset-top);
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1279px) {
   #mobileMenuPanel {
     padding-bottom: calc(40px + env(safe-area-inset-bottom));
   }
