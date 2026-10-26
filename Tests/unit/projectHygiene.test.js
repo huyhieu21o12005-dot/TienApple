@@ -214,3 +214,27 @@ describe('mobile: 3 thẻ chọn và nút Lọc vừa một hàng 375px', () => 
     assert.match(idx, /class="filter-toggle-text"/);
   });
 });
+
+describe('liên kết Facebook của cửa hàng', () => {
+  const FB = 'https://www.facebook.com/van.tien.201660';
+  const idx = read('Frontend/index.html');
+  it('có biểu tượng Facebook ở cụm liên hệ chân trang và nút nổi, mở tab mới an toàn', () => {
+    const links = [...idx.matchAll(/<a [^>]*href="https:\/\/www\.facebook\.com\/van\.tien\.201660"[^>]*>/g)].map(m => m[0]);
+    assert.equal(links.length, 2, 'cần đúng 2 liên kết (chân trang và nút nổi)');
+    for (const l of links) {
+      assert.match(l, /target="_blank"/);
+      assert.match(l, /rel="noopener noreferrer"/);
+      assert.match(l, /aria-label="[^"]*Facebook/);
+    }
+    assert.ok(idx.includes(FB));
+  });
+  it('biểu tượng là tệp riêng trong assets/icons', () => {
+    assert.ok(exists('Frontend/assets/icons/facebook.svg'));
+    assert.match(read('Frontend/assets/icons/facebook.svg'), /<svg[\s\S]*#1877F2/i);
+    assert.match(idx, /assets\/icons\/facebook\.svg/);
+  });
+  it('nút nổi vẫn là cụm gọn, nhận cả Facebook', () => {
+    const floating = idx.slice(idx.indexOf('id="floatingContact"'), idx.indexOf('id="floatingContact"') + 4000);
+    assert.match(floating, /facebook\.com\/van\.tien\.201660/);
+  });
+});
