@@ -896,92 +896,7 @@
        7. HỆ THỐNG POPUP / MODAL TƯƠNG TÁC
        ====================================================================== -->
 
-  <!-- POPUP 1: Modal "Xem Nhanh Chi Tiết Sản Phẩm" (#quickViewModal) -->
-  <div id="quickViewModal" class="fixed inset-0 modal-overlay z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-[20px] max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 shadow-2xl relative border border-[#D2D2D7]">
-      <button id="close-quickview-btn" aria-label="Đóng" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-[#F5F5F7] flex items-center justify-center text-[#1D1D1F] hover:bg-[#E5E5EA] transition-colors cursor-pointer border-0">
-        <span class="material-symbols-outlined text-[18px]">close</span>
-      </button>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mt-2">
-        <!-- Cột trái: Ảnh to + Thumbnail -->
-        <div class="flex flex-col items-center">
-          <div class="w-full bg-[#F5F5F7] rounded-2xl p-8 flex items-center justify-center min-h-[300px]">
-            <img id="modalProductImg" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Sản phẩm" class="max-h-[280px] object-contain transition-transform duration-300 hover:scale-105" />
-          </div>
-          <div class="flex items-center gap-2 mt-3">
-            <button class="w-12 h-12 rounded-lg bg-[#F5F5F7] border border-[#1D1D1F] p-1 flex items-center justify-center">
-              <img id="modalThumb1" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Thumbnail" class="h-full object-contain" />
-            </button>
-            <button class="w-12 h-12 rounded-lg bg-[#F5F5F7] border border-[#D2D2D7] p-1 flex items-center justify-center opacity-70 hover:opacity-100">
-              <span class="material-symbols-outlined text-[20px] text-[#6E6E73]">smartphone</span>
-            </button>
-            <button class="w-12 h-12 rounded-lg bg-[#F5F5F7] border border-[#D2D2D7] p-1 flex items-center justify-center opacity-70 hover:opacity-100">
-              <span class="material-symbols-outlined text-[20px] text-[#6E6E73]">360</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Cột phải: Thông số, swatches và cấu hình máy -->
-        <div>
-          <div class="inline-block px-2.5 py-0.5 rounded bg-[#F5F5F7] text-[11px] font-semibold uppercase text-[#1D1D1F] mb-2">CHÍNH HÃNG NGUYÊN BẢN</div>
-          <h2 id="modalProductTitle" class="text-[24px] font-semibold text-[#1D1D1F] leading-tight mb-2">Tên sản phẩm</h2>
-          <div class="flex items-baseline gap-3 mb-4">
-            <span id="modalProductPrice" class="text-[24px] font-semibold text-[#1D1D1F]">0₫</span>
-            <span id="modalProductOldPrice" class="text-[14px] text-[#6E6E73] line-through">0₫</span>
-            <span class="text-[12px] font-semibold px-2 py-0.5 rounded bg-[#0071E3]/10 text-[#0071E3]">Tiết kiệm đặc quyền</span>
-          </div>
-
-          <!-- Color Swatches -->
-          <div class="mb-4">
-            <div class="text-[12px] font-semibold text-[#6E6E73] uppercase mb-2">
-              Màu sắc: <span id="modalProductColor" class="text-[#1D1D1F] font-medium">Titan Tự Nhiên</span>
-            </div>
-            <div id="modal-swatches-container" class="flex items-center gap-2.5">
-              <!-- Render động -->
-            </div>
-          </div>
-
-          <!-- Storage Chips -->
-          <div class="mb-5">
-            <div class="text-[12px] font-semibold text-[#6E6E73] uppercase mb-2">Dung lượng bộ nhớ</div>
-            <div id="modal-storage-container" class="flex items-center gap-2 flex-wrap">
-              <!-- Render động -->
-            </div>
-          </div>
-
-          <!-- Specs summary -->
-          <div class="grid grid-cols-2 gap-2.5 text-[12px] p-3.5 bg-[#F5F5F7] rounded-xl mb-5">
-            <div><span class="text-[#6E6E73]">Màn hình:</span> <strong id="modalSpecScreen" class="text-[#1D1D1F]">6.3" OLED 120Hz</strong></div>
-            <div><span class="text-[#6E6E73]">Vi xử lý:</span> <strong id="modalSpecChip" class="text-[#1D1D1F]">A18 Pro</strong></div>
-            <div><span class="text-[#6E6E73]">Camera:</span> <strong id="modalSpecCam" class="text-[#1D1D1F]">48MP Pro</strong></div>
-            <div><span class="text-[#6E6E73]">Dung lượng pin:</span> <strong id="modalSpecBattery" class="text-[#1D1D1F]">3.582 mAh</strong></div>
-          </div>
-
-          <div class="flex items-center gap-2 text-[12px] text-[#6E6E73] mb-5">
-            <span class="material-symbols-outlined text-[16px] text-emerald-600">verified</span>
-            <span>Bảo hành chính hãng 12 tháng • 1 đổi 1 trong 30 ngày nếu phát sinh lỗi</span>
-          </div>
-
-          <!-- CTAs -->
-          <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5">
-            <button id="modal-buy-now-btn" class="flex-1 h-11 px-5 rounded-full bg-[#1D1D1F] text-white text-[13px] font-medium hover:bg-black transition-colors cursor-pointer border-0 flex items-center justify-center gap-1.5" type="button">
-              <span class="material-symbols-outlined text-[17px]">shopping_bag</span>
-              <span>Đặt mua ngay (Giao 2H)</span>
-            </button>
-            <button id="modal-add-to-cart-btn" class="h-11 px-4 rounded-full border border-[#D2D2D7] text-[#1D1D1F] text-[13px] font-medium hover:bg-[#F5F5F7] transition-colors cursor-pointer" type="button">
-              + Giỏ hàng
-            </button>
-            <button class="booking-trigger h-11 px-4 rounded-full border border-[#D2D2D7] text-[#6E6E73] text-[12px] font-medium hover:text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors cursor-pointer hidden sm:inline-flex items-center justify-center" data-service-context="Tư vấn mua trả góp 0%" type="button">
-              Tư vấn 0%
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- POPUP 2: Giỏ hàng dạng popup giữa màn hình (#cart-drawer-root) -->
+  <!-- POPUP 1: Giỏ hàng dạng popup giữa màn hình (#cart-drawer-root) -->
   <aside id="cart-drawer-root" class="fixed inset-0 z-50 overflow-hidden hidden" aria-modal="true" role="dialog">
     <div id="drawer-backdrop" class="fixed inset-0 bg-black/45 backdrop-blur-sm transition-opacity"></div>
     <div class="fixed inset-0 flex items-center justify-center p-3 sm:p-6 pointer-events-none">
@@ -1104,7 +1019,7 @@
     </div>
   </aside>
 
-  <!-- POPUP 3: Modal "Đặt Lịch Sửa Chữa Nhanh" (#repairModal) -->
+  <!-- POPUP 2: Modal "Đặt Lịch Sửa Chữa Nhanh" (#repairModal) -->
   <div id="repairModal" class="fixed inset-0 modal-overlay z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-[20px] max-w-[500px] w-full p-6 sm:p-8 shadow-2xl relative border border-[#D2D2D7]">
       <button id="close-repair-modal-btn" aria-label="Đóng" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-[#F5F5F7] flex items-center justify-center text-[#1D1D1F] hover:bg-[#E5E5EA] transition-colors cursor-pointer border-0">

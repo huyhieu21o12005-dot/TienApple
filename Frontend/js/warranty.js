@@ -69,18 +69,6 @@ export function formatDate(value) {
 }
 
 /**
- * Che tên khách: "Nguyễn Văn An" -> "N**** V** A*" (giống hàm mask_name trên Supabase).
- */
-export function maskName(name) {
-  return String(name ?? '').trim().split(/\s+/).filter(Boolean)
-    .map(word => {
-      const chars = [...word];
-      return chars.length <= 1 ? word : chars[0] + '*'.repeat(Math.min(chars.length - 1, 4));
-    })
-    .join(' ');
-}
-
-/**
  * Kiểm tra dữ liệu phiếu bảo hành trước khi lưu.
  * @returns {{ valid: boolean, errors: string[], phone: string }}
  */

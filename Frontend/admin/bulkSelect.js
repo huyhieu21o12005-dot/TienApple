@@ -55,21 +55,3 @@ export function buildFacetGroups(products) {
       .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, 'vi'))
   })).filter(g => g.options.length > 0);
 }
-
-/** Id các sản phẩm thỏa mọi nhóm có tích. Không tích ô nào thì trả về mảng rỗng. */
-export function matchByFacets(products, selectedOptionIds) {
-  const picked = new Set(selectedOptionIds || []);
-  if (picked.size === 0) return [];
-  const byGroup = new Map();
-  for (const id of picked) {
-    const group = String(id).split(':')[0];
-    if (!byGroup.has(group)) byGroup.set(group, new Set());
-    byGroup.get(group).add(id);
-  }
-  return (Array.isArray(products) ? products : [])
-    .filter(p => {
-      const have = new Set(facetValues(p));
-      return [...byGroup.values()].every(options => [...options].some(o => have.has(o)));
-    })
-    .map(p => p.id);
-}

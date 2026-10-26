@@ -1,9 +1,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  parseCsv, parseVnd, parsePercent, normalizeKey, parseSheetDate, parseSheetRows, planPriceUpdates,
-  slugify, productNameFor, brandsOf, planNewProducts, parseUsedRows, usedGroup, planUsedProducts, BIG_CHANGE_RATIO
-} from '../../Frontend/admin/sheetPricing.js';
+  parseCsv, parseVnd, parsePercent, normalizeKey, parseSheetDate, parseSheetRows,
+  slugify, productNameFor, planNewProducts, parseUsedRows, usedGroup, planUsedProducts } from '../../Frontend/admin/sheetPricing.js';
 import { planSync, diffProduct } from '../../Frontend/admin/syncPlan.js';
 
 describe('parseCsv', () => {
@@ -81,31 +80,7 @@ describe('parseSheetRows', () => {
   });
 });
 
-describe('planPriceUpdates', () => {
-  const rows = parseSheetRows([HEADER, 'K1,Apple,iPhone 15,128GB,6GB,"20.000.000",10%,"18.000.000",3,Còn,Hiện,,', 'K2,Apple,iPhone 16,128GB,6GB,"10.000.000",0%,"10.000.000",3,Còn,Hiện,,'].join('\n')).rows;
-  it('đầu vào không phải mảng vẫn chạy được', () => {
-    const out = planPriceUpdates(null, null);
-    assert.deepEqual(out, { changes: [], same: [], unmatched: [], skipped: 0 });
-  });
-  it('phân loại: bỏ qua phụ kiện, không khớp, giữ nguyên, đổi giá lớn', () => {
-    const products = [
-      null,
-      { id: 'a', name: 'iPhone 15 128GB', kind: 'accessory', condition: 'new', price: 1 },
-      { id: 'b', name: 'iPhone 99 128GB', condition: 'new', price: 1 },
-      { id: 'c', name: 'iPhone 16 128GB', condition: 'new', price: 10000000, oldPrice: null },
-      { id: 'd', name: 'iPhone 15 128GB', condition: 'new', price: 20000000, basePrice: 15000000, oldPrice: 20000000 }
-    ];
-    const out = planPriceUpdates(products, rows);
-    assert.equal(out.skipped, 2);
-    assert.equal(out.unmatched.length, 1);
-    assert.equal(out.same.length, 1);
-    assert.equal(out.changes.length, 1);
-    assert.equal(out.changes[0].markup, 5000000);
-    assert.equal(out.changes[0].bigChange, Math.abs(18000000 - 15000000) / 15000000 > BIG_CHANGE_RATIO);
-  });
-});
-
-describe('tên, mã và hãng', () => {
+describe('tên và mã', () => {
   it('slugify xử lý dấu cộng và rỗng', () => {
     assert.equal(slugify('iPhone 15 Pro+ Đen'), 'iphone-15-pro-plus-den');
     assert.equal(slugify(null), '');
@@ -114,10 +89,6 @@ describe('tên, mã và hãng', () => {
     assert.equal(productNameFor({ brand: 'Samsung', model: 'Galaxy S24', storage: '256GB' }), 'Samsung Galaxy S24 256GB');
     assert.equal(productNameFor({ brand: 'Apple', model: 'iPhone 15', storage: '' }), 'iPhone 15');
     assert.equal(productNameFor({ brand: 'Xiaomi', model: 'Xiaomi 14', storage: '256GB' }), 'Xiaomi 14 256GB');
-  });
-  it('brandsOf đếm theo thứ tự xuất hiện, đầu vào lạ thì rỗng', () => {
-    assert.deepEqual(brandsOf([{ brand: 'A' }, { brand: 'B' }, { brand: 'A' }]), [{ brand: 'A', count: 2 }, { brand: 'B', count: 1 }]);
-    assert.deepEqual(brandsOf(null), []);
   });
 });
 

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CartManager, ProductFilter, BookingValidator } from '../../Frontend/js/store.js';
+import { CartManager, BookingValidator } from '../../Frontend/js/store.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,10 +11,10 @@ const rootDir = path.resolve(__dirname, '../../');
 
 describe('Tien Mobile Integration Test Suite - Real Catalog Data & End-to-End Scenarios', () => {
 
-  const productsRaw = fs.readFileSync(path.join(rootDir, 'Data/products.json'), 'utf-8');
+  const productsRaw = fs.readFileSync(path.join(rootDir, 'Frontend/data/products.json'), 'utf-8');
   const products = JSON.parse(productsRaw);
 
-  const servicesRaw = fs.readFileSync(path.join(rootDir, 'Data/services.json'), 'utf-8');
+  const servicesRaw = fs.readFileSync(path.join(rootDir, 'Frontend/data/services.json'), 'utf-8');
   const services = JSON.parse(servicesRaw);
 
   it('dữ liệu catalog sản phẩm đầy đủ và hợp lệ', () => {

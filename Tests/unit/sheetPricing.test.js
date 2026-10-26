@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseUsedRows, usedGroup, planUsedProducts, planNewProducts, brandsOf, parseSheetDate, slugify, productNameFor, parseCsv, parseVnd, parsePercent, normalizeKey, parseSheetRows, planPriceUpdates } from '../../Frontend/admin/sheetPricing.js';
+import { parseUsedRows, usedGroup, planUsedProducts, planNewProducts, parseSheetDate, slugify, productNameFor, parseCsv, parseVnd, parsePercent, normalizeKey, parseSheetRows } from '../../Frontend/admin/sheetPricing.js';
 
 const csv = [
   'TIEN MOBILE - BẢNG BÁO GIÁ,,,,,,',
@@ -53,42 +53,11 @@ describe('sheetPricing - CSV dạng gviz (tiêu đề ô gộp bị mất)', () 
   });
 });
 
-describe('sheetPricing - planPriceUpdates', () => {
-  const { rows } = parseSheetRows(csv);
-  const products = [
-    { id: 'a', name: 'iPhone 15 128GB', kind: 'phone', condition: 'new', price: 18990000, oldPrice: 21490000 },
-    { id: 'b', name: 'Samsung Galaxy S24 Ultra 256GB', kind: 'phone', condition: 'new', price: 29990000, oldPrice: undefined },
-    { id: 'c', name: 'Xiaomi 14 5G 256GB', kind: 'phone', condition: 'new', price: 30000000 },
-    { id: 'd', name: 'iPhone 14 128GB Quốc Tế', kind: 'phone', condition: 'likenew', price: 13890000 },
-    { id: 'e', name: 'Củ sạc 30W', kind: 'accessory', condition: 'new', price: 650000 },
-    { id: 'f', name: 'OPPO Find X7 256GB', kind: 'phone', condition: 'new', price: 17290000 }
-  ];
-  const plan = planPriceUpdates(products, rows);
-  it('chỉ xử lý điện thoại hàng mới; hàng cũ và phụ kiện bị bỏ qua', () => {
-    assert.equal(plan.skipped, 2);
-  });
-  it('đổi giá theo giá sau sale và giá gạch ngang theo giá bán', () => {
-    const a = plan.changes.find(c => c.id === 'a');
-    assert.equal(a.newPrice, 16440600);
-    assert.equal(a.newList, 17490000);
-    assert.equal(a.bigChange, false);
-  });
-  it('không sale thì bỏ giá gạch ngang; giống giá cũ thì vào nhóm không đổi', () => {
-    assert.equal(plan.same.length, 1);
-    assert.equal(plan.same[0].id, 'b');
-  });
-  it('báo đổi giá lớn và sản phẩm không có trong sheet', () => {
-    assert.equal(plan.changes.find(c => c.id === 'c').bigChange, true);
-    assert.deepEqual(plan.unmatched.map(u => u.id), ['f']);
-  });
-});
-
 describe('sheetPricing - sản phẩm mới', () => {
   const text = csv.replace('TIEN MOBILE - BẢNG BÁO GIÁ,,,,,,', 'TIEN MOBILE | Cập nhật ngày 25/10/2026,,,,,,');
   const { rows } = parseSheetRows(text);
-  it('đọc ngày cập nhật và danh sách hãng', () => {
+  it('đọc ngày cập nhật', () => {
     assert.equal(parseSheetDate(text), '25/10/2026');
-    assert.deepEqual(brandsOf(rows).map(b => b.brand), ['Apple', 'Samsung', 'Xiaomi']);
   });
   it('slug và tên hiển thị', () => {
     assert.equal(slugify('iPhone 16 Pro Max 256GB'), 'iphone-16-pro-max-256gb');

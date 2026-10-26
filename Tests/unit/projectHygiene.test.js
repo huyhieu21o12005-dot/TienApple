@@ -1,0 +1,64 @@
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { existsSync, readFileSync } from 'node:fs';
+
+const root = new URL('../../', import.meta.url);
+const exists = (p) => existsSync(new URL(p, root));
+const read = (p) => readFileSync(new URL(p, root), 'utf8');
+
+describe('dự án gọn: không còn bản sao và tài nguyên không dùng', () => {
+  it('dữ liệu mẫu chỉ có một nơi duy nhất (Frontend/data), không còn Data/ và Mock/', () => {
+    assert.equal(exists('Data/products.json'), false);
+    assert.equal(exists('Mock/products.json'), false);
+    assert.ok(exists('Frontend/data/products.json'));
+    assert.ok(exists('Frontend/data/services.json'));
+    assert.doesNotMatch(read('Frontend/js/app.js'), /\.\.\/Data\//);
+  });
+  it('không còn ảnh, mô hình thô không trang nào dùng trong thư mục triển khai', () => {
+    for (const p of ['Frontend/assets/hand_open.jpg', 'Frontend/assets/hand_open.png', 'Frontend/assets/hand_transparent.png', 'Frontend/assets/ip18promax', 'Frontend/models/new_model']) {
+      assert.equal(exists(p), false, p);
+    }
+    assert.ok(exists('Frontend/models/iphone_18_pro_max.glb'));
+  });
+});
+
+describe('admin.js không còn mã của các nút Sheet cũ', () => {
+  const js = read('Frontend/admin/admin.js');
+  it('không còn tham chiếu nút đã bị gỡ khỏi trang', () => {
+    for (const id of ['sheetNewBtn', 'sheetAccBtn', 'sheetUsedBtn', 'sheetPriceBtn']) assert.doesNotMatch(js, new RegExp(id), id);
+  });
+  it('mọi id admin.js tìm bằng getElementById đều có trong trang quản trị hoặc do mã tự tạo', () => {
+    const html = read('Frontend/admin/index.html');
+    const ids = new Set([...js.matchAll(/getElementById\(\s*['"]([A-Za-z0-9_-]+)['"]\s*\)/g)].map(m => m[1]));
+    const missing = [...ids].filter(id => !new RegExp(`id=["']${id}["']`).test(html) && !new RegExp(`id=\\\\?["']${id}\\\\?["']|\\.id\\s*=\\s*['"]${id}['"]`).test(js));
+    assert.deepEqual(missing, []);
+  });
+});
+
+describe('hàm đã thay thế không còn tồn tại', () => {
+  it('sheetPricing không còn planPriceUpdates và brandsOf (luồng đồng bộ hợp nhất đã thay thế)', async () => {
+    const m = await import('../../Frontend/admin/sheetPricing.js');
+    assert.equal('planPriceUpdates' in m, false);
+    assert.equal('brandsOf' in m, false);
+    assert.ok(typeof m.planNewProducts === 'function' && typeof m.planUsedProducts === 'function');
+  });
+  it('không còn hàm mở xem nhanh không ai gọi trong app.js', () => {
+    assert.doesNotMatch(read('Frontend/js/app.js'), /openQuickViewModalById/);
+  });
+});
+
+describe('style.css không còn lớp mồ côi', () => {
+  it('mọi lớp khai báo trong style.css đều được trang bán hàng hoặc mã JS dùng', async () => {
+    const { execSync } = await import('node:child_process');
+    const css = read('Frontend/css/style.css').replace(/\/\*[\s\S]*?\*\//g, '');
+    const files = execSync("git ls-files Frontend | grep -E '\\.(js|html)$' | grep -vE 'three.min|GLTFLoader|admin/'", { cwd: root, encoding: 'utf8' }).trim().split('\n').filter(f => exists(f));
+    const src = files.map(read).join('\n');
+    const helpers = new Set(['truncate', 'line-clamp-1', 'line-clamp-2']); // bổ sung cho tiện ích Tailwind
+    const classes = [...new Set([...css.matchAll(/\.([a-zA-Z_][\w-]*)/g)].map(m => m[1]))].filter(c => !helpers.has(c));
+    const unused = classes.filter(c => !new RegExp(`(?<![\\w-])${c.replace(/-/g, '\\-')}(?![\\w-])`).test(src));
+    assert.deepEqual(unused, []);
+  });
+  it('trang halora.html không liên quan không còn nằm trong thư mục triển khai', () => {
+    assert.equal(exists('Frontend/halora.html'), false);
+  });
+});

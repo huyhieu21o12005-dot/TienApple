@@ -135,32 +135,6 @@ export function parseSheetRows(csvText) {
   return { rows, errors };
 }
 
-/**
- * Ghép sản phẩm HÀNG MỚI (phone, condition new) với dòng trong sheet theo tên máy + dung lượng.
- * @param {Array<{id:string,name:string,kind?:string,condition?:string,price:number,oldPrice?:number}>} products dữ liệu qua mapDbToProduct
- * @returns {{ changes: object[], same: object[], unmatched: object[], skipped: number }}
- */
-export function planPriceUpdates(products, sheetRows) {
-  const byKey = new Map();
-  for (const r of Array.isArray(sheetRows) ? sheetRows : []) if (!byKey.has(r.key)) byKey.set(r.key, r);
-  const out = { changes: [], same: [], unmatched: [], skipped: 0 };
-  for (const p of Array.isArray(products) ? products : []) {
-    if (!p || (p.kind || 'phone') !== 'phone' || p.condition !== 'new') { out.skipped++; continue; }
-    const row = byKey.get(normalizeKey(p.name));
-    if (!row) { out.unmatched.push({ id: p.id, name: p.name }); continue; }
-    const newPrice = row.finalPrice;
-    const newOld = row.salePercent > 0 && row.listPrice > newPrice ? row.listPrice : null;
-    // So sánh với GIÁ GỐC (base_price); phần cộng thêm đã set (price - base_price) được giữ nguyên khi áp giá mới.
-    const cur = p.basePrice || p.price;
-    const markup = p.basePrice ? p.price - p.basePrice : 0;
-    const item = { id: p.id, name: p.name, line: row.line, sheetKey: row.key, oldPrice: cur, newPrice, oldList: p.oldPrice ?? null, newList: newOld, markup };
-    if (cur === newPrice && (p.oldPrice ?? null) === newOld) { out.same.push(item); continue; }
-    item.bigChange = cur > 0 && Math.abs(newPrice - cur) / cur > BIG_CHANGE_RATIO;
-    out.changes.push(item);
-  }
-  return out;
-}
-
 /** Không phải điện thoại (đồng hồ, máy tính bảng, tai nghe...): không tự tạo vào mục điện thoại. */
 const NOT_PHONE = /\b(watch|ipad|macbook|airpods|tai nghe|sac|cap)\b/i;
 
@@ -182,13 +156,6 @@ export function productNameFor(row) {
   const model = row.model.trim();
   const hasBrand = brand.toLowerCase() === 'apple' || model.toLowerCase().startsWith(brand.toLowerCase());
   return `${hasBrand ? model : `${brand} ${model}`} ${row.storage}`.trim();
-}
-
-/** Danh sách hãng trong sheet theo thứ tự xuất hiện, kèm số dòng. */
-export function brandsOf(rows) {
-  const map = new Map();
-  for (const r of Array.isArray(rows) ? rows : []) map.set(r.brand, (map.get(r.brand) || 0) + 1);
-  return [...map.entries()].map(([brand, count]) => ({ brand, count }));
 }
 
 /**

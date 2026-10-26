@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  normalizePhone, addMonths, warrantyInfo, formatDate, maskName, validateWarranty, filterWarranties
+  normalizePhone, addMonths, warrantyInfo, formatDate, validateWarranty, filterWarranties
 } from '../../Frontend/js/warranty.js';
 import { warrantyResultsHtml } from '../../Frontend/js/templates.js';
 import { lookupWarranty } from '../../Frontend/js/warrantyApi.js';
@@ -36,11 +36,9 @@ describe('warranty helpers', () => {
     assert.equal(warrantyInfo('x', 3).active, false);
   });
 
-  it('formatDate và maskName', () => {
+  it('formatDate', () => {
     assert.equal(formatDate('2026-04-05'), '05/04/2026');
     assert.equal(formatDate('bad'), '');
-    assert.equal(maskName('Nguyễn Văn An'), 'N**** V** A*');
-    assert.equal(maskName(''), '');
   });
 
   it('validateWarranty báo lỗi từng trường', () => {

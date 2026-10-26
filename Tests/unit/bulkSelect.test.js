@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { facetValues, buildFacetGroups, matchByFacets } from '../../Frontend/admin/bulkSelect.js';
+import { facetValues, buildFacetGroups } from '../../Frontend/admin/bulkSelect.js';
 
 const P = [
   { id: 'a', name: 'iPhone 16', brandName: 'Apple iPhone', condition: 'new', kind: 'phone', is_visible: true, stock: 3, image: 'x.png', badge: '' },
@@ -27,15 +27,5 @@ describe('bulkSelect', () => {
     const state = groups.find(g => g.id === 'state');
     assert.equal(state.options.find(o => o.id === 'state:noimage').count, 2);
     assert.equal(groups.find(g => g.id === 'cond').options.some(o => o.id === 'cond:used'), false);
-  });
-  it('cùng nhóm là OR, khác nhóm là AND', () => {
-    assert.deepEqual(matchByFacets(P, ['brand:apple iphone']).sort(), ['a', 'b']);
-    assert.deepEqual(matchByFacets(P, ['brand:apple iphone', 'brand:samsung galaxy']).sort(), ['a', 'b', 'c']);
-    assert.deepEqual(matchByFacets(P, ['brand:apple iphone', 'cond:likenew']), ['b']);
-    assert.deepEqual(matchByFacets(P, ['state:noimage', 'kind:phone']), ['b']);
-  });
-  it('không tích gì thì không chọn sản phẩm nào', () => {
-    assert.deepEqual(matchByFacets(P, []), []);
-    assert.deepEqual(matchByFacets(null, ['cond:new']), []);
   });
 });

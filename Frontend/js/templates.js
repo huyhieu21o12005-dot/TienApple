@@ -4,7 +4,7 @@
  */
 
 import { CartManager } from './store.js';
-import { escapeHtml, jsArg, safeUrl, safeColor, discountPercent, imageZoomClass } from './utils.js';
+import { escapeHtml, jsArg, safeUrl, discountPercent, imageZoomClass } from './utils.js';
 import { formatDate } from './warranty.js';
 
 /** Ảnh tạm khi sản phẩm chưa có ảnh. */
@@ -90,33 +90,6 @@ export function emptyCatalogHtml({ storeEmpty = false } = {}) {
           <p class="text-[14px]">${hint}</p>
         </div>
       `;
-}
-
-export function swatchesHtml(colors, selectedColor) {
-  const list = Array.isArray(colors) && colors.length ? colors : [{ name: 'Tiêu chuẩn', hex: '#FFFFFF' }];
-  return list.map(c => `
-        <button
-          type="button"
-          title="${escapeHtml(c.name)}"
-          aria-label="Màu ${escapeHtml(c.name)}"
-          class="swatch-btn ${c.name === selectedColor ? 'active' : ''}"
-          style="background-color: ${safeColor(c.hex)};"
-          onclick="window.tienApp.selectModalColor(${jsArg(c.name)})"
-        ></button>
-      `).join('');
-}
-
-export function storageChipsHtml(storages, selectedStorage) {
-  const list = Array.isArray(storages) && storages.length ? storages : ['Chuẩn Zin'];
-  return list.map(s => `
-        <button
-          type="button"
-          class="storage-chip ${s === selectedStorage ? 'active' : ''}"
-          onclick="window.tienApp.selectModalStorage(${jsArg(s)})"
-        >
-          ${escapeHtml(s)}
-        </button>
-      `).join('');
 }
 
 export function cartItemHtml(item, index) {

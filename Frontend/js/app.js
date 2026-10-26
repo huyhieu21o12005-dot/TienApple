@@ -21,8 +21,6 @@ import { safeUrl, partitionProducts, escapeHtml } from './utils.js';
 import {
   productCardHtml,
   emptyCatalogHtml,
-  swatchesHtml,
-  storageChipsHtml,
   cartItemHtml,
   emptyCartHtml,
   warrantyResultsHtml,
@@ -315,9 +313,6 @@ class App {
     this.searchQuery = '';
     
     // Quick View state
-    this.selectedProduct = null;
-    this.selectedColor = null;
-    this.selectedStorage = null;
 
     this.init();
   }
@@ -333,10 +328,7 @@ class App {
         loaded = remoteProducts;
         remoteLoaded = true;
       } else {
-        let res = await fetch('data/products.json');
-        if (!res.ok) {
-          res = await fetch('../Data/products.json');
-        }
+        const res = await fetch('data/products.json');
         if (res.ok) {
           const json = await res.json();
           if (Array.isArray(json) && json.length > 0) loaded = json;
@@ -801,51 +793,7 @@ class App {
       });
     }
 
-    // 8. Quick View Modal Listeners
-    const closeQuickViewBtn = document.getElementById('close-quickview-btn');
-    if (closeQuickViewBtn) {
-      closeQuickViewBtn.addEventListener('click', () => this.closeProductModal());
-    }
-
-    const quickViewOverlay = document.getElementById('quickViewModal');
-    if (quickViewOverlay) {
-      quickViewOverlay.addEventListener('click', (e) => {
-        if (e.target === quickViewOverlay) this.closeProductModal();
-      });
-    }
-
-    // Modal Buy Now & Add To Cart
-    const modalBuyNowBtn = document.getElementById('modal-buy-now-btn');
-    if (modalBuyNowBtn) {
-      modalBuyNowBtn.addEventListener('click', () => {
-        if (this.selectedProduct) {
-          this.cart.addItem(this.selectedProduct, 1, this.selectedColor, this.selectedStorage);
-          this.updateCartBadge();
-          this.showToast(`Đã chọn mua "${this.selectedProduct.name}"!`);
-          this.closeProductModal();
-          this.openCartDrawer();
-          setTimeout(() => {
-            const custName = document.getElementById('cust-name');
-            if (custName) custName.focus();
-          }, 350);
-        }
-      });
-    }
-
-    const modalAddToCartBtn = document.getElementById('modal-add-to-cart-btn');
-    if (modalAddToCartBtn) {
-      modalAddToCartBtn.addEventListener('click', () => {
-        if (this.selectedProduct) {
-          this.cart.addItem(this.selectedProduct, 1, this.selectedColor, this.selectedStorage);
-          this.updateCartBadge();
-          this.showToast(`Đã thêm "${this.selectedProduct.name}" vào giỏ hàng!`);
-          this.closeProductModal();
-          this.openCartDrawer();
-        }
-      });
-    }
-
-    // 9. Chat Widget Toggle
+    // 8. Chat Widget Toggle
     const chatToggleBtn = document.getElementById('chat-toggle-btn');
     if (chatToggleBtn) {
       chatToggleBtn.addEventListener('click', () => this.toggleChat());
@@ -876,10 +824,9 @@ class App {
       });
     }
 
-    // 10. Global Escape Key Listener
+    // 9. Global Escape Key Listener
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        this.closeProductModal();
         this.closeBookingModal();
         this.closeCartDrawer();
         const chat = document.getElementById('chatPopover');
@@ -1273,75 +1220,6 @@ class App {
   openProductModalById(productId) {
     if (productId === undefined || productId === null || productId === '') return;
     window.location.href = `product.html?id=${encodeURIComponent(productId)}`;
-  }
-
-  /** Popup xem nhanh cũ, không còn dùng cho thẻ sản phẩm. */
-  openQuickViewModalById(productId) {
-    const product = this.findProduct(productId);
-    if (!product) return;
-
-    this.selectedProduct = product;
-    this.selectedColor = product.defaultColor || (product.colors && product.colors[0]?.name) || 'Tiêu chuẩn';
-    this.selectedStorage = product.storages ? product.storages[0] : 'Chuẩn Zin';
-
-    document.getElementById('modalProductTitle').innerText = product.name;
-    document.getElementById('modalProductPrice').innerText = CartManager.formatCurrency(product.price);
-    document.getElementById('modalProductOldPrice').innerText = product.oldPrice ? CartManager.formatCurrency(product.oldPrice) : '';
-    document.getElementById('modalProductImg').src = safeUrl(product.image);
-    document.getElementById('modalThumb1').src = safeUrl(product.image);
-
-    document.getElementById('modalSpecChip').innerText = product.chip || 'Chuẩn Apple';
-    document.getElementById('modalSpecCam').innerText = product.camera || 'Phụ kiện zin';
-    document.getElementById('modalSpecBattery').innerText = product.battery || 'Tối ưu hiệu năng';
-    document.getElementById('modalSpecScreen').innerText = product.screen || 'Chính hãng';
-
-    // Render Color Swatches
-    const swatchesContainer = document.getElementById('modal-swatches-container');
-    const colorLabel = document.getElementById('modalProductColor');
-    colorLabel.innerText = this.selectedColor;
-
-    if (swatchesContainer) {
-      swatchesContainer.innerHTML = swatchesHtml(product.colors, this.selectedColor);
-    }
-
-    // Render Storage Chips
-    const storageContainer = document.getElementById('modal-storage-container');
-    if (storageContainer) {
-      storageContainer.innerHTML = storageChipsHtml(product.storages, this.selectedStorage);
-    }
-
-    const modal = document.getElementById('quickViewModal');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    document.body.style.overflow = 'hidden';
-  }
-
-  selectModalColor(colorName) {
-    this.selectedColor = colorName;
-    document.getElementById('modalProductColor').innerText = colorName;
-    const btns = document.querySelectorAll('#modal-swatches-container .swatch-btn');
-    btns.forEach(b => {
-      if (b.title === colorName) b.classList.add('active');
-      else b.classList.remove('active');
-    });
-  }
-
-  selectModalStorage(storage) {
-    this.selectedStorage = storage;
-    const chips = document.querySelectorAll('#modal-storage-container .storage-chip');
-    chips.forEach(c => {
-      if (c.innerText.trim() === storage) c.classList.add('active');
-      else c.classList.remove('active');
-    });
-  }
-
-  closeProductModal() {
-    const modal = document.getElementById('quickViewModal');
-    if (modal) {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-      document.body.style.overflow = '';
-    }
   }
 
   // Cart Drawer

@@ -4,8 +4,6 @@ import {
   isOutOfStock,
   productCardHtml,
   emptyCatalogHtml,
-  swatchesHtml,
-  storageChipsHtml,
   cartItemHtml,
   emptyCartHtml
 } from '../../Frontend/js/templates.js';
@@ -85,26 +83,6 @@ describe('templates - dựng HTML an toàn', () => {
   it('emptyCatalogHtml và emptyCartHtml có thông báo rỗng', () => {
     assert.ok(emptyCatalogHtml().includes('Không tìm thấy thiết bị phù hợp'));
     assert.ok(emptyCartHtml().includes('Giỏ hàng của bạn đang trống'));
-  });
-
-  it('swatchesHtml đánh dấu màu đang chọn, chặn màu độc hại, có mặc định khi rỗng', () => {
-    const html = swatchesHtml([
-      { name: 'Đen', hex: '#000000' },
-      { name: evil, hex: 'red;background:url(//evil)' }
-    ], 'Đen');
-    assert.ok(html.includes('swatch-btn active'));
-    assert.ok(html.includes('background-color: #000000'));
-    assert.ok(html.includes('background-color: #FFFFFF'));
-    assert.ok(!html.includes('<img src=x'));
-    assert.ok(swatchesHtml([], '').includes('Tiêu chuẩn'));
-    assert.ok(swatchesHtml(undefined, '').includes('Tiêu chuẩn'));
-  });
-
-  it('storageChipsHtml đánh dấu dung lượng đang chọn và escape', () => {
-    const html = storageChipsHtml(['128GB', evil], '128GB');
-    assert.ok(html.includes('storage-chip active'));
-    assert.ok(!html.includes('<img src=x'));
-    assert.ok(storageChipsHtml(null, '').includes('Chuẩn Zin'));
   });
 
   it('cartItemHtml tính thành tiền theo số lượng và escape dữ liệu', () => {
