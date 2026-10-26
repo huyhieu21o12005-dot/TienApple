@@ -247,28 +247,19 @@
           </div>
         </div>
 
-        <!-- Quick Filter Bar -->
-        <div class="filter-bar flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
-          <!-- Nhóm pills thương hiệu -->
-          <div class="filter-head">
-            <div class="tag-scroller flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 min-w-0 flex-1" id="brandFilterPills">
+        <!-- Thanh lọc chung cho web và mobile: thẻ hãng + tìm kiếm / 3 thẻ chọn gọn + nút Lọc -->
+        <div class="catalog-bar">
+          <div class="catalog-top">
+            <div class="tag-scroller no-scrollbar catalog-brands" id="brandFilterPills">
               <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#1D1D1F] text-white transition-colors cursor-pointer shrink-0" data-brand="all">Tất cả</button>
             </div>
-            <button type="button" id="filterToggleBtn" class="filter-toggle" aria-expanded="false" aria-controls="filterPanel">
-              <span class="material-symbols-outlined text-[18px]" aria-hidden="true">tune</span>
-              <span>Lọc</span>
-              <span class="filter-badge" id="filterBadge" hidden>0</span>
-            </button>
-          </div>
-
-          <div class="filter-panel" id="filterPanel">
             <div class="search-field">
               <span class="material-symbols-outlined search-field-icon" aria-hidden="true">search</span>
               <input
                 type="search"
                 id="product-search-input"
                 class="search-field-input"
-                placeholder="Tìm máy, chip, dung lượng..."
+                placeholder="Tìm máy: 18, ip 17 pro max, 256..."
                 aria-label="Tìm kiếm điện thoại"
                 enterkeyhint="search"
                 autocomplete="off"
@@ -279,38 +270,49 @@
                 <span class="material-symbols-outlined" aria-hidden="true">close</span>
               </button>
             </div>
-            <div class="filter-chips">
-              <div class="filter-chip-label">Tình trạng</div>
-              <div class="filter-chip-row"><button type="button" class="filter-chip is-on" data-chip="condition" data-value="all" aria-pressed="true">Tất cả</button><button type="button" class="filter-chip" data-chip="condition" data-value="new" aria-pressed="false">Mới 100%</button><button type="button" class="filter-chip" data-chip="condition" data-value="likenew" aria-pressed="false">Like New</button></div>
-              <div class="filter-chip-label">Khoảng giá</div>
-              <div class="filter-chip-row"><button type="button" class="filter-chip is-on" data-chip="price" data-value="all" aria-pressed="true">Mọi giá</button><button type="button" class="filter-chip" data-chip="price" data-value="under15" aria-pressed="false">Dưới 15tr</button><button type="button" class="filter-chip" data-chip="price" data-value="15to25" aria-pressed="false">15–25tr</button><button type="button" class="filter-chip" data-chip="price" data-value="above25" aria-pressed="false">Trên 25tr</button></div>
-              <div class="filter-actions">
-                <button type="button" id="filterResetBtn" class="filter-reset">Xóa bộ lọc</button>
-                <button type="button" id="filterApplyBtn" class="filter-apply">Xem kết quả</button>
-              </div>
+          </div>
+
+          <div class="catalog-tags">
+            <div class="catalog-selects no-scrollbar">
+              <select id="filter-condition" aria-label="Tình trạng máy">
+                <option value="all">Mọi máy</option>
+                <option value="new">Mới 100%</option>
+                <option value="likenew">Like New</option>
+              </select>
+              <select id="filter-price" aria-label="Khoảng giá">
+                <option value="all">Mọi giá</option>
+                <option value="under15">Dưới 15tr</option>
+                <option value="15to25">15–25tr</option>
+                <option value="above25">Trên 25tr</option>
+              </select>
+              <select id="filter-sort" aria-label="Sắp xếp">
+                <option value="newest">Mới nhất</option>
+                <option value="price-asc">Giá thấp → cao</option>
+                <option value="price-desc">Giá cao → thấp</option>
+                <option value="rating">Đánh giá cao</option>
+              </select>
+            </div>
+            <button type="button" id="filterToggleBtn" class="filter-toggle" aria-expanded="false" aria-controls="filterPanel" aria-label="Bộ lọc chi tiết">
+              <span class="material-symbols-outlined" aria-hidden="true">tune</span>
+              <span class="filter-toggle-text">Lọc</span>
+              <span class="filter-badge" id="filterBadge" hidden>0</span>
+            </button>
+          </div>
+
+          <div class="filter-panel" id="filterPanel">
+            <div class="filter-chip-label">Tình trạng</div>
+            <div class="filter-chip-row"><button type="button" class="filter-chip is-on" data-chip="condition" data-value="all" aria-pressed="true">Tất cả</button><button type="button" class="filter-chip" data-chip="condition" data-value="new" aria-pressed="false">Mới 100%</button><button type="button" class="filter-chip" data-chip="condition" data-value="likenew" aria-pressed="false">Like New</button></div>
+            <div class="filter-chip-label">Khoảng giá</div>
+            <div class="filter-chip-row"><button type="button" class="filter-chip is-on" data-chip="price" data-value="all" aria-pressed="true">Mọi giá</button><button type="button" class="filter-chip" data-chip="price" data-value="under15" aria-pressed="false">Dưới 15tr</button><button type="button" class="filter-chip" data-chip="price" data-value="15to25" aria-pressed="false">15–25tr</button><button type="button" class="filter-chip" data-chip="price" data-value="above25" aria-pressed="false">Trên 25tr</button></div>
+            <div class="filter-chip-label">Dung lượng</div>
+            <div class="filter-chip-row" id="storageChips"></div>
+            <div class="filter-chip-label">Sắp xếp</div>
+            <div class="filter-chip-row"><button type="button" class="filter-chip is-on" data-chip="sort" data-value="newest" aria-pressed="true">Mới nhất</button><button type="button" class="filter-chip" data-chip="sort" data-value="price-asc" aria-pressed="false">Giá thấp → cao</button><button type="button" class="filter-chip" data-chip="sort" data-value="price-desc" aria-pressed="false">Giá cao → thấp</button><button type="button" class="filter-chip" data-chip="sort" data-value="rating" aria-pressed="false">Đánh giá cao</button></div>
+            <div class="filter-actions">
+              <button type="button" id="filterResetBtn" class="filter-reset">Xóa bộ lọc</button>
+              <button type="button" id="filterApplyBtn" class="filter-apply">Xem kết quả</button>
             </div>
           </div>
-        </div>
-
-        <!-- Ngoài trang: chỉ giữ khoảng giá và sắp xếp (nhãn ngắn); tình trạng chọn trong nút Lọc ở mobile -->
-        <div class="filter-selects">
-          <select id="filter-condition" class="filter-select-condition w-full">
-            <option value="all">Mọi tình trạng</option>
-            <option value="new">Mới 100%</option>
-            <option value="likenew">Like New</option>
-          </select>
-          <select id="filter-price" class="w-full">
-            <option value="all">Mọi giá</option>
-            <option value="under15">Dưới 15tr</option>
-            <option value="15to25">15–25tr</option>
-            <option value="above25">Trên 25tr</option>
-          </select>
-          <select id="filter-sort" class="w-full">
-            <option value="newest">Mới nhất</option>
-            <option value="price-asc">Giá thấp → cao</option>
-            <option value="price-desc">Giá cao → thấp</option>
-            <option value="rating">Đánh giá cao</option>
-          </select>
         </div>
 
         <!-- Product Grid: 5 Cột trên Desktop, 2 Cột trên Mobile -->

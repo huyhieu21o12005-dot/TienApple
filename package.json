@@ -8,7 +8,7 @@
     "test": "node --test Tests/**/*.test.js",
     "test:unit": "node --test Tests/unit/*.test.js",
     "test:integration": "node --test Tests/integration/*.test.js",
-    "coverage": "node --test --experimental-test-coverage --test-coverage-lines=90 --test-coverage-branches=90 --test-coverage-functions=90 --test-coverage-include='Frontend/js/{store,utils,templates,productsApi,ordersApi,warranty,warrantyApi,tradeIn,installment,installmentApi,zalo,customSelect,config,waterRipples,lazyScripts}.js' --test-coverage-include='api/_og.js' --test-coverage-include='Frontend/admin/{adminHelpers,ordersHelpers,invoiceHelpers,cashflowHelpers,sheetPricing,modelImages,bulkSelect,pricing,accessorySheet,syncPlan,imageLibrary,buybackContract}.js' Tests/unit/*.test.js Tests/integration/*.test.js",
+    "coverage": "node --test --experimental-test-coverage --test-coverage-lines=90 --test-coverage-branches=90 --test-coverage-functions=90 --test-coverage-include='Frontend/js/{store,searchMatch,utils,templates,productsApi,ordersApi,warranty,warrantyApi,tradeIn,installment,installmentApi,zalo,customSelect,config,waterRipples,lazyScripts}.js' --test-coverage-include='api/_og.js' --test-coverage-include='Frontend/admin/{adminHelpers,ordersHelpers,invoiceHelpers,cashflowHelpers,sheetPricing,modelImages,bulkSelect,pricing,accessorySheet,syncPlan,imageLibrary,buybackContract}.js' Tests/unit/*.test.js Tests/integration/*.test.js",
     "build:css": "tailwindcss -c tailwind.config.cjs -i Frontend/css/tailwind.src.css -o Frontend/css/tailwind.css --minify"
   },
   "keywords": [

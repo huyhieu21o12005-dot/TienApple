@@ -118,19 +118,6 @@ describe('mobile: menu iPhone/iPad, bộ lọc một nút, tiêu đề hóa đơ
     assert.match(js, /chip\('acc', 'tablet', 'iPad'\)/);
     assert.match(idx, /id="mobileMenuPanel"[^>]*\btop-0\b/);
   });
-  it('nút Lọc mở phần tìm kiếm và thẻ chọn nhanh; ngoài trang chỉ giữ ô khoảng giá và sắp xếp với nhãn ngắn', () => {
-    assert.match(idx, /id="filterToggleBtn"[^>]*aria-expanded="false"[^>]*aria-controls="filterPanel"/);
-    const panel = idx.slice(idx.indexOf('id="filterPanel"'), idx.indexOf('class="filter-selects"'));
-    assert.match(panel, /id="product-search-input"/);
-    assert.match(panel, /data-chip="condition"[^>]*data-value="new"/);
-    assert.match(panel, /data-chip="price"[^>]*data-value="under15"/);
-    const outside = idx.slice(idx.indexOf('class="filter-selects"'), idx.indexOf('id="productGrid"'));
-    for (const id of ['filter-condition', 'filter-price', 'filter-sort']) assert.match(outside, new RegExp(`id="${id}"`), id);
-    assert.match(outside, /filter-select-condition/);
-    assert.doesNotMatch(outside, /Tình trạng: |Khoảng giá: |Sắp xếp: /);
-    assert.match(js, /filterToggleBtn/);
-    assert.match(js, /data-chip/);
-  });
   it('tiêu đề hóa đơn và giấy tờ: logo web bên trái, điện thoại và liên hệ bên phải', async () => {
     for (const f of ['print.html', 'buyback.html']) {
       const html = read(`Frontend/admin/${f}`);
@@ -144,31 +131,39 @@ describe('mobile: menu iPhone/iPad, bộ lọc một nút, tiêu đề hóa đơ
   });
 });
 
-describe('thanh tìm kiếm và bộ lọc tinh gọn, đồng bộ phong cách web (mobile trước)', () => {
+describe('thanh tìm kiếm và bộ lọc: một bố cục chung cho web và mobile', () => {
   const idx = read('Frontend/index.html');
   const css = read('Frontend/css/style.css');
   const js = read('Frontend/js/app.js');
-  it('ô tìm kiếm: type=search, bàn phím có nút Tìm, nhãn đọc màn hình, nút xóa chữ', () => {
-    assert.match(idx, /class="search-field"/);
-    assert.match(idx, /<input[^>]*id="product-search-input"[^>]*type="search"|<input[^>]*type="search"[^>]*id="product-search-input"/);
-    assert.match(idx, /id="product-search-input"[\s\S]{0,300}enterkeyhint="search"/);
-    assert.match(idx, /id="product-search-input"[\s\S]{0,300}aria-label="/);
-    assert.match(idx, /id="productSearchClear"[^>]*aria-label="Xóa/);
+  const bar = idx.slice(idx.indexOf('class="catalog-bar"'), idx.indexOf('id="productGrid"'));
+  it('thanh gồm: thẻ hãng, ô tìm kiếm, 3 thẻ chọn gọn và nút Lọc ở góc phải hàng thẻ', () => {
+    assert.ok(bar.length > 100, 'thiếu .catalog-bar');
+    const order = ['id="brandFilterPills"', 'class="search-field"', 'id="filter-condition"', 'id="filter-price"', 'id="filter-sort"', 'id="filterToggleBtn"'].map(k => bar.indexOf(k));
+    assert.ok(order.every(i => i >= 0), String(order));
+    assert.deepEqual([...order].sort((a, b) => a - b), order);
+    assert.match(bar, /class="catalog-tags"[\s\S]*id="filterToggleBtn"/);
+  });
+  it('ô tìm kiếm: type=search, nút Tìm trên bàn phím, nhãn đọc màn hình, nút xóa chữ', () => {
+    assert.match(bar, /<input[\s\S]*?type="search"[\s\S]*?id="product-search-input"|<input[\s\S]*?id="product-search-input"[\s\S]*?type="search"/);
+    assert.match(bar, /enterkeyhint="search"/);
+    assert.match(bar, /id="product-search-input"[\s\S]{0,400}aria-label="/);
+    assert.match(bar, /id="productSearchClear"[^>]*aria-label="Xóa/);
     assert.match(js, /productSearchClear/);
   });
-  it('trong nút Lọc có Xóa bộ lọc và nút Xem kết quả; thẻ chọn báo trạng thái bằng aria-pressed', () => {
-    const panel = idx.slice(idx.indexOf('id="filterPanel"'), idx.indexOf('class="filter-selects"'));
-    assert.match(panel, /id="filterResetBtn"/);
-    assert.match(panel, /id="filterApplyBtn"/);
+  it('bộ lọc chi tiết trong nút Lọc: tình trạng, khoảng giá, dung lượng, sắp xếp, Xóa bộ lọc, Xem kết quả', () => {
+    const panel = bar.slice(bar.indexOf('id="filterPanel"'));
+    for (const k of ['data-chip="condition"', 'data-chip="price"', 'data-chip="sort"', 'id="storageChips"', 'id="filterResetBtn"', 'id="filterApplyBtn"']) assert.ok(panel.includes(k), k);
     assert.match(panel, /data-chip="price"[^>]*aria-pressed=/);
     assert.match(js, /aria-pressed/);
-    assert.match(js, /filterResetBtn/);
+    assert.match(js, /activeStorage/);
   });
-  it('kiểu dáng: cùng một chiều cao 44px trên mobile, bo tròn như thẻ hãng, có viền focus rõ', () => {
+  it('ô tìm kiếm có viền đen rõ; thẻ chọn gọn (không kéo dài hết hàng); nút Lọc có viền đen', () => {
+    assert.match(css, /\.search-field\s*\{[^}]*border:\s*1\.5px solid #1D1D1F/);
     assert.match(css, /\.search-field\s*\{[^}]*border-radius:\s*9999px/);
+    assert.match(css, /\.catalog-tags \.cs\s*\{[^}]*width:\s*auto/);
+    assert.match(css, /\.filter-toggle\s*\{[^}]*border:\s*1\.5px solid #1D1D1F/);
     assert.match(css, /\.search-field:focus-within/);
     assert.match(css, /\.filter-chip:focus-visible/);
-    assert.match(css, /\.filter-toggle:focus-visible/);
     for (const sel of ['filter-toggle', 'search-field', 'filter-apply\\b[^{]*', 'filter-reset']) assert.match(css, new RegExp(`\\.${sel}[^{]*\\{[^}]*min-height:\\s*44px`), sel);
   });
   it('nút gọi/Zalo nổi không che nút "Xem kết quả" khi bảng Lọc đang mở', () => {
@@ -176,9 +171,9 @@ describe('thanh tìm kiếm và bộ lọc tinh gọn, đồng bộ phong cách 
     assert.match(css, /body\.filter-open #floatingContact\s*\{[^}]*display:\s*none/);
     assert.match(js, /classList\.toggle\('filter-open'/);
   });
-  it('cũ: không còn ô tìm kiếm dựng bằng lớp Tailwind rời rạc', () => {
-    assert.doesNotMatch(idx, /id="product-search-input"[^>]*class="w-full h-10 pl-9/);
-    assert.doesNotMatch(idx, /absolute left-3 top-2\.5 text-\[18px\] text-\[#6E6E73\]">search/);
+  it('không còn mã và kiểu của bố cục cũ', () => {
+    assert.doesNotMatch(idx, /class="filter-selects"|class="filter-head"|class="filter-bar/);
+    assert.doesNotMatch(css, /\.filter-selects|\.filter-head|\.filter-select-condition/);
   });
 });
 
@@ -209,5 +204,16 @@ describe('không còn thư mục rỗng và tệp tạm của công cụ', () =>
     for (const d of ['Backend', 'Config', 'Control', 'Scripts', 'Upload']) assert.equal(exists(d), false, d);
     assert.equal(exists('supabase/.temp/cli-latest') && /supabase\/\.temp/.test(read('.gitignore')) === false, false);
     assert.match(read('.gitignore'), /supabase\/\.temp/);
+  });
+});
+
+describe('mobile: 3 thẻ chọn và nút Lọc vừa một hàng 375px', () => {
+  const idx = read('Frontend/index.html');
+  const css = read('Frontend/css/style.css');
+  it('nhãn thẻ ngắn, nút Lọc có aria-label và thu thành biểu tượng khi màn hình hẹp', () => {
+    assert.match(idx, /<option value="all">Mọi máy<\/option>/);
+    assert.match(idx, /id="filterToggleBtn"[^>]*aria-label="Bộ lọc chi tiết"/);
+    assert.match(css, /@media \(max-width: 479px\)[\s\S]*\.filter-toggle-text\s*\{[^}]*display:\s*none/);
+    assert.match(idx, /class="filter-toggle-text"/);
   });
 });

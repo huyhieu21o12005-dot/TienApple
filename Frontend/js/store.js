@@ -3,6 +3,8 @@
  * Architecture: Clean State Management & TDD Verified
  */
 
+import { matchesQuery } from './searchMatch.js';
+
 export class CartManager {
   constructor(initialItems = []) {
     this.items = [...initialItems];
@@ -191,8 +193,8 @@ export class CartManager {
 
 export class ProductFilter {
   /** Số bộ lọc đang khác mặc định (tình trạng, khoảng giá, sắp xếp, từ khóa) để hiện trên nút Lọc. */
-  static activeFilterCount({ condition = 'all', price = 'all', sort = 'newest', search = '' } = {}) {
-    return [condition !== 'all', price !== 'all', sort !== 'newest', String(search).trim() !== ''].filter(Boolean).length;
+  static activeFilterCount({ condition = 'all', price = 'all', sort = 'newest', storage = 'all', search = '' } = {}) {
+    return [condition !== 'all', price !== 'all', sort !== 'newest', storage !== 'all', String(search).trim() !== ''].filter(Boolean).length;
   }
 
   static filterByBrand(products, brand) {
@@ -241,16 +243,24 @@ export class ProductFilter {
   }
 
   static searchProducts(products, query) {
-    if (!query || !query.trim()) {
-      return [...products];
-    }
-    const q = query.trim().toLowerCase();
-    return products.filter(p =>
-      (p.name && p.name.toLowerCase().includes(q)) ||
-      (p.description && p.description.toLowerCase().includes(q)) ||
-      (p.chip && p.chip.toLowerCase().includes(q)) ||
-      (p.brandName && p.brandName.toLowerCase().includes(q))
-    );
+    return products.filter(p => matchesQuery(p, query));
+  }
+
+  /** Dung lượng ghi trong tên máy ("256GB", "1 TB") về dạng "256GB"; không ghi thì rỗng. */
+  static storageOf(product) {
+    const m = /(\d+)\s*(gb|tb)/i.exec(product?.name || '');
+    return m ? `${Number(m[1])}${m[2].toUpperCase()}` : '';
+  }
+
+  /** Các dung lượng có thật trong danh sách, xếp từ nhỏ đến lớn. */
+  static storageOptions(products) {
+    const size = (v) => parseInt(v, 10) * (v.endsWith('TB') ? 1024 : 1);
+    return [...new Set(products.map(p => ProductFilter.storageOf(p)).filter(Boolean))].sort((a, b) => size(a) - size(b));
+  }
+
+  static filterByStorage(products, storage) {
+    if (!storage || storage === 'all') return [...products];
+    return products.filter(p => ProductFilter.storageOf(p) === storage);
   }
 }
 

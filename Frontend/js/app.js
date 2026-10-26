@@ -17,6 +17,7 @@ import { calcInstallment, INSTALLMENT_REFERENCE_RATE } from './installment.js';
 const ACCESSORY_LABELS = { charger: 'Sạc & Cáp', audio: 'Tai nghe', case: 'Cường lực & Ốp lưng', tablet: 'iPad', watch: 'Đồng hồ', other: 'Phụ kiện khác' };
 import { validateZaloOffer, buildZaloMessage, buildOfferBooking, ZALO_URL } from './zalo.js';
 import { enhanceSelects } from './customSelect.js';
+import { matchesQuery, foldText } from './searchMatch.js';
 import { safeUrl, partitionProducts, escapeHtml } from './utils.js';
 import {
   productCardHtml,
@@ -310,6 +311,7 @@ class App {
     this.activeCondition = 'all';
     this.activePrice = 'all';
     this.activeSort = 'newest';
+    this.activeStorage = 'all';
     this.searchQuery = '';
     
     // Quick View state
@@ -591,7 +593,6 @@ class App {
     if (!overlay || !input || !results || !openBtn) return;
     let list = [];
     let active = -1;
-    const norm = (s) => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase();
     const setOpen = (open) => {
       if (open) {
         overlay.hidden = false;
@@ -608,10 +609,9 @@ class App {
       results.querySelectorAll('.search-item').forEach((el, i) => el.classList.toggle('is-active', i === active));
     };
     const render = () => {
-      const tokens = norm(input.value).split(/\s+/).filter(Boolean);
-      if (!tokens.length) { results.innerHTML = ''; list = []; return; }
+      if (!foldText(input.value).trim()) { results.innerHTML = ''; list = []; return; }
       const all = [...this.products, ...this.accessories];
-      list = all.filter(p => { const hay = norm(`${p.name} ${p.brandName || ''} ${p.chip || ''}`); return tokens.every(t => hay.includes(t)); }).slice(0, 8);
+      list = all.filter(p => matchesQuery(p, input.value)).slice(0, 8);
       active = list.length ? 0 : -1;
       results.innerHTML = list.length
         ? list.map((p, i) => `<button type="button" class="search-item" role="option" data-i="${i}">${p.image ? `<img src="${escapeHtml(safeUrl(p.image))}" alt="" loading="lazy" decoding="async">` : ''}<span class="si-name">${escapeHtml(p.name)}</span><span class="si-price">${CartManager.formatCurrency(Number(p.price) || 0)}</span></button>`).join('')
@@ -710,23 +710,26 @@ class App {
       });
     }
 
-    // 2.5. Nút Lọc (mobile): mở/đóng phần tìm kiếm và 3 ô chọn
+    // 2.5. Nút Lọc: mở/đóng bộ lọc chi tiết (bấm ra ngoài hoặc Esc cũng đóng)
     const filterBtn = document.getElementById('filterToggleBtn');
     const filterPanel = document.getElementById('filterPanel');
-    if (filterBtn && filterPanel) {
-      filterBtn.addEventListener('click', () => {
-        const open = filterPanel.classList.toggle('is-open');
-        filterBtn.setAttribute('aria-expanded', String(open));
-        document.body.classList.toggle('filter-open', open);
-      });
-    }
+    const setFilterOpen = (open) => {
+      filterPanel?.classList.toggle('is-open', open);
+      filterBtn?.setAttribute('aria-expanded', String(open));
+      document.body.classList.toggle('filter-open', open);
+    };
+    filterBtn?.addEventListener('click', () => setFilterOpen(!filterPanel.classList.contains('is-open')));
+    document.addEventListener('click', (e) => {
+      if (filterPanel?.classList.contains('is-open') && !e.target.closest('#filterPanel, #filterToggleBtn')) setFilterOpen(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && filterPanel?.classList.contains('is-open')) { setFilterOpen(false); filterBtn.focus(); }
+    });
 
-    // 2.6. Thẻ chọn nhanh trong nút Lọc: đặt giá trị cho ô chọn tương ứng rồi dùng lại luồng "change"
-    document.getElementById('filterPanel')?.addEventListener('click', (e) => {
+    // 2.6. Thẻ chọn trong bộ lọc chi tiết: đồng bộ với ô chọn ngoài trang (tình trạng, giá, sắp xếp) và dung lượng
+    filterPanel?.addEventListener('click', (e) => {
       if (e.target.closest('#filterApplyBtn')) {
-        filterPanel.classList.remove('is-open');
-        filterBtn?.setAttribute('aria-expanded', 'false');
-        document.body.classList.toggle('filter-open', false);
+        setFilterOpen(false);
         document.getElementById('productGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         return;
       }
@@ -736,6 +739,11 @@ class App {
       }
       const chip = e.target.closest('[data-chip]');
       if (!chip) return;
+      if (chip.dataset.chip === 'storage') {
+        this.activeStorage = chip.dataset.value;
+        this.renderProducts();
+        return;
+      }
       const select = document.getElementById(`filter-${chip.dataset.chip}`);
       if (!select) return;
       select.value = chip.dataset.value;
@@ -1141,6 +1149,7 @@ class App {
     if (!box) return;
     let pool = ProductFilter.filterByCondition([...this.products], this.activeCondition);
     pool = ProductFilter.filterByPriceRange(pool, this.activePrice);
+    pool = ProductFilter.filterByStorage(pool, this.activeStorage);
     if (this.searchQuery) pool = ProductFilter.searchProducts(pool, this.searchQuery);
 
     const brands = new Map();
@@ -1163,11 +1172,23 @@ class App {
     box.innerHTML = btn('all', 'Tất cả', pool.length) + list.map(b => btn(b.key, b.label, b.count)).join('');
   }
 
-  /** Đưa tình trạng, khoảng giá, sắp xếp và ô tìm kiếm về mặc định (nút "Xóa bộ lọc"). */
+  /** Dựng thẻ dung lượng theo máy đang bán (chỉ khi danh sách dung lượng đổi). */
+  renderStorageChips() {
+    const box = document.getElementById('storageChips');
+    if (!box) return;
+    const options = ProductFilter.storageOptions(this.products);
+    const key = options.join('|');
+    if (box.dataset.key === key) return;
+    box.dataset.key = key;
+    box.innerHTML = ['all', ...options].map(v => `<button type="button" class="filter-chip" data-chip="storage" data-value="${escapeHtml(v)}" aria-pressed="false">${v === 'all' ? 'Mọi dung lượng' : escapeHtml(v)}</button>`).join('');
+  }
+
+  /** Đưa tình trạng, khoảng giá, dung lượng, sắp xếp và ô tìm kiếm về mặc định (nút "Xóa bộ lọc"). */
   resetFilters() {
     this.activeCondition = 'all';
     this.activePrice = 'all';
     this.activeSort = 'newest';
+    this.activeStorage = 'all';
     this.searchQuery = '';
     const search = document.getElementById('product-search-input');
     if (search) search.value = '';
@@ -1184,13 +1205,14 @@ class App {
     this.renderBrandTags();
     const badge = document.getElementById('filterBadge');
     if (badge) {
-      const n = ProductFilter.activeFilterCount?.({ condition: this.activeCondition, price: this.activePrice, sort: this.activeSort, search: this.searchQuery }) ?? 0;
+      const n = ProductFilter.activeFilterCount?.({ condition: this.activeCondition, price: this.activePrice, sort: this.activeSort, storage: this.activeStorage, search: this.searchQuery }) ?? 0;
       badge.textContent = String(n);
       badge.hidden = n === 0;
     }
+    this.renderStorageChips();
+    const current = { condition: this.activeCondition, price: this.activePrice, sort: this.activeSort, storage: this.activeStorage };
     document.querySelectorAll('#filterPanel [data-chip]').forEach(c => {
-      const current = c.dataset.chip === 'condition' ? this.activeCondition : this.activePrice;
-      const on = c.dataset.value === (current || 'all');
+      const on = c.dataset.value === (current[c.dataset.chip] || 'all');
       c.classList.toggle('is-on', on);
       c.setAttribute('aria-pressed', String(on));
     });
@@ -1207,6 +1229,9 @@ class App {
 
     // Filter by Price Range
     filtered = ProductFilter.filterByPriceRange(filtered, this.activePrice);
+
+    // Filter by Storage
+    filtered = ProductFilter.filterByStorage(filtered, this.activeStorage);
 
     // Search Query
     if (this.searchQuery) {
