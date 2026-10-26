@@ -76,7 +76,7 @@ describe('không dùng logo quả táo của Apple (tránh vi phạm bản quy�
     assert.doesNotMatch(read('Frontend/css/style.css'), /apple-bg-watermark|apple-watermark-svg/);
     assert.doesNotMatch(read('Frontend/js/app.js'), /appleBgWatermark|appleWatermark/);
   });
-  it('logo.svg là chữ TM tự thiết kế, không có hình quả táo', () => {
+  it('logo.svg là biểu tượng điện thoại tự thiết kế, không có hình quả táo', () => {
     assert.doesNotMatch(read('Frontend/assets/logo.svg'), APPLE_GLYPH);
     assert.match(read('Frontend/assets/logo.svg'), /Tien Mobile Thu Duc/);
   });
