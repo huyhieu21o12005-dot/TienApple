@@ -66,7 +66,8 @@ describe('invoice - buildInvoice', () => {
 describe('invoice - invoiceHtml', () => {
   it('escape dữ liệu khách và hiện thông tin cửa hàng', () => {
     const html = invoiceHtml(buildInvoice('order', order));
-    assert.match(html, /TIEN MOBILE/);
+    assert.match(html, /Tien Mobile/);
+    assert.match(html, /shop-contact[\s\S]*Hotline/);
     assert.match(html, /DH1001/);
     assert.match(html, /An &lt;b&gt;/);
     assert.doesNotMatch(html, /An <b>/);

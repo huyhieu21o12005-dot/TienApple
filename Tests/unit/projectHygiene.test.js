@@ -118,20 +118,28 @@ describe('mobile: menu iPhone/iPad, bộ lọc một nút, tiêu đề hóa đơ
     assert.match(js, /chip\('acc', 'tablet', 'iPad'\)/);
     assert.match(idx, /id="mobileMenuPanel"[^>]*\btop-0\b/);
   });
-  it('bộ lọc gom sau một nút Lọc bên phải hàng thẻ hãng, ô tìm kiếm và 3 ô chọn nằm trong phần thu gọn', () => {
+  it('nút Lọc mở phần tìm kiếm và thẻ chọn nhanh; ngoài trang chỉ giữ ô khoảng giá và sắp xếp với nhãn ngắn', () => {
     assert.match(idx, /id="filterToggleBtn"[^>]*aria-expanded="false"[^>]*aria-controls="filterPanel"/);
-    assert.match(idx, /id="filterPanel"/);
-    const panel = idx.slice(idx.indexOf('id="filterPanel"'), idx.indexOf('id="productGrid"'));
-    for (const id of ['product-search-input', 'filter-condition', 'filter-price', 'filter-sort']) assert.match(panel, new RegExp(`id="${id}"`), id);
+    const panel = idx.slice(idx.indexOf('id="filterPanel"'), idx.indexOf('class="filter-selects"'));
+    assert.match(panel, /id="product-search-input"/);
+    assert.match(panel, /data-chip="condition"[^>]*data-value="new"/);
+    assert.match(panel, /data-chip="price"[^>]*data-value="under15"/);
+    const outside = idx.slice(idx.indexOf('class="filter-selects"'), idx.indexOf('id="productGrid"'));
+    for (const id of ['filter-condition', 'filter-price', 'filter-sort']) assert.match(outside, new RegExp(`id="${id}"`), id);
+    assert.match(outside, /filter-select-condition/);
+    assert.doesNotMatch(outside, /Tình trạng: |Khoảng giá: |Sắp xếp: /);
     assert.match(js, /filterToggleBtn/);
+    assert.match(js, /data-chip/);
   });
-  it('tiêu đề hóa đơn và giấy tờ: logo và tên quán căn trái, không lặp tên quán', async () => {
+  it('tiêu đề hóa đơn và giấy tờ: logo web bên trái, điện thoại và liên hệ bên phải', async () => {
     for (const f of ['print.html', 'buyback.html']) {
       const html = read(`Frontend/admin/${f}`);
-      assert.match(html, /\.inv-head \{ text-align: left;/, f);
-      assert.match(html, /\.brand-mark \{[^}]*justify-content: flex-start/, f);
+      assert.match(html, /\.shop-head \{[^}]*display: flex;[^}]*justify-content: space-between/, f);
+      assert.match(html, /\.shop-contact \{[^}]*text-align: right/, f);
     }
-    const { invoiceHtml, buildInvoice } = await import('../../Frontend/admin/invoiceHelpers.js');
-    assert.doesNotMatch(invoiceHtml(buildInvoice('order', { items: [] })), /class="inv-shop"/);
+    const { invoiceHtml, buildInvoice, brandMarkHtml } = await import('../../Frontend/admin/invoiceHelpers.js');
+    const html = invoiceHtml(buildInvoice('order', { items: [] }));
+    assert.match(html, /class="shop-head"[\s\S]*class="brand-mark"[\s\S]*class="shop-contact"/);
+    assert.match(brandMarkHtml(), /Tien Mobile[\s\S]*Thu Duc/);
   });
 });

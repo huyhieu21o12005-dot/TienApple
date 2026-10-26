@@ -262,8 +262,7 @@
           </div>
 
           <div class="filter-panel" id="filterPanel">
-          <!-- Ô tìm kiếm trực tiếp -->
-          <div class="relative w-full lg:w-72">
+            <div class="relative w-full lg:w-72">
             <span class="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-[#6E6E73]">search</span>
             <input 
               type="text" 
@@ -272,30 +271,34 @@
               class="w-full h-10 pl-9 pr-4 bg-[#F5F5F7] rounded-full text-[13px] text-[#1D1D1F] border-0 focus:ring-1 focus:ring-[#1D1D1F] outline-none" 
             />
           </div>
-
-        <!-- Nhóm dropdowns lọc chi tiết -->
-        <div class="filter-selects">
-          <select id="filter-condition" class="w-full bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
-            <option value="all">Tình trạng: Tất cả máy</option>
-            <option value="new">Mới 100% Nguyên Seal</option>
-            <option value="likenew">Like New 99% Keng</option>
-          </select>
-
-          <select id="filter-price" class="w-full bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
-            <option value="all">Khoảng giá: Tất cả mức giá</option>
-            <option value="under15">Dưới 15 triệu</option>
-            <option value="15to25">15 - 25 triệu</option>
-            <option value="above25">Trên 25 triệu</option>
-          </select>
-
-          <select id="filter-sort" class="w-full bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
-            <option value="newest">Sắp xếp: Mới nhất</option>
-            <option value="price-asc">Giá: Thấp đến cao</option>
-            <option value="price-desc">Giá: Cao đến thấp</option>
-            <option value="rating">Đánh giá cao nhất</option>
-          </select>
-        </div>
+            <div class="filter-chips">
+              <div class="filter-chip-label">Tình trạng</div>
+              <div class="filter-chip-row"><button type="button" class="filter-chip is-on" data-chip="condition" data-value="all">Tất cả</button><button type="button" class="filter-chip" data-chip="condition" data-value="new">Mới 100%</button><button type="button" class="filter-chip" data-chip="condition" data-value="likenew">Like New</button></div>
+              <div class="filter-chip-label">Khoảng giá</div>
+              <div class="filter-chip-row"><button type="button" class="filter-chip is-on" data-chip="price" data-value="all">Mọi giá</button><button type="button" class="filter-chip" data-chip="price" data-value="under15">Dưới 15tr</button><button type="button" class="filter-chip" data-chip="price" data-value="15to25">15–25tr</button><button type="button" class="filter-chip" data-chip="price" data-value="above25">Trên 25tr</button></div>
+            </div>
           </div>
+        </div>
+
+        <!-- Ngoài trang: chỉ giữ khoảng giá và sắp xếp (nhãn ngắn); tình trạng chọn trong nút Lọc ở mobile -->
+        <div class="filter-selects">
+          <select id="filter-condition" class="filter-select-condition w-full">
+            <option value="all">Mọi tình trạng</option>
+            <option value="new">Mới 100%</option>
+            <option value="likenew">Like New</option>
+          </select>
+          <select id="filter-price" class="w-full">
+            <option value="all">Mọi giá</option>
+            <option value="under15">Dưới 15tr</option>
+            <option value="15to25">15–25tr</option>
+            <option value="above25">Trên 25tr</option>
+          </select>
+          <select id="filter-sort" class="w-full">
+            <option value="newest">Mới nhất</option>
+            <option value="price-asc">Giá thấp → cao</option>
+            <option value="price-desc">Giá cao → thấp</option>
+            <option value="rating">Đánh giá cao</option>
+          </select>
         </div>
 
         <!-- Product Grid: 5 Cột trên Desktop, 2 Cột trên Mobile -->

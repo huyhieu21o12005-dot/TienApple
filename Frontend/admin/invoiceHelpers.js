@@ -11,7 +11,20 @@ import { installmentStatusLabel, nextDueDate, parseMoney, parseRate } from '../j
 
 /** Logo cửa hàng (giống thanh đầu web) vẽ bằng SVG để in luôn có hình, không phụ thuộc tải ảnh. */
 export function brandMarkHtml() {
-  return `<div class="brand-mark"><svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="18" y="6" width="28" height="52" rx="8" fill="none" stroke="#1D1D1F" stroke-width="5"/></svg><span class="brand-mark-t"><b>${escapeHtml(SHOP.name)}</b></span></div>`;
+  return `<div class="brand-mark"><svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="18" y="6" width="28" height="52" rx="8" fill="none" stroke="#1D1D1F" stroke-width="5"/></svg><span class="brand-mark-t"><b>Tien Mobile</b><i>Thu Duc</i></span></div>`;
+}
+
+/** Đầu giấy tờ: logo như trên web ở bên trái, tên quán/điện thoại/liên hệ ở bên phải như hóa đơn cửa hàng. */
+export function shopHeadHtml() {
+  return `<div class="shop-head">
+    ${brandMarkHtml()}
+    <div class="shop-contact">
+      <div>${escapeHtml(SHOP.tagline)}</div>
+      ${SHOP.address ? `<div>${escapeHtml(SHOP.address)}</div>` : ''}
+      <div>Hotline: ${escapeHtml(SHOP.hotline)}</div>
+      <div>${escapeHtml(SHOP.website)} · ${escapeHtml(SHOP.hours)}</div>
+    </div>
+  </div>`;
 }
 
 export const SHOP = {
@@ -204,11 +217,7 @@ export function invoiceHtml(inv) {
 
   return `
   <div class="inv-head">
-    ${brandMarkHtml()}
-    <div class="inv-small">${escapeHtml(SHOP.tagline)}</div>
-    ${SHOP.address ? `<div class="inv-small">${escapeHtml(SHOP.address)}</div>` : ''}
-    <div class="inv-small">Hotline: ${escapeHtml(SHOP.hotline)}</div>
-    <div class="inv-small">${escapeHtml(SHOP.website)} · ${escapeHtml(SHOP.hours)}</div>
+    ${shopHeadHtml()}
   </div>
   <div class="inv-title">${escapeHtml(inv.title)}</div>
   <div class="inv-block">
@@ -372,7 +381,7 @@ export function contractHtml(c) {
   }).join('');
   const sign = c.signatures.map(t => `<div class="ct-sign"><span>${escapeHtml(t)}</span></div>`).join('');
   return `
-  ${brandMarkHtml()}
+  ${shopHeadHtml()}
   <div class="ct-nation"><div>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div><div>Độc lập - Tự do - Hạnh phúc</div></div>
   <div class="ct-title">${escapeHtml(c.title)}</div>
   <div class="ct-meta">${escapeHtml(c.number)}</div>

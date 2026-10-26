@@ -683,20 +683,29 @@ img.tm-zoom { mix-blend-mode: normal !important; }
   width: 100%; background: #F5F5F7; font-size: 13px; font-weight: 500; color: #1D1D1F; border: 0;
   border-radius: 12px; padding: 10px 16px; cursor: pointer; outline: none;
 }
+.filter-chips { display: none; }
+.filter-chip-label { margin: 12px 0 6px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #6E6E73; }
+.filter-chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.filter-chip {
+  height: 36px; padding: 0 14px; border: 0; border-radius: 9999px; background: #F5F5F7; color: #1D1D1F;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+}
+.filter-chip.is-on { background: #1D1D1F; color: #fff; }
 @media (max-width: 1023px) {
-  .filter-panel { display: none; margin-bottom: 16px; }
+  .filter-panel { display: none; margin-bottom: 12px; }
   .filter-panel.is-open { display: block; }
   .filter-panel.is-open #product-search-input { height: 44px; font-size: 16px; }
-  .filter-selects { grid-template-columns: 1fr; gap: 8px; margin: 10px 0 0; }
-  .filter-selects select { height: 44px; padding-top: 0; padding-bottom: 0; font-size: 16px; }
-}
-@media (min-width: 640px) and (max-width: 1023px) {
-  .filter-selects { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .filter-panel.is-open .filter-chips { display: block; }
+  .filter-chip { height: 40px; }
+  /* ngoài trang chỉ còn khoảng giá và sắp xếp, hai ô ngắn nằm cùng hàng */
+  .filter-selects { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0 0 20px; }
+  .filter-select-condition, .filter-selects .cs:has(.filter-select-condition) { display: none; }
+  .filter-selects select, .filter-selects .cs-trigger { height: 40px; padding-top: 0; padding-bottom: 0; font-size: 14px; }
 }
 @media (min-width: 1024px) {
   .filter-toggle { display: none; }
   .filter-panel { display: contents; }
   .filter-head { flex: 1 1 auto; }
-  .filter-bar { flex-wrap: wrap; }
-  .filter-selects { flex: 0 0 100%; order: 3; }
 }
+.filter-selects .cs { width: 100%; }
+.filter-selects .cs-trigger { width: 100%; background: #F5F5F7; border: 0; border-radius: 12px; padding-left: 14px; padding-right: 12px; }

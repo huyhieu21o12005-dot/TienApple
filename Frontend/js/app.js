@@ -720,6 +720,16 @@ class App {
       });
     }
 
+    // 2.6. Thẻ chọn nhanh trong nút Lọc: đặt giá trị cho ô chọn tương ứng rồi dùng lại luồng "change"
+    document.getElementById('filterPanel')?.addEventListener('click', (e) => {
+      const chip = e.target.closest('[data-chip]');
+      if (!chip) return;
+      const select = document.getElementById(`filter-${chip.dataset.chip}`);
+      if (!select) return;
+      select.value = chip.dataset.value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
     // 3. Search Bar
     const searchInput = document.getElementById('product-search-input');
     if (searchInput) {
@@ -1143,6 +1153,10 @@ class App {
       badge.textContent = String(n);
       badge.hidden = n === 0;
     }
+    document.querySelectorAll('#filterPanel [data-chip]').forEach(c => {
+      const current = c.dataset.chip === 'condition' ? this.activeCondition : this.activePrice;
+      c.classList.toggle('is-on', c.dataset.value === (current || 'all'));
+    });
     this.renderMegaMenu();
     let filtered = [...this.products];
 
