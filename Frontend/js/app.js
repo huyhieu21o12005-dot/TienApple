@@ -1149,7 +1149,7 @@ class App {
     this.renderBrandTags();
     const badge = document.getElementById('filterBadge');
     if (badge) {
-      const n = ProductFilter.activeFilterCount({ condition: this.activeCondition, price: this.activePrice, sort: this.activeSort, search: this.searchQuery });
+      const n = ProductFilter.activeFilterCount?.({ condition: this.activeCondition, price: this.activePrice, sort: this.activeSort, search: this.searchQuery }) ?? 0;
       badge.textContent = String(n);
       badge.hidden = n === 0;
     }

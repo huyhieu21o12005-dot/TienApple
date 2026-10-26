@@ -19,10 +19,19 @@ describe('vercel.json: lưu đệm và định tuyến', () => {
       assert.match(cacheFor(p), /immutable|stale-while-revalidate/, p);
     }
   });
-  it('mã JS/CSS lưu đệm ngắn nhưng có stale-while-revalidate để vào lại nhanh', () => {
-    for (const p of ['/js/app.js', '/css/style.css', '/js/three.min.js']) {
-      assert.match(cacheFor(p), /stale-while-revalidate/, p);
+  it('mã JS/CSS luôn hỏi lại máy chủ (304 nếu không đổi) để bản mới hiện ngay, không kẹt bản cũ trong bộ nhớ đệm', () => {
+    for (const p of ['/js/app.js', '/js/store.js', '/css/style.css', '/css/tailwind.css', '/js/three.min.js']) {
+      assert.match(cacheFor(p), /max-age=0/, p);
+      assert.match(cacheFor(p), /must-revalidate/, p);
     }
+  });
+  it('trang liên kết css và app.js kèm ?v= để máy đang giữ bản cũ tải lại ngay', () => {
+    for (const f of ['Frontend/index.html', 'Frontend/product.html']) {
+      const h = readFileSync(new URL(`../../${f}`, import.meta.url), 'utf8');
+      assert.match(h, /href="css\/style\.css\?v=\w+"/, f);
+      assert.match(h, /href="css\/tailwind\.css\?v=\w+"/, f);
+    }
+    assert.match(readFileSync(new URL('../../Frontend/index.html', import.meta.url), 'utf8'), /src="js\/app\.js\?v=\w+"/);
   });
   it('trang HTML không bị lưu đệm cứng để cập nhật hiện ngay', () => {
     assert.equal(cacheFor('/index.html'), '');

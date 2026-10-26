@@ -26,7 +26,7 @@
     {
       "src": "/(js|css)/(.*)",
       "headers": {
-        "Cache-Control": "public, max-age=3600, stale-while-revalidate=604800"
+        "Cache-Control": "public, max-age=0, must-revalidate"
       },
       "continue": true
     },
