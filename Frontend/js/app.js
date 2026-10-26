@@ -1231,6 +1231,7 @@ class App {
     }
 
     if (!grid) return;
+    grid.removeAttribute('aria-busy');
 
     if (filtered.length === 0) {
       grid.innerHTML = emptyCatalogHtml({ storeEmpty: this.products.length === 0 });
@@ -1244,6 +1245,7 @@ class App {
   renderAccessories(category = 'all') {
     const grid = document.getElementById('accessoryGrid');
     if (!grid) return;
+    grid.removeAttribute('aria-busy');
 
     const labels = ACCESSORY_LABELS;
     const counts = new Map();

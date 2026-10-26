@@ -40,10 +40,12 @@ export function productCardHtml(p, opts = {}) {
           <div class="h-44 w-full flex items-center justify-center p-3 mb-2 bg-[#F5F5F7] rounded-xl cursor-pointer overflow-hidden group" onclick="window.tienApp.openProductModalById(${idArg})">
             <img
               alt="${escapeHtml(p.name)}"
-              class="h-full object-contain transition-transform duration-300 ${imageZoomClass(p.image) || 'group-hover:scale-105'}"
+              class="img-blur h-full object-contain transition-transform duration-300 ${imageZoomClass(p.image) || 'group-hover:scale-105'}"
               src="${escapeHtml(safeUrl(p.image) || NO_IMAGE)}"
               loading="lazy"
               decoding="async"
+              onload="this.classList.add('is-loaded')"
+              onerror="this.classList.add('is-loaded')"
             />
           </div>
 

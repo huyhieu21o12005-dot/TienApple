@@ -25,9 +25,9 @@
 
   <!-- Custom Design System Stylesheet -->
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
-  <link rel="stylesheet" href="css/style.css?v=f7573a73" />
+  <link rel="stylesheet" href="css/style.css?v=579b494e" />
   <!-- Tailwind biên dịch sẵn (npm run build:css), đặt sau style.css như bản CDN trước đây -->
-  <link rel="stylesheet" href="css/tailwind.css?v=f7573a73" />
+  <link rel="stylesheet" href="css/tailwind.css?v=579b494e" />
 </head>
 
 <body class="min-h-screen bg-white text-[#1D1D1F] flex flex-col font-sans antialiased">
@@ -297,8 +297,18 @@
         </div>
 
         <!-- Product Grid: 5 Cột trên Desktop, 2 Cột trên Mobile -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4" id="productGrid">
-          <!-- Được render động từ app.js -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4" id="productGrid" aria-busy="true">
+          <!-- Khung chờ mờ, được thay bằng sản phẩm thật từ app.js -->
+          <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
+          <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
+          <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
+          <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
+          <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
+          <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
+          <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
+          <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
+          <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
+          <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
         </div>
 
       </div>
@@ -326,7 +336,12 @@
         </div>
 
         <!-- Accessory Products Grid (5 Cột Desktop, 2 Cột Mobile) -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4" id="accessoryGrid">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4" id="accessoryGrid" aria-busy="true">
+          <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
+          <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
+          <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
+          <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
+          <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
           <!-- Rendered dynamically -->
         </div>
       </div>
@@ -1103,29 +1118,29 @@
   <!-- Main JavaScript App -->
   <script type="importmap">{
     "imports": {
-      "./admin/adminHelpers.js": "./admin/adminHelpers.js?v=f7573a73",
-      "./admin/modelImages.js": "./admin/modelImages.js?v=f7573a73",
-      "./js/config.js": "./js/config.js?v=f7573a73",
-      "./js/customSelect.js": "./js/customSelect.js?v=f7573a73",
-      "./js/dialog.js": "./js/dialog.js?v=f7573a73",
-      "./js/hero3d.js": "./js/hero3d.js?v=f7573a73",
-      "./js/installment.js": "./js/installment.js?v=f7573a73",
-      "./js/installmentApi.js": "./js/installmentApi.js?v=f7573a73",
-      "./js/lazyScripts.js": "./js/lazyScripts.js?v=f7573a73",
-      "./js/ordersApi.js": "./js/ordersApi.js?v=f7573a73",
-      "./js/productsApi.js": "./js/productsApi.js?v=f7573a73",
-      "./js/searchMatch.js": "./js/searchMatch.js?v=f7573a73",
-      "./js/store.js": "./js/store.js?v=f7573a73",
-      "./js/templates.js": "./js/templates.js?v=f7573a73",
-      "./js/tradeIn.js": "./js/tradeIn.js?v=f7573a73",
-      "./js/utils.js": "./js/utils.js?v=f7573a73",
-      "./js/warranty.js": "./js/warranty.js?v=f7573a73",
-      "./js/warrantyApi.js": "./js/warrantyApi.js?v=f7573a73",
-      "./js/waterRipples.js": "./js/waterRipples.js?v=f7573a73",
-      "./js/zalo.js": "./js/zalo.js?v=f7573a73"
+      "./admin/adminHelpers.js": "./admin/adminHelpers.js?v=579b494e",
+      "./admin/modelImages.js": "./admin/modelImages.js?v=579b494e",
+      "./js/config.js": "./js/config.js?v=579b494e",
+      "./js/customSelect.js": "./js/customSelect.js?v=579b494e",
+      "./js/dialog.js": "./js/dialog.js?v=579b494e",
+      "./js/hero3d.js": "./js/hero3d.js?v=579b494e",
+      "./js/installment.js": "./js/installment.js?v=579b494e",
+      "./js/installmentApi.js": "./js/installmentApi.js?v=579b494e",
+      "./js/lazyScripts.js": "./js/lazyScripts.js?v=579b494e",
+      "./js/ordersApi.js": "./js/ordersApi.js?v=579b494e",
+      "./js/productsApi.js": "./js/productsApi.js?v=579b494e",
+      "./js/searchMatch.js": "./js/searchMatch.js?v=579b494e",
+      "./js/store.js": "./js/store.js?v=579b494e",
+      "./js/templates.js": "./js/templates.js?v=579b494e",
+      "./js/tradeIn.js": "./js/tradeIn.js?v=579b494e",
+      "./js/utils.js": "./js/utils.js?v=579b494e",
+      "./js/warranty.js": "./js/warranty.js?v=579b494e",
+      "./js/warrantyApi.js": "./js/warrantyApi.js?v=579b494e",
+      "./js/waterRipples.js": "./js/waterRipples.js?v=579b494e",
+      "./js/zalo.js": "./js/zalo.js?v=579b494e"
     }
   }</script>
-  <script type="module" src="js/app.js?v=f7573a73"></script>
+  <script type="module" src="js/app.js?v=579b494e"></script>
 
 </body>
 </html>
