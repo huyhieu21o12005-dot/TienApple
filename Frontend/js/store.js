@@ -190,6 +190,11 @@ export class CartManager {
 }
 
 export class ProductFilter {
+  /** Số bộ lọc đang khác mặc định (tình trạng, khoảng giá, sắp xếp, từ khóa) để hiện trên nút Lọc. */
+  static activeFilterCount({ condition = 'all', price = 'all', sort = 'newest', search = '' } = {}) {
+    return [condition !== 'all', price !== 'all', sort !== 'newest', String(search).trim() !== ''].filter(Boolean).length;
+  }
+
   static filterByBrand(products, brand) {
     if (!brand || brand.toLowerCase() === 'all') {
       return [...products];

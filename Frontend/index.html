@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&icon_names=arrow_back,arrow_forward,battery_charging_full,bolt,check_circle,close,currency_exchange,delete,devices_off,layers,local_shipping,manage_search,memory,menu,open_in_new,photo_camera,published_with_changes,qr_code,schedule,screenshot,search,security,shopping_bag,shopping_cart,smartphone,support_agent,thumb_up,verified,verified_user,visibility,volume_up&display=block" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&icon_names=arrow_back,arrow_forward,battery_charging_full,bolt,check_circle,close,currency_exchange,delete,devices_off,layers,local_shipping,manage_search,memory,menu,open_in_new,photo_camera,published_with_changes,qr_code,schedule,screenshot,search,security,shopping_bag,shopping_cart,smartphone,support_agent,thumb_up,tune,verified,verified_user,visibility,volume_up&display=block" rel="stylesheet" />
 
   <!-- Custom Design System Stylesheet -->
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
@@ -109,7 +109,7 @@
   </header>
 
   <!-- Menu điều hướng trên điện thoại / máy tính bảng -->
-  <nav id="mobileMenuPanel" class="xl:hidden hidden fixed inset-x-0 top-[68px] bottom-0 z-30 bg-white overflow-y-auto px-6 sm:px-10 pb-10" aria-label="Điều hướng chính">
+  <nav id="mobileMenuPanel" class="xl:hidden hidden fixed inset-x-0 top-0 pt-[84px] bottom-0 z-30 bg-white overflow-y-auto px-6 sm:px-10 pb-10" aria-label="Điều hướng chính">
     <div id="mobileQuick" class="mobile-quick"></div>
     <a href="#trangchu" class="nav-layer-link mobile-nav-link" data-layer="layer-trangchu">Trang chủ</a>
     <a href="#dienthoai" class="nav-layer-link mobile-nav-link" data-layer="layer-dienthoai">Điện thoại</a>
@@ -248,12 +248,20 @@
         </div>
 
         <!-- Quick Filter Bar -->
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+        <div class="filter-bar flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
           <!-- Nhóm pills thương hiệu -->
-          <div class="tag-scroller flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 -mx-6 px-6 sm:mx-0 sm:px-0" id="brandFilterPills">
-            <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#1D1D1F] text-white transition-colors cursor-pointer shrink-0" data-brand="all">Tất cả</button>
+          <div class="filter-head">
+            <div class="tag-scroller flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 min-w-0 flex-1" id="brandFilterPills">
+              <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#1D1D1F] text-white transition-colors cursor-pointer shrink-0" data-brand="all">Tất cả</button>
+            </div>
+            <button type="button" id="filterToggleBtn" class="filter-toggle" aria-expanded="false" aria-controls="filterPanel">
+              <span class="material-symbols-outlined text-[18px]">tune</span>
+              <span>Lọc</span>
+              <span class="filter-badge" id="filterBadge" hidden>0</span>
+            </button>
           </div>
 
+          <div class="filter-panel" id="filterPanel">
           <!-- Ô tìm kiếm trực tiếp -->
           <div class="relative w-full lg:w-72">
             <span class="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-[#6E6E73]">search</span>
@@ -264,29 +272,30 @@
               class="w-full h-10 pl-9 pr-4 bg-[#F5F5F7] rounded-full text-[13px] text-[#1D1D1F] border-0 focus:ring-1 focus:ring-[#1D1D1F] outline-none" 
             />
           </div>
-        </div>
 
         <!-- Nhóm dropdowns lọc chi tiết -->
-        <div class="tag-scroller flex sm:grid sm:grid-cols-3 gap-2 sm:gap-3 mb-6 sm:mb-8 overflow-x-auto no-scrollbar -mx-6 px-6 sm:mx-0 sm:px-0">
-          <select id="filter-condition" class="shrink-0 w-[212px] sm:w-auto bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
+        <div class="filter-selects">
+          <select id="filter-condition" class="w-full bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
             <option value="all">Tình trạng: Tất cả máy</option>
             <option value="new">Mới 100% Nguyên Seal</option>
             <option value="likenew">Like New 99% Keng</option>
           </select>
 
-          <select id="filter-price" class="shrink-0 w-[212px] sm:w-auto bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
+          <select id="filter-price" class="w-full bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
             <option value="all">Khoảng giá: Tất cả mức giá</option>
             <option value="under15">Dưới 15 triệu</option>
             <option value="15to25">15 - 25 triệu</option>
             <option value="above25">Trên 25 triệu</option>
           </select>
 
-          <select id="filter-sort" class="shrink-0 w-[212px] sm:w-auto bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
+          <select id="filter-sort" class="w-full bg-[#F5F5F7] text-[13px] font-medium text-[#1D1D1F] border-0 rounded-xl px-4 py-2.5 focus:ring-1 focus:ring-[#1D1D1F] outline-none cursor-pointer">
             <option value="newest">Sắp xếp: Mới nhất</option>
             <option value="price-asc">Giá: Thấp đến cao</option>
             <option value="price-desc">Giá: Cao đến thấp</option>
             <option value="rating">Đánh giá cao nhất</option>
           </select>
+        </div>
+          </div>
         </div>
 
         <!-- Product Grid: 5 Cột trên Desktop, 2 Cột trên Mobile -->

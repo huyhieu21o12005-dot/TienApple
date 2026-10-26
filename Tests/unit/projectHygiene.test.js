@@ -109,3 +109,29 @@ describe('thanh trên trang quản trị gom gọn cho điện thoại', () => {
     for (const h of ['../index.html', './orders.html', './warranty.html', './installments.html', './cashflow.html', './buyback.html']) assert.ok(bar.includes(`href="${h}"`), h);
   });
 });
+
+describe('mobile: menu iPhone/iPad, bộ lọc một nút, tiêu đề hóa đơn căn trái', () => {
+  const idx = read('Frontend/index.html');
+  const js = read('Frontend/js/app.js');
+  it('menu di động có thẻ iPhone và iPad, nền menu phủ kín dưới thanh đầu trang', () => {
+    assert.match(js, /chip\('phone', 'all', 'iPhone'\)/);
+    assert.match(js, /chip\('acc', 'tablet', 'iPad'\)/);
+    assert.match(idx, /id="mobileMenuPanel"[^>]*\btop-0\b/);
+  });
+  it('bộ lọc gom sau một nút Lọc bên phải hàng thẻ hãng, ô tìm kiếm và 3 ô chọn nằm trong phần thu gọn', () => {
+    assert.match(idx, /id="filterToggleBtn"[^>]*aria-expanded="false"[^>]*aria-controls="filterPanel"/);
+    assert.match(idx, /id="filterPanel"/);
+    const panel = idx.slice(idx.indexOf('id="filterPanel"'), idx.indexOf('id="productGrid"'));
+    for (const id of ['product-search-input', 'filter-condition', 'filter-price', 'filter-sort']) assert.match(panel, new RegExp(`id="${id}"`), id);
+    assert.match(js, /filterToggleBtn/);
+  });
+  it('tiêu đề hóa đơn và giấy tờ: logo và tên quán căn trái, không lặp tên quán', async () => {
+    for (const f of ['print.html', 'buyback.html']) {
+      const html = read(`Frontend/admin/${f}`);
+      assert.match(html, /\.inv-head \{ text-align: left;/, f);
+      assert.match(html, /\.brand-mark \{[^}]*justify-content: flex-start/, f);
+    }
+    const { invoiceHtml, buildInvoice } = await import('../../Frontend/admin/invoiceHelpers.js');
+    assert.doesNotMatch(invoiceHtml(buildInvoice('order', { items: [] })), /class="inv-shop"/);
+  });
+});

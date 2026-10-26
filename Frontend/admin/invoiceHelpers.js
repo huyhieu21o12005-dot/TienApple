@@ -11,7 +11,7 @@ import { installmentStatusLabel, nextDueDate, parseMoney, parseRate } from '../j
 
 /** Logo cửa hàng (giống thanh đầu web) vẽ bằng SVG để in luôn có hình, không phụ thuộc tải ảnh. */
 export function brandMarkHtml() {
-  return '<div class="brand-mark"><svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="18" y="6" width="28" height="52" rx="8" fill="none" stroke="#1D1D1F" stroke-width="5"/></svg><span class="brand-mark-t"><b>Tien Mobile</b><i>Thu Duc</i></span></div>';
+  return `<div class="brand-mark"><svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="18" y="6" width="28" height="52" rx="8" fill="none" stroke="#1D1D1F" stroke-width="5"/></svg><span class="brand-mark-t"><b>${escapeHtml(SHOP.name)}</b></span></div>`;
 }
 
 export const SHOP = {
@@ -205,7 +205,6 @@ export function invoiceHtml(inv) {
   return `
   <div class="inv-head">
     ${brandMarkHtml()}
-    <div class="inv-shop">${escapeHtml(SHOP.name)}</div>
     <div class="inv-small">${escapeHtml(SHOP.tagline)}</div>
     ${SHOP.address ? `<div class="inv-small">${escapeHtml(SHOP.address)}</div>` : ''}
     <div class="inv-small">Hotline: ${escapeHtml(SHOP.hotline)}</div>

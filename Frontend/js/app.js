@@ -522,7 +522,7 @@ class App {
     }
     if (quick) {
       const chip = (kind, key, label) => `<button type="button" class="mega-chip" data-mm="${kind}" data-key="${escapeHtml(key)}">${escapeHtml(label)}</button>`;
-      quick.innerHTML = chip('phone', 'all', 'Điện thoại') + (tablets ? chip('acc', 'tablet', 'iPad') : '');
+      quick.innerHTML = chip('phone', 'all', 'iPhone') + (tablets ? chip('acc', 'tablet', 'iPad') : '');
     }
   }
 
@@ -707,6 +707,16 @@ class App {
       sortFilter.addEventListener('change', (e) => {
         this.activeSort = e.target.value;
         this.renderProducts();
+      });
+    }
+
+    // 2.5. Nút Lọc (mobile): mở/đóng phần tìm kiếm và 3 ô chọn
+    const filterBtn = document.getElementById('filterToggleBtn');
+    const filterPanel = document.getElementById('filterPanel');
+    if (filterBtn && filterPanel) {
+      filterBtn.addEventListener('click', () => {
+        const open = filterPanel.classList.toggle('is-open');
+        filterBtn.setAttribute('aria-expanded', String(open));
       });
     }
 
@@ -1127,6 +1137,12 @@ class App {
 
   renderProducts() {
     this.renderBrandTags();
+    const badge = document.getElementById('filterBadge');
+    if (badge) {
+      const n = ProductFilter.activeFilterCount({ condition: this.activeCondition, price: this.activePrice, sort: this.activeSort, search: this.searchQuery });
+      badge.textContent = String(n);
+      badge.hidden = n === 0;
+    }
     this.renderMegaMenu();
     let filtered = [...this.products];
 

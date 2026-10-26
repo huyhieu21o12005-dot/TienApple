@@ -220,3 +220,14 @@ describe('BookingValidator - số điện thoại và trường trống', () => 
     assert.equal(BookingValidator.validateOrderForm({}).errors.length, 3);
   });
 });
+
+describe('ProductFilter.activeFilterCount (số bộ lọc đang bật, hiện trên nút Lọc ở mobile)', () => {
+  it('không bật gì thì bằng 0', () => {
+    assert.equal(ProductFilter.activeFilterCount({}), 0);
+    assert.equal(ProductFilter.activeFilterCount({ condition: 'all', price: 'all', sort: 'newest', search: '  ' }), 0);
+  });
+  it('đếm từng bộ lọc khác mặc định, kể cả từ khóa tìm kiếm', () => {
+    assert.equal(ProductFilter.activeFilterCount({ condition: 'new', price: 'all', sort: 'newest', search: '' }), 1);
+    assert.equal(ProductFilter.activeFilterCount({ condition: 'new', price: 'under15', sort: 'price-asc', search: '15 pro' }), 4);
+  });
+});

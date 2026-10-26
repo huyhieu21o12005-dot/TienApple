@@ -35,7 +35,7 @@ describe('buybackContract', () => {
 
 describe('logo trên bản in', () => {
   it('hóa đơn và hợp đồng in có logo cửa hàng', () => {
-    assert.match(brandMarkHtml(), /<svg[\s\S]*Tien Mobile[\s\S]*Thu Duc/);
+    assert.match(brandMarkHtml(), /<svg[\s\S]*TIEN MOBILE THU DUC/);
     assert.match(contractHtml({ title: 'T', number: 'N', place: 'P', dateText: 'D', intro: 'I', parties: [], articles: [], signatures: [] }), /brand-mark/);
   });
 });
