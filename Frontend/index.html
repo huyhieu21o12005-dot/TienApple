@@ -25,9 +25,9 @@
 
   <!-- Custom Design System Stylesheet -->
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
-  <link rel="stylesheet" href="css/style.css?v=2" />
+  <link rel="stylesheet" href="css/style.css?v=a57d4577" />
   <!-- Tailwind biên dịch sẵn (npm run build:css), đặt sau style.css như bản CDN trước đây -->
-  <link rel="stylesheet" href="css/tailwind.css?v=2" />
+  <link rel="stylesheet" href="css/tailwind.css?v=a57d4577" />
 </head>
 
 <body class="min-h-screen bg-white text-[#1D1D1F] flex flex-col font-sans antialiased">
@@ -1116,7 +1116,31 @@
   <div id="toast-container"></div>
 
   <!-- Main JavaScript App -->
-  <script type="module" src="js/app.js?v=2"></script>
+  <script type="importmap">{
+    "imports": {
+      "./admin/adminHelpers.js": "./admin/adminHelpers.js?v=a57d4577",
+      "./admin/modelImages.js": "./admin/modelImages.js?v=a57d4577",
+      "./js/config.js": "./js/config.js?v=a57d4577",
+      "./js/customSelect.js": "./js/customSelect.js?v=a57d4577",
+      "./js/dialog.js": "./js/dialog.js?v=a57d4577",
+      "./js/hero3d.js": "./js/hero3d.js?v=a57d4577",
+      "./js/installment.js": "./js/installment.js?v=a57d4577",
+      "./js/installmentApi.js": "./js/installmentApi.js?v=a57d4577",
+      "./js/lazyScripts.js": "./js/lazyScripts.js?v=a57d4577",
+      "./js/ordersApi.js": "./js/ordersApi.js?v=a57d4577",
+      "./js/productsApi.js": "./js/productsApi.js?v=a57d4577",
+      "./js/searchMatch.js": "./js/searchMatch.js?v=a57d4577",
+      "./js/store.js": "./js/store.js?v=a57d4577",
+      "./js/templates.js": "./js/templates.js?v=a57d4577",
+      "./js/tradeIn.js": "./js/tradeIn.js?v=a57d4577",
+      "./js/utils.js": "./js/utils.js?v=a57d4577",
+      "./js/warranty.js": "./js/warranty.js?v=a57d4577",
+      "./js/warrantyApi.js": "./js/warrantyApi.js?v=a57d4577",
+      "./js/waterRipples.js": "./js/waterRipples.js?v=a57d4577",
+      "./js/zalo.js": "./js/zalo.js?v=a57d4577"
+    }
+  }</script>
+  <script type="module" src="js/app.js?v=a57d4577"></script>
 
 </body>
 </html>
