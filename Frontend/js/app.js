@@ -528,13 +528,12 @@ class App {
     const link = (kind, key, label, n) => `<button type="button" class="mega-tag" data-mm="${kind}" data-key="${escapeHtml(key)}"${n ? '' : ' disabled'}>${escapeHtml(label)} <span>${n}</span></button>`;
     if (mega) {
       this.megaHtml = {
-        phone: `<div class="mega-col"><div class="mega-tags">${link('phone', 'all', 'Điện thoại', this.products.length)}${link('acc', 'tablet', 'iPad', tablets)}</div></div>`
+        phone: `<div class="mega-col"><div class="mega-tags">${link('phone', 'all', 'iPhone', this.products.length)}${link('acc', 'tablet', 'iPad', tablets)}</div></div>`
       };
       if (!mega.hidden && mega.dataset.kind) mega.innerHTML = this.megaHtml[mega.dataset.kind] || '';
     }
     if (quick) {
-      const chip = (kind, key, label) => `<button type="button" class="mega-chip" data-mm="${kind}" data-key="${escapeHtml(key)}">${escapeHtml(label)}</button>`;
-      quick.innerHTML = chip('phone', 'all', 'iPhone') + (tablets ? chip('acc', 'tablet', 'iPad') : '');
+      quick.innerHTML = `<div class="mega-tags">${link('phone', 'all', 'iPhone', this.products.length)}${link('acc', 'tablet', 'iPad', tablets)}</div>`;
     }
   }
 

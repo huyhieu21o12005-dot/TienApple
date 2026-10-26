@@ -123,3 +123,18 @@ export function inferCategory(product) {
   const hit = CATEGORY_RULES.find(([, re]) => re.test(name));
   return hit ? hit[0] : 'other';
 }
+
+/** Bỏ phần "RAM ..." khỏi mô tả (đoạn ngăn bởi dấu chấm tròn hoặc dấu phẩy). */
+export function withoutRam(text) {
+  const kept = String(text ?? '')
+    .split(' • ')
+    .filter(part => !/^\s*RAM\s*[\d.]+\s*(GB)?\s*$/i.test(part))
+    .join(' • ');
+  return kept.replace(/,?\s*\bRAM\s*[\d.]+\s*(GB)?\s*,?/gi, (m) => (m.startsWith(',') && m.trim().endsWith(',') ? ',' : '')).replace(/\s{2,}/g, ' ').replace(/^[\s,]+|[\s,]+$/g, '');
+}
+
+/** Mô tả hiển thị: iPhone không nêu RAM (khách quan tâm bộ nhớ), máy khác giữ nguyên. */
+export function descriptionFor(product) {
+  const text = product?.description ?? '';
+  return /iphone/i.test(product?.name || '') ? withoutRam(text) : text;
+}

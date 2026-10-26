@@ -163,6 +163,11 @@ export function productNameFor(row) {
  * Ảnh, màu, chip, camera để trống; tạo ẩn (is_visible=false) mặc định cho tới khi có ảnh.
  * @returns {{ items: Array<{ key: string, brand: string, line: number, product: object }>, duplicates: number }}
  */
+/** Máy Apple iPhone: mô tả không ghi RAM. */
+function isIphone(brand, line, name) {
+  return brand === 'apple' && /iphone/i.test(`${line || ''} ${name || ''}`);
+}
+
 export function planNewProducts(existingProducts, sheetRows, { visible = false } = {}) {
   const existing = Array.isArray(existingProducts) ? existingProducts : [];
   const haveKey = new Set(existing.map(p => normalizeKey(p?.name)));
@@ -196,7 +201,7 @@ export function planNewProducts(existingProducts, sheetRows, { visible = false }
         price: r.finalPrice, base_price: r.finalPrice, old_price: r.salePercent > 0 && r.listPrice > r.finalPrice ? r.listPrice : null,
         colors: [], default_color: color, storages: r.storage ? [r.storage] : [],
         chip: '', camera: '', battery: '', screen: '',
-        description: [r.note, r.ram && r.ram !== '--' && `RAM ${r.ram}`, r.storage && `Bộ nhớ ${r.storage}`, r.warranty && `Bảo hành ${r.warranty}`].filter(Boolean).join(' • '),
+        description: [r.note, !isIphone(brand, r.line, name) && r.ram && r.ram !== '--' && `RAM ${r.ram}`, r.storage && `Bộ nhớ ${r.storage}`, r.warranty && `Bảo hành ${r.warranty}`].filter(Boolean).join(' • '),
         rating: 5, review_count: 0, image_url: imageFor(name) || imageFor(productNameFor(r)), stock: r.stock, is_visible: Boolean(visible), sort_order: 0
       }
     });
@@ -293,7 +298,7 @@ export function planUsedProducts(existingProducts, usedRows, { visible = false }
         price: r.finalPrice, base_price: r.finalPrice, old_price: null,
         colors: [], default_color: color, storages: r.storage ? [r.storage] : [],
         chip: '', camera: '', screen: '', battery: battery ? `Pin ${battery[1]}` : '',
-        description: [r.description, r.ram && r.ram !== '--' && `RAM ${r.ram}`, image && USED_IMAGE_NOTE].filter(Boolean).join(' • '),
+        description: [r.description, !isPhone && r.ram && r.ram !== '--' && `RAM ${r.ram}`, image && USED_IMAGE_NOTE].filter(Boolean).join(' • '),
         rating: 5, review_count: 0, image_url: image, stock: r.stock, is_visible: Boolean(visible), sort_order: 0
       }
     });

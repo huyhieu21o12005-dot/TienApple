@@ -114,8 +114,9 @@ describe('mobile: menu iPhone/iPad, bộ lọc một nút, tiêu đề hóa đơ
   const idx = read('Frontend/index.html');
   const js = read('Frontend/js/app.js');
   it('menu di động có thẻ iPhone và iPad, nền menu phủ kín dưới thanh đầu trang', () => {
-    assert.match(js, /chip\('phone', 'all', 'iPhone'\)/);
-    assert.match(js, /chip\('acc', 'tablet', 'iPad'\)/);
+    assert.match(js, /link\('phone', 'all', 'iPhone'/);
+    assert.match(js, /link\('acc', 'tablet', 'iPad'/);
+    assert.doesNotMatch(js, /link\('phone', 'all', 'Điện thoại'/);
     assert.match(idx, /id="mobileMenuPanel"[^>]*\btop-0\b/);
   });
   it('tiêu đề hóa đơn và giấy tờ: logo web bên trái, điện thoại và liên hệ bên phải', async () => {

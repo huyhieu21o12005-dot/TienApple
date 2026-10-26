@@ -6,7 +6,7 @@
 import { SUPABASE_URL, SUPABASE_ANON_KEY, isSupabaseConfigured } from './config.js';
 import { mapDbToProduct } from '../admin/adminHelpers.js';
 import { imageFor, isKnownSource } from '../admin/modelImages.js';
-import { inferCategory, isAccessory } from './utils.js';
+import { inferCategory, isAccessory, descriptionFor } from './utils.js';
 
 let supabaseClient = null;
 
@@ -115,6 +115,7 @@ export async function fetchProducts(options = {}) {
     // Map từng row sang cấu trúc camelCase của app.js
     const mapped = data.map(row => mapDbToProduct(row)).filter(Boolean).map(p => ({
       ...p,
+      description: descriptionFor(p),
       image: !p.image || isKnownSource(p.image) ? imageFor(p.name, p.defaultColor) : p.image,
       ...(isAccessory(p) ? { category: inferCategory(p) } : {})
     }));
