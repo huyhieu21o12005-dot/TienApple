@@ -33,8 +33,8 @@ export function productCardHtml(p, opts = {}) {
       <article class="product-card" data-id="${escapeHtml(p.id)}">
         <div>
           <div class="flex flex-wrap items-center justify-between gap-1 mb-2">
-            <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-white text-[#1D1D1F] border border-[#D2D2D7]/70">${escapeHtml(label)}</span>
-            ${p.badge ? `<span class="text-[10px] font-medium text-[#0071E3] bg-[#0071E3]/5 px-2 py-0.5 rounded">${escapeHtml(p.badge)}</span>` : ''}
+            <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-white text-[#1D1D1F] border border-[#D2D2D7]/70">${escapeHtml(label)}</span>
+            ${p.badge ? `<span class="text-[11px] font-medium text-[#0071E3] bg-[#0071E3]/5 px-2 py-0.5 rounded">${escapeHtml(p.badge)}</span>` : ''}
           </div>
 
           <div class="h-44 w-full flex items-center justify-center p-3 mb-2 bg-[#F5F5F7] rounded-xl cursor-pointer overflow-hidden group" onclick="window.tienApp.openProductModalById(${idArg})">
@@ -64,7 +64,7 @@ export function productCardHtml(p, opts = {}) {
               <div class="text-[16px] sm:text-[18px] font-semibold text-[#1D1D1F] leading-tight whitespace-nowrap">${CartManager.formatCurrency(Number(p.price) || 0)}</div>
               ${percent > 0 ? `<div class="text-[12px] text-[#6E6E73] line-through">${CartManager.formatCurrency(Number(p.oldPrice))}</div>` : ''}
             </div>
-            ${percent > 0 ? `<span class="text-[10px] font-medium text-[#0071E3] bg-[#0071E3]/10 px-1.5 py-0.5 rounded">-${percent}%</span>` : ''}
+            ${percent > 0 ? `<span class="text-[11px] font-medium text-[#0071E3] bg-[#0071E3]/10 px-1.5 py-0.5 rounded">-${percent}%</span>` : ''}
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">

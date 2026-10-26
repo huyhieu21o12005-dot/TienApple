@@ -717,11 +717,23 @@ class App {
       filterBtn.addEventListener('click', () => {
         const open = filterPanel.classList.toggle('is-open');
         filterBtn.setAttribute('aria-expanded', String(open));
+        document.body.classList.toggle('filter-open', open);
       });
     }
 
     // 2.6. Thẻ chọn nhanh trong nút Lọc: đặt giá trị cho ô chọn tương ứng rồi dùng lại luồng "change"
     document.getElementById('filterPanel')?.addEventListener('click', (e) => {
+      if (e.target.closest('#filterApplyBtn')) {
+        filterPanel.classList.remove('is-open');
+        filterBtn?.setAttribute('aria-expanded', 'false');
+        document.body.classList.toggle('filter-open', false);
+        document.getElementById('productGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      if (e.target.closest('#filterResetBtn')) {
+        this.resetFilters();
+        return;
+      }
       const chip = e.target.closest('[data-chip]');
       if (!chip) return;
       const select = document.getElementById(`filter-${chip.dataset.chip}`);
@@ -736,6 +748,12 @@ class App {
       searchInput.addEventListener('input', (e) => {
         this.searchQuery = e.target.value;
         this.renderProducts();
+      });
+      document.getElementById('productSearchClear')?.addEventListener('click', () => {
+        searchInput.value = '';
+        this.searchQuery = '';
+        this.renderProducts();
+        searchInput.focus();
       });
     }
 
@@ -1145,6 +1163,23 @@ class App {
     box.innerHTML = btn('all', 'Tất cả', pool.length) + list.map(b => btn(b.key, b.label, b.count)).join('');
   }
 
+  /** Đưa tình trạng, khoảng giá, sắp xếp và ô tìm kiếm về mặc định (nút "Xóa bộ lọc"). */
+  resetFilters() {
+    this.activeCondition = 'all';
+    this.activePrice = 'all';
+    this.activeSort = 'newest';
+    this.searchQuery = '';
+    const search = document.getElementById('product-search-input');
+    if (search) search.value = '';
+    for (const [id, value] of [['filter-condition', 'all'], ['filter-price', 'all'], ['filter-sort', 'newest']]) {
+      const select = document.getElementById(id);
+      if (!select) continue;
+      select.value = value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    this.renderProducts();
+  }
+
   renderProducts() {
     this.renderBrandTags();
     const badge = document.getElementById('filterBadge');
@@ -1155,8 +1190,12 @@ class App {
     }
     document.querySelectorAll('#filterPanel [data-chip]').forEach(c => {
       const current = c.dataset.chip === 'condition' ? this.activeCondition : this.activePrice;
-      c.classList.toggle('is-on', c.dataset.value === (current || 'all'));
+      const on = c.dataset.value === (current || 'all');
+      c.classList.toggle('is-on', on);
+      c.setAttribute('aria-pressed', String(on));
     });
+    const clearBtn = document.getElementById('productSearchClear');
+    if (clearBtn) clearBtn.hidden = !this.searchQuery;
     this.renderMegaMenu();
     let filtered = [...this.products];
 

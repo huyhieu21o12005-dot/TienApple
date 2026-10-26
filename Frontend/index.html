@@ -255,27 +255,39 @@
               <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#1D1D1F] text-white transition-colors cursor-pointer shrink-0" data-brand="all">Tất cả</button>
             </div>
             <button type="button" id="filterToggleBtn" class="filter-toggle" aria-expanded="false" aria-controls="filterPanel">
-              <span class="material-symbols-outlined text-[18px]">tune</span>
+              <span class="material-symbols-outlined text-[18px]" aria-hidden="true">tune</span>
               <span>Lọc</span>
               <span class="filter-badge" id="filterBadge" hidden>0</span>
             </button>
           </div>
 
           <div class="filter-panel" id="filterPanel">
-            <div class="relative w-full lg:w-72">
-            <span class="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-[#6E6E73]">search</span>
-            <input 
-              type="text" 
-              id="product-search-input" 
-              placeholder="Tìm kiếm máy, chip, dung lượng..." 
-              class="w-full h-10 pl-9 pr-4 bg-[#F5F5F7] rounded-full text-[13px] text-[#1D1D1F] border-0 focus:ring-1 focus:ring-[#1D1D1F] outline-none" 
-            />
-          </div>
+            <div class="search-field">
+              <span class="material-symbols-outlined search-field-icon" aria-hidden="true">search</span>
+              <input
+                type="search"
+                id="product-search-input"
+                class="search-field-input"
+                placeholder="Tìm máy, chip, dung lượng..."
+                aria-label="Tìm kiếm điện thoại"
+                enterkeyhint="search"
+                autocomplete="off"
+                autocapitalize="none"
+                spellcheck="false"
+              />
+              <button type="button" id="productSearchClear" class="search-field-clear" aria-label="Xóa từ khóa" hidden>
+                <span class="material-symbols-outlined" aria-hidden="true">close</span>
+              </button>
+            </div>
             <div class="filter-chips">
               <div class="filter-chip-label">Tình trạng</div>
-              <div class="filter-chip-row"><button type="button" class="filter-chip is-on" data-chip="condition" data-value="all">Tất cả</button><button type="button" class="filter-chip" data-chip="condition" data-value="new">Mới 100%</button><button type="button" class="filter-chip" data-chip="condition" data-value="likenew">Like New</button></div>
+              <div class="filter-chip-row"><button type="button" class="filter-chip is-on" data-chip="condition" data-value="all" aria-pressed="true">Tất cả</button><button type="button" class="filter-chip" data-chip="condition" data-value="new" aria-pressed="false">Mới 100%</button><button type="button" class="filter-chip" data-chip="condition" data-value="likenew" aria-pressed="false">Like New</button></div>
               <div class="filter-chip-label">Khoảng giá</div>
-              <div class="filter-chip-row"><button type="button" class="filter-chip is-on" data-chip="price" data-value="all">Mọi giá</button><button type="button" class="filter-chip" data-chip="price" data-value="under15">Dưới 15tr</button><button type="button" class="filter-chip" data-chip="price" data-value="15to25">15–25tr</button><button type="button" class="filter-chip" data-chip="price" data-value="above25">Trên 25tr</button></div>
+              <div class="filter-chip-row"><button type="button" class="filter-chip is-on" data-chip="price" data-value="all" aria-pressed="true">Mọi giá</button><button type="button" class="filter-chip" data-chip="price" data-value="under15" aria-pressed="false">Dưới 15tr</button><button type="button" class="filter-chip" data-chip="price" data-value="15to25" aria-pressed="false">15–25tr</button><button type="button" class="filter-chip" data-chip="price" data-value="above25" aria-pressed="false">Trên 25tr</button></div>
+              <div class="filter-actions">
+                <button type="button" id="filterResetBtn" class="filter-reset">Xóa bộ lọc</button>
+                <button type="button" id="filterApplyBtn" class="filter-apply">Xem kết quả</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1082,7 +1094,7 @@
   </div>
 
   <!-- Nút Zalo CSKH nổi ở góc dưới cùng bên phải -->
-  <div class="fixed bottom-6 right-6 z-40 flex flex-col items-center gap-3">
+  <div id="floatingContact" class="fixed bottom-6 right-6 z-40 flex flex-col items-center gap-3">
     <a href="tel:0986455457" id="call-now-btn" class="w-12 h-12 rounded-full bg-[#1D1D1F] hover:bg-black text-white shadow-xl hover:scale-110 transition-all flex items-center justify-center no-underline shrink-0" title="Gọi ngay: 0986 455 457" aria-label="Gọi ngay 0986 455 457">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.6a1 1 0 0 1-.25 1z"/></svg>
     </a>

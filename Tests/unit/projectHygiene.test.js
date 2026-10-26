@@ -143,3 +143,71 @@ describe('mobile: menu iPhone/iPad, bộ lọc một nút, tiêu đề hóa đơ
     assert.match(brandMarkHtml(), /Tien Mobile[\s\S]*Thu Duc/);
   });
 });
+
+describe('thanh tìm kiếm và bộ lọc tinh gọn, đồng bộ phong cách web (mobile trước)', () => {
+  const idx = read('Frontend/index.html');
+  const css = read('Frontend/css/style.css');
+  const js = read('Frontend/js/app.js');
+  it('ô tìm kiếm: type=search, bàn phím có nút Tìm, nhãn đọc màn hình, nút xóa chữ', () => {
+    assert.match(idx, /class="search-field"/);
+    assert.match(idx, /<input[^>]*id="product-search-input"[^>]*type="search"|<input[^>]*type="search"[^>]*id="product-search-input"/);
+    assert.match(idx, /id="product-search-input"[\s\S]{0,300}enterkeyhint="search"/);
+    assert.match(idx, /id="product-search-input"[\s\S]{0,300}aria-label="/);
+    assert.match(idx, /id="productSearchClear"[^>]*aria-label="Xóa/);
+    assert.match(js, /productSearchClear/);
+  });
+  it('trong nút Lọc có Xóa bộ lọc và nút Xem kết quả; thẻ chọn báo trạng thái bằng aria-pressed', () => {
+    const panel = idx.slice(idx.indexOf('id="filterPanel"'), idx.indexOf('class="filter-selects"'));
+    assert.match(panel, /id="filterResetBtn"/);
+    assert.match(panel, /id="filterApplyBtn"/);
+    assert.match(panel, /data-chip="price"[^>]*aria-pressed=/);
+    assert.match(js, /aria-pressed/);
+    assert.match(js, /filterResetBtn/);
+  });
+  it('kiểu dáng: cùng một chiều cao 44px trên mobile, bo tròn như thẻ hãng, có viền focus rõ', () => {
+    assert.match(css, /\.search-field\s*\{[^}]*border-radius:\s*9999px/);
+    assert.match(css, /\.search-field:focus-within/);
+    assert.match(css, /\.filter-chip:focus-visible/);
+    assert.match(css, /\.filter-toggle:focus-visible/);
+    for (const sel of ['filter-toggle', 'search-field', 'filter-apply\\b[^{]*', 'filter-reset']) assert.match(css, new RegExp(`\\.${sel}[^{]*\\{[^}]*min-height:\\s*44px`), sel);
+  });
+  it('nút gọi/Zalo nổi không che nút "Xem kết quả" khi bảng Lọc đang mở', () => {
+    assert.match(idx, /id="floatingContact"/);
+    assert.match(css, /body\.filter-open #floatingContact\s*\{[^}]*display:\s*none/);
+    assert.match(js, /classList\.toggle\('filter-open'/);
+  });
+  it('cũ: không còn ô tìm kiếm dựng bằng lớp Tailwind rời rạc', () => {
+    assert.doesNotMatch(idx, /id="product-search-input"[^>]*class="w-full h-10 pl-9/);
+    assert.doesNotMatch(idx, /absolute left-3 top-2\.5 text-\[18px\] text-\[#6E6E73\]">search/);
+  });
+});
+
+describe('mobile: vùng bấm đủ 44px và chữ nhãn không nhỏ hơn 11px', () => {
+  const css = read('Frontend/css/style.css');
+  it('biểu tượng giỏ hàng và tìm kiếm trên thanh đầu trang cao rộng tối thiểu 44px', () => {
+    assert.match(css, /\.cart-chip\s*\{[^}]*min-width:\s*44px[^}]*min-height:\s*44px|\.cart-chip\s*\{[^}]*min-height:\s*44px[^}]*min-width:\s*44px/);
+    assert.match(css, /\.nav-search-btn\s*\{[^}]*min-width:\s*44px[^}]*min-height:\s*44px|\.nav-search-btn\s*\{[^}]*min-height:\s*44px[^}]*min-width:\s*44px/);
+  });
+  it('liên kết chân trang có vùng bấm cao tối thiểu 44px', () => {
+    assert.match(css, /footer a\.nav-layer-link\s*\{[^}]*min-height:\s*44px/);
+  });
+  it('thẻ sản phẩm không dùng chữ 10px', () => {
+    assert.doesNotMatch(read('Frontend/js/templates.js'), /text-\[10px\]/);
+  });
+});
+
+describe('trang sản phẩm trên mobile: nút chọn dung lượng cao 44px', () => {
+  it('nút dung lượng dùng h-11, không dùng h-9', () => {
+    const js = read('Frontend/js/product.js');
+    assert.match(js, /data-storage=[^>]*class="[^"]*\bh-11\b/);
+    assert.doesNotMatch(js, /data-storage=[^>]*class="[^"]*\bh-9\b/);
+  });
+});
+
+describe('không còn thư mục rỗng và tệp tạm của công cụ', () => {
+  it('các thư mục rỗng ở gốc dự án đã xóa, supabase/.temp không nằm trong git', () => {
+    for (const d of ['Backend', 'Config', 'Control', 'Scripts', 'Upload']) assert.equal(exists(d), false, d);
+    assert.equal(exists('supabase/.temp/cli-latest') && /supabase\/\.temp/.test(read('.gitignore')) === false, false);
+    assert.match(read('.gitignore'), /supabase\/\.temp/);
+  });
+});
