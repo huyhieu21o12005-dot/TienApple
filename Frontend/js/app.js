@@ -1015,9 +1015,8 @@ class App {
       console.warn('Error initializing WaterRipplesEngine:', err);
     }
 
-    // 2. Chuyển động Parallax chiều sâu cho Logo Apple Watermark nền
+    // 2. Chuyển động Parallax chiều sâu cho khung 3D
     const heroSection = document.getElementById('heroSection');
-    const appleWatermark = document.getElementById('appleBgWatermark');
     const canvasWrap = document.getElementById('phone3DCanvasWrap');
 
     if (!heroSection) return;
@@ -1032,10 +1031,6 @@ class App {
         const normX = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
         const normY = (e.clientY - rect.top) / rect.height - 0.5; // -0.5 to 0.5
 
-        if (appleWatermark) {
-          appleWatermark.style.transform = `translate(calc(-50% + ${(normX * 18).toFixed(1)}px), calc(-50% + ${(normY * 14).toFixed(1)}px))`;
-        }
-
         if (canvasWrap) {
           canvasWrap.style.transform = `perspective(1000px) rotateX(${(-normY * 6).toFixed(2)}deg) rotateY(${(normX * 8).toFixed(2)}deg)`;
         }
@@ -1045,9 +1040,6 @@ class App {
     });
 
     heroSection.addEventListener('mouseleave', () => {
-      if (appleWatermark) {
-        appleWatermark.style.transform = 'translate(-50%, -50%)';
-      }
       if (canvasWrap) {
         canvasWrap.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
       }

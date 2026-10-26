@@ -62,3 +62,28 @@ describe('style.css không còn lớp mồ côi', () => {
     assert.equal(exists('Frontend/halora.html'), false);
   });
 });
+
+describe('không dùng logo quả táo của Apple (tránh vi phạm bản quyền)', () => {
+  const APPLE_GLYPH = /M18\.71 19\.5c/;
+  it('không file triển khai nào chứa đường vẽ logo Apple', async () => {
+    const { execSync } = await import('node:child_process');
+    const files = execSync("git ls-files Frontend api | grep -E '\\.(js|html|css|svg)$' | grep -vE 'three.min|GLTFLoader'", { cwd: root, encoding: 'utf8' }).trim().split('\n').filter(f => exists(f));
+    const hits = files.filter(f => APPLE_GLYPH.test(read(f)));
+    assert.deepEqual(hits, []);
+  });
+  it('trang chủ không còn hình nền logo Apple và mã chuyển động của nó', () => {
+    assert.doesNotMatch(read('Frontend/index.html'), /apple-bg-watermark|apple-watermark-svg|appleBgWatermark/);
+    assert.doesNotMatch(read('Frontend/css/style.css'), /apple-bg-watermark|apple-watermark-svg/);
+    assert.doesNotMatch(read('Frontend/js/app.js'), /appleBgWatermark|appleWatermark/);
+  });
+  it('logo.svg là chữ TM tự thiết kế, không có hình quả táo', () => {
+    assert.doesNotMatch(read('Frontend/assets/logo.svg'), APPLE_GLYPH);
+    assert.match(read('Frontend/assets/logo.svg'), /Tien Mobile Thu Duc/);
+  });
+});
+
+describe('thư mục nháp và tệp lời nhắc không dùng đã được xóa', () => {
+  it('không còn Design/ và các tệp lời nhắc ở gốc dự án', () => {
+    for (const p of ['Design', 'antigravity-admin-prompt.txt', 'stitch-prompt.txt']) assert.equal(exists(p), false, p);
+  });
+});

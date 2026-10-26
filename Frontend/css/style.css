@@ -287,55 +287,13 @@ body {
 }
 
 /* ==========================================================================
-   Tien Mobile - Subtle Frosted Apple Watermark Background & 18 Pro Max 3D Stage
+   Tien Mobile - 18 Pro Max 3D Stage
    ========================================================================== */
 
-/* 1. Subtle Frosted Apple Logo Background (Nền cân đối cho phần 'Điện thoại mới. Sửa xong trong ngày.') */
+/* 1. Cột chữ phần hero */
 .hero-editorial-col {
   position: relative;
   overflow: visible;
-}
-
-.apple-bg-watermark {
-  position: absolute;
-  top: 48%;
-  left: 40%;
-  transform: translate(-50%, -50%);
-  width: 440px;
-  height: 440px;
-  pointer-events: none;
-  z-index: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform;
-}
-
-@media (min-width: 1280px) {
-  .apple-bg-watermark {
-    width: 460px;
-    height: 460px;
-    top: 48%;
-    left: 42%;
-  }
-}
-
-@media (max-width: 1024px) {
-  .apple-bg-watermark {
-    top: 42%;
-    left: 48%;
-    width: 320px;
-    height: 320px;
-  }
-}
-
-.apple-watermark-svg {
-  width: 100%;
-  height: 100%;
-  color: #1D1D1F;
-  opacity: 0.088; /* Cân đối rõ nét, thanh lịch chuẩn mực Apple Studio (không bị quá chìm) */
-  filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.025));
 }
 
 /* 1.2. Navigation Active Underline Indicator Bar (Thanh ngang dưới mục được chọn) */
