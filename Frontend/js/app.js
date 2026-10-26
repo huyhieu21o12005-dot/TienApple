@@ -301,6 +301,16 @@ const ACCESSORIES_DATA = [
   }
 ];
 
+// Máy còn giữ store.js bản cũ trong bộ nhớ đệm (thiếu hàm mới): tải lại các module bản mới rồi mở lại trang đúng một lần
+if (typeof ProductFilter.filterByStorage !== 'function') {
+  let tried = false;
+  try { tried = sessionStorage.getItem('tm-module-refresh') === '1'; sessionStorage.setItem('tm-module-refresh', '1'); } catch { /* không có sessionStorage */ }
+  if (!tried) {
+    Promise.all(['store.js', 'searchMatch.js', 'templates.js', 'utils.js'].map(f => fetch(new URL(f, import.meta.url), { cache: 'reload' }).catch(() => null)))
+      .finally(() => location.reload());
+  }
+}
+
 class App {
   constructor() {
     window.tienApp = this;

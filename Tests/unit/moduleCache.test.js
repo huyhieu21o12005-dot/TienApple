@@ -43,3 +43,13 @@ describe('bản mới của module luôn được tải (import map có số phi
     execFileSync('node', ['tools/stamp-modules.mjs', '--check'], { cwd: root, stdio: 'pipe' });
   });
 });
+
+describe('tự chữa khi máy giữ module cũ', () => {
+  it('app.js phát hiện store.js cũ (thiếu hàm mới), tải lại bằng cache:"reload" rồi mở lại trang đúng một lần', () => {
+    const js = readFileSync(resolve(front, 'js/app.js'), 'utf8');
+    assert.match(js, /typeof ProductFilter\.filterByStorage !== 'function'/);
+    assert.match(js, /cache: 'reload'/);
+    assert.match(js, /sessionStorage/);
+    assert.match(js, /location\.reload\(\)/);
+  });
+});
