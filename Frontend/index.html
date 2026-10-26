@@ -25,9 +25,9 @@
 
   <!-- Custom Design System Stylesheet -->
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
-  <link rel="stylesheet" href="css/style.css?v=5367abeb" />
+  <link rel="stylesheet" href="css/style.css?v=f7573a73" />
   <!-- Tailwind biên dịch sẵn (npm run build:css), đặt sau style.css như bản CDN trước đây -->
-  <link rel="stylesheet" href="css/tailwind.css?v=5367abeb" />
+  <link rel="stylesheet" href="css/tailwind.css?v=f7573a73" />
 </head>
 
 <body class="min-h-screen bg-white text-[#1D1D1F] flex flex-col font-sans antialiased">
@@ -247,29 +247,10 @@
           </div>
         </div>
 
-        <!-- Thanh lọc chung cho web và mobile: thẻ hãng + tìm kiếm / 3 thẻ chọn gọn + nút Lọc -->
+        <!-- Thanh lọc chung cho web và mobile: thẻ hãng, 3 thẻ chọn gọn + nút Lọc (tìm kiếm dùng thanh trên đầu trang) -->
         <div class="catalog-bar">
-          <div class="catalog-top">
-            <div class="tag-scroller no-scrollbar catalog-brands" id="brandFilterPills">
-              <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#1D1D1F] text-white transition-colors cursor-pointer shrink-0" data-brand="all">Tất cả</button>
-            </div>
-            <div class="search-field">
-              <span class="material-symbols-outlined search-field-icon" aria-hidden="true">search</span>
-              <input
-                type="search"
-                id="product-search-input"
-                class="search-field-input"
-                placeholder="Tìm máy: 18, ip 17 pro max, 256..."
-                aria-label="Tìm kiếm điện thoại"
-                enterkeyhint="search"
-                autocomplete="off"
-                autocapitalize="none"
-                spellcheck="false"
-              />
-              <button type="button" id="productSearchClear" class="search-field-clear" aria-label="Xóa từ khóa" hidden>
-                <span class="material-symbols-outlined" aria-hidden="true">close</span>
-              </button>
-            </div>
+          <div class="tag-scroller no-scrollbar catalog-brands" id="brandFilterPills">
+            <button class="brand-btn px-4 py-2 rounded-full text-[13px] font-medium bg-[#1D1D1F] text-white transition-colors cursor-pointer shrink-0" data-brand="all">Tất cả</button>
           </div>
 
           <div class="catalog-tags">
@@ -1118,29 +1099,29 @@
   <!-- Main JavaScript App -->
   <script type="importmap">{
     "imports": {
-      "./admin/adminHelpers.js": "./admin/adminHelpers.js?v=5367abeb",
-      "./admin/modelImages.js": "./admin/modelImages.js?v=5367abeb",
-      "./js/config.js": "./js/config.js?v=5367abeb",
-      "./js/customSelect.js": "./js/customSelect.js?v=5367abeb",
-      "./js/dialog.js": "./js/dialog.js?v=5367abeb",
-      "./js/hero3d.js": "./js/hero3d.js?v=5367abeb",
-      "./js/installment.js": "./js/installment.js?v=5367abeb",
-      "./js/installmentApi.js": "./js/installmentApi.js?v=5367abeb",
-      "./js/lazyScripts.js": "./js/lazyScripts.js?v=5367abeb",
-      "./js/ordersApi.js": "./js/ordersApi.js?v=5367abeb",
-      "./js/productsApi.js": "./js/productsApi.js?v=5367abeb",
-      "./js/searchMatch.js": "./js/searchMatch.js?v=5367abeb",
-      "./js/store.js": "./js/store.js?v=5367abeb",
-      "./js/templates.js": "./js/templates.js?v=5367abeb",
-      "./js/tradeIn.js": "./js/tradeIn.js?v=5367abeb",
-      "./js/utils.js": "./js/utils.js?v=5367abeb",
-      "./js/warranty.js": "./js/warranty.js?v=5367abeb",
-      "./js/warrantyApi.js": "./js/warrantyApi.js?v=5367abeb",
-      "./js/waterRipples.js": "./js/waterRipples.js?v=5367abeb",
-      "./js/zalo.js": "./js/zalo.js?v=5367abeb"
+      "./admin/adminHelpers.js": "./admin/adminHelpers.js?v=f7573a73",
+      "./admin/modelImages.js": "./admin/modelImages.js?v=f7573a73",
+      "./js/config.js": "./js/config.js?v=f7573a73",
+      "./js/customSelect.js": "./js/customSelect.js?v=f7573a73",
+      "./js/dialog.js": "./js/dialog.js?v=f7573a73",
+      "./js/hero3d.js": "./js/hero3d.js?v=f7573a73",
+      "./js/installment.js": "./js/installment.js?v=f7573a73",
+      "./js/installmentApi.js": "./js/installmentApi.js?v=f7573a73",
+      "./js/lazyScripts.js": "./js/lazyScripts.js?v=f7573a73",
+      "./js/ordersApi.js": "./js/ordersApi.js?v=f7573a73",
+      "./js/productsApi.js": "./js/productsApi.js?v=f7573a73",
+      "./js/searchMatch.js": "./js/searchMatch.js?v=f7573a73",
+      "./js/store.js": "./js/store.js?v=f7573a73",
+      "./js/templates.js": "./js/templates.js?v=f7573a73",
+      "./js/tradeIn.js": "./js/tradeIn.js?v=f7573a73",
+      "./js/utils.js": "./js/utils.js?v=f7573a73",
+      "./js/warranty.js": "./js/warranty.js?v=f7573a73",
+      "./js/warrantyApi.js": "./js/warrantyApi.js?v=f7573a73",
+      "./js/waterRipples.js": "./js/waterRipples.js?v=f7573a73",
+      "./js/zalo.js": "./js/zalo.js?v=f7573a73"
     }
   }</script>
-  <script type="module" src="js/app.js?v=5367abeb"></script>
+  <script type="module" src="js/app.js?v=f7573a73"></script>
 
 </body>
 </html>

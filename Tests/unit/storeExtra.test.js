@@ -1,6 +1,7 @@
 import { describe, it, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { CartManager, ProductFilter, BookingValidator } from '../../Frontend/js/store.js';
+import { matchesQuery } from '../../Frontend/js/searchMatch.js';
 
 const phone = { id: 'p1', name: 'Phone 1', price: 20000000, defaultColor: 'Đen', storages: ['128GB'] };
 const acc = { id: 'a1', name: 'Ốp', price: 200000 };
@@ -192,13 +193,14 @@ describe('ProductFilter - dữ liệu thiếu trường', () => {
     assert.deepEqual(ProductFilter.sortProducts(list, undefined).map(p => p.id), ['1', '2', '3']);
   });
 
+  const find = (items, q) => items.filter(p => matchesQuery(p, q));
   it('tìm kiếm theo mô tả, chip, tên hãng và bỏ qua khoảng trắng', () => {
-    assert.deepEqual(ProductFilter.searchProducts(list, 'màn đẹp').map(p => p.id), ['1']);
-    assert.deepEqual(ProductFilter.searchProducts(list, ' a18 ').map(p => p.id), ['1']);
-    assert.deepEqual(ProductFilter.searchProducts(list, 'APPLE').map(p => p.id), ['1']);
-    assert.equal(ProductFilter.searchProducts(list, '   ').length, 3);
-    assert.equal(ProductFilter.searchProducts(list, null).length, 3);
-    assert.equal(ProductFilter.searchProducts(list, 'không có').length, 0);
+    assert.deepEqual(find(list, 'màn đẹp').map(p => p.id), ['1']);
+    assert.deepEqual(find(list, ' a18 ').map(p => p.id), ['1']);
+    assert.deepEqual(find(list, 'APPLE').map(p => p.id), ['1']);
+    assert.equal(find(list, '   ').length, 3);
+    assert.equal(find(list, null).length, 3);
+    assert.equal(find(list, 'không có').length, 0);
   });
 });
 

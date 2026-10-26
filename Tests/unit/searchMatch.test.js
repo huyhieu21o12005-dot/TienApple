@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { foldText, queryTokens, matchesQuery } from '../../Frontend/js/searchMatch.js';
+import { readFileSync } from 'node:fs';
 import { ProductFilter } from '../../Frontend/js/store.js';
 
 const p = (name, extra = {}) => ({ id: name, name, brandName: 'Apple iPhone', ...extra });
@@ -48,9 +49,10 @@ describe('searchMatch: tìm theo cách gọi tắt', () => {
     assert.equal(matchesQuery(p('Máy A', { chip: 'A19 Pro' }), 'a19'), true);
     assert.equal(matchesQuery(p('Máy B', { description: 'pin mới thay' }), 'pin moi'), true);
   });
-  it('ProductFilter.searchProducts dùng cùng luật tìm', () => {
-    assert.deepEqual(ProductFilter.searchProducts(all, 'ip 18').map(x => x.name), [i18.name]);
-    assert.equal(ProductFilter.searchProducts(all, '   ').length, 4);
+  it('ô tìm kiếm nhanh trên đầu trang dùng đúng luật này; danh mục không còn ô tìm riêng', () => {
+    const app = readFileSync(new URL('../../Frontend/js/app.js', import.meta.url), 'utf8');
+    assert.match(app, /matchesQuery\(p, input\.value\)/);
+    assert.equal(ProductFilter.searchProducts, undefined);
   });
 });
 

@@ -3,8 +3,6 @@
  * Architecture: Clean State Management & TDD Verified
  */
 
-import { matchesQuery } from './searchMatch.js';
-
 export class CartManager {
   constructor(initialItems = []) {
     this.items = [...initialItems];
@@ -240,10 +238,6 @@ export class ProductFilter {
       default:
         return list;
     }
-  }
-
-  static searchProducts(products, query) {
-    return products.filter(p => matchesQuery(p, query));
   }
 
   /** Dung lượng ghi trong tên máy ("256GB", "1 TB") về dạng "256GB"; không ghi thì rỗng. */

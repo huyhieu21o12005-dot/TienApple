@@ -137,19 +137,18 @@ describe('thanh tìm kiếm và bộ lọc: một bố cục chung cho web và m
   const css = read('Frontend/css/style.css');
   const js = read('Frontend/js/app.js');
   const bar = idx.slice(idx.indexOf('class="catalog-bar"'), idx.indexOf('id="productGrid"'));
-  it('thanh gồm: thẻ hãng, ô tìm kiếm, 3 thẻ chọn gọn và nút Lọc ở góc phải hàng thẻ', () => {
+  it('thanh gồm: thẻ hãng, 3 thẻ chọn gọn và nút Lọc ở góc phải hàng thẻ', () => {
     assert.ok(bar.length > 100, 'thiếu .catalog-bar');
-    const order = ['id="brandFilterPills"', 'class="search-field"', 'id="filter-condition"', 'id="filter-price"', 'id="filter-sort"', 'id="filterToggleBtn"'].map(k => bar.indexOf(k));
+    const order = ['id="brandFilterPills"', 'id="filter-condition"', 'id="filter-price"', 'id="filter-sort"', 'id="filterToggleBtn"'].map(k => bar.indexOf(k));
     assert.ok(order.every(i => i >= 0), String(order));
     assert.deepEqual([...order].sort((a, b) => a - b), order);
     assert.match(bar, /class="catalog-tags"[\s\S]*id="filterToggleBtn"/);
   });
-  it('ô tìm kiếm: type=search, nút Tìm trên bàn phím, nhãn đọc màn hình, nút xóa chữ', () => {
-    assert.match(bar, /<input[\s\S]*?type="search"[\s\S]*?id="product-search-input"|<input[\s\S]*?id="product-search-input"[\s\S]*?type="search"/);
-    assert.match(bar, /enterkeyhint="search"/);
-    assert.match(bar, /id="product-search-input"[\s\S]{0,400}aria-label="/);
-    assert.match(bar, /id="productSearchClear"[^>]*aria-label="Xóa/);
-    assert.match(js, /productSearchClear/);
+  it('không còn ô tìm kiếm riêng ở danh mục (đã có thanh tìm kiếm trên đầu trang)', () => {
+    assert.doesNotMatch(bar, /product-search-input|productSearchClear|search-field/);
+    assert.doesNotMatch(js, /product-search-input|productSearchClear|searchQuery/);
+    assert.match(idx, /id="searchOpenBtn"/);
+    assert.match(idx, /id="siteSearchInput"/);
   });
   it('bộ lọc chi tiết trong nút Lọc: tình trạng, khoảng giá, dung lượng, sắp xếp, Xóa bộ lọc, Xem kết quả', () => {
     const panel = bar.slice(bar.indexOf('id="filterPanel"'));
@@ -158,14 +157,11 @@ describe('thanh tìm kiếm và bộ lọc: một bố cục chung cho web và m
     assert.match(js, /aria-pressed/);
     assert.match(js, /activeStorage/);
   });
-  it('ô tìm kiếm có viền đen rõ; thẻ chọn gọn (không kéo dài hết hàng); nút Lọc có viền đen', () => {
-    assert.match(css, /\.search-field\s*\{[^}]*border:\s*1\.5px solid #1D1D1F/);
-    assert.match(css, /\.search-field\s*\{[^}]*border-radius:\s*9999px/);
+  it('thẻ chọn gọn (không kéo dài hết hàng); nút Lọc có viền đen', () => {
     assert.match(css, /\.catalog-tags \.cs\s*\{[^}]*width:\s*auto/);
     assert.match(css, /\.filter-toggle\s*\{[^}]*border:\s*1\.5px solid #1D1D1F/);
-    assert.match(css, /\.search-field:focus-within/);
     assert.match(css, /\.filter-chip:focus-visible/);
-    for (const sel of ['filter-toggle', 'search-field', 'filter-apply\\b[^{]*', 'filter-reset']) assert.match(css, new RegExp(`\\.${sel}[^{]*\\{[^}]*min-height:\\s*44px`), sel);
+    for (const sel of ['filter-toggle', 'filter-apply\\b[^{]*', 'filter-reset']) assert.match(css, new RegExp(`\\.${sel}[^{]*\\{[^}]*min-height:\\s*44px`), sel);
   });
   it('nút gọi/Zalo nổi không che nút "Xem kết quả" khi bảng Lọc đang mở', () => {
     assert.match(idx, /id="floatingContact"/);

@@ -322,7 +322,6 @@ class App {
     this.activePrice = 'all';
     this.activeSort = 'newest';
     this.activeStorage = 'all';
-    this.searchQuery = '';
     
     // Quick View state
 
@@ -759,21 +758,6 @@ class App {
       select.dispatchEvent(new Event('change', { bubbles: true }));
     });
 
-    // 3. Search Bar
-    const searchInput = document.getElementById('product-search-input');
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        this.searchQuery = e.target.value;
-        this.renderProducts();
-      });
-      document.getElementById('productSearchClear')?.addEventListener('click', () => {
-        searchInput.value = '';
-        this.searchQuery = '';
-        this.renderProducts();
-        searchInput.focus();
-      });
-    }
-
     // 4. Cart Triggers
     const cartTriggers = document.querySelectorAll('.cart-open-trigger');
     cartTriggers.forEach(btn => {
@@ -1152,14 +1136,13 @@ class App {
     });
   }
 
-  /** Dựng lại các thẻ hãng với số máy thật (đã áp dụng tình trạng, khoảng giá, tìm kiếm đang chọn). */
+  /** Dựng lại các thẻ hãng với số máy thật (đã áp dụng tình trạng, khoảng giá, dung lượng đang chọn). */
   renderBrandTags() {
     const box = document.getElementById('brandFilterPills');
     if (!box) return;
     let pool = ProductFilter.filterByCondition([...this.products], this.activeCondition);
     pool = ProductFilter.filterByPriceRange(pool, this.activePrice);
     pool = ProductFilter.filterByStorage(pool, this.activeStorage);
-    if (this.searchQuery) pool = ProductFilter.searchProducts(pool, this.searchQuery);
 
     const brands = new Map();
     for (const p of pool) {
@@ -1192,15 +1175,12 @@ class App {
     box.innerHTML = ['all', ...options].map(v => `<button type="button" class="filter-chip" data-chip="storage" data-value="${escapeHtml(v)}" aria-pressed="false">${v === 'all' ? 'Mọi dung lượng' : escapeHtml(v)}</button>`).join('');
   }
 
-  /** Đưa tình trạng, khoảng giá, dung lượng, sắp xếp và ô tìm kiếm về mặc định (nút "Xóa bộ lọc"). */
+  /** Đưa tình trạng, khoảng giá, dung lượng, sắp xếp về mặc định (nút "Xóa bộ lọc"). */
   resetFilters() {
     this.activeCondition = 'all';
     this.activePrice = 'all';
     this.activeSort = 'newest';
     this.activeStorage = 'all';
-    this.searchQuery = '';
-    const search = document.getElementById('product-search-input');
-    if (search) search.value = '';
     for (const [id, value] of [['filter-condition', 'all'], ['filter-price', 'all'], ['filter-sort', 'newest']]) {
       const select = document.getElementById(id);
       if (!select) continue;
@@ -1214,7 +1194,7 @@ class App {
     this.renderBrandTags();
     const badge = document.getElementById('filterBadge');
     if (badge) {
-      const n = ProductFilter.activeFilterCount?.({ condition: this.activeCondition, price: this.activePrice, sort: this.activeSort, storage: this.activeStorage, search: this.searchQuery }) ?? 0;
+      const n = ProductFilter.activeFilterCount?.({ condition: this.activeCondition, price: this.activePrice, sort: this.activeSort, storage: this.activeStorage }) ?? 0;
       badge.textContent = String(n);
       badge.hidden = n === 0;
     }
@@ -1225,8 +1205,6 @@ class App {
       c.classList.toggle('is-on', on);
       c.setAttribute('aria-pressed', String(on));
     });
-    const clearBtn = document.getElementById('productSearchClear');
-    if (clearBtn) clearBtn.hidden = !this.searchQuery;
     this.renderMegaMenu();
     let filtered = [...this.products];
 
@@ -1242,10 +1220,6 @@ class App {
     // Filter by Storage
     filtered = ProductFilter.filterByStorage(filtered, this.activeStorage);
 
-    // Search Query
-    if (this.searchQuery) {
-      filtered = ProductFilter.searchProducts(filtered, this.searchQuery);
-    }
 
     // Sort
     filtered = ProductFilter.sortProducts(filtered, this.activeSort);

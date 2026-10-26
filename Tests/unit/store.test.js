@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { CartManager, ProductFilter, BookingValidator } from '../../Frontend/js/store.js';
+import { matchesQuery } from '../../Frontend/js/searchMatch.js';
 
 describe('Tien Mobile TDD Suite - Store & Cart Logic', () => {
 
@@ -179,11 +180,11 @@ describe('Tien Mobile TDD Suite - Store & Cart Logic', () => {
     });
 
     it('tìm kiếm sản phẩm theo tên hoặc từ khóa', () => {
-      const result = ProductFilter.searchProducts(sampleProducts, 'pro');
+      const result = sampleProducts.filter(p => matchesQuery(p, 'pro'));
       assert.equal(result.length, 1);
       assert.equal(result[0].id, 'ip16-pro');
 
-      const ultraResult = ProductFilter.searchProducts(sampleProducts, 'ultra');
+      const ultraResult = sampleProducts.filter(p => matchesQuery(p, 'ultra'));
       assert.equal(ultraResult.length, 1);
       assert.equal(ultraResult[0].id, 'samsung-s24');
     });
