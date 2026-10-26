@@ -95,3 +95,17 @@ describe('trang quản trị và đăng nhập không hiện logo', () => {
     for (const f of pages) assert.doesNotMatch(read(`Frontend/admin/${f}`), /brand-logo|assets\/logo\.svg"\s+width/, f);
   });
 });
+
+describe('thanh trên trang quản trị gom gọn cho điện thoại', () => {
+  const html = read('Frontend/admin/index.html');
+  const bar = html.slice(html.indexOf('class="topbar-actions"'), html.indexOf('</header>'));
+  it('chỉ còn tối đa 4 nhóm ngoài cùng: Quản lý, Công cụ, nút chính, tài khoản', () => {
+    const groups = (bar.match(/class="(?:menu-group|btn btn-primary|user-menu)\b/g) || []).length;
+    assert.ok(groups <= 6 && /class="menu-group/.test(bar), String(groups));
+    assert.equal((bar.match(/<details class="menu-group/g) || []).length, 2);
+  });
+  it('mọi nút và liên kết cũ vẫn còn đúng id/đường dẫn', () => {
+    for (const id of ['visBtn', 'setPriceBtn', 'sheetSyncBtn', 'bulkModeBtn', 'sheetImageBtn', 'addProductBtn', 'logoutBtn']) assert.match(bar, new RegExp(`id="${id}"`), id);
+    for (const h of ['../index.html', './orders.html', './warranty.html', './installments.html', './cashflow.html', './buyback.html']) assert.ok(bar.includes(`href="${h}"`), h);
+  });
+});

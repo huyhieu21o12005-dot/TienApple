@@ -2072,3 +2072,11 @@ function escapeHtml(str) {
 
 // Start Admin App
 init();
+
+// Nhóm nút trên thanh quản trị: chỉ mở một danh sách một lúc, bấm ra ngoài hoặc chọn mục thì đóng
+document.addEventListener('click', (e) => {
+  const inside = e.target.closest('.menu-group');
+  document.querySelectorAll('.menu-group[open]').forEach(d => {
+    if (d !== inside || e.target.closest('.menu-item')) d.removeAttribute('open');
+  });
+});
