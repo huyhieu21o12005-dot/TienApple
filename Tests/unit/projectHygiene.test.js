@@ -87,3 +87,11 @@ describe('thư mục nháp và tệp lời nhắc không dùng đã được xó
     for (const p of ['Design', 'antigravity-admin-prompt.txt', 'stitch-prompt.txt']) assert.equal(exists(p), false, p);
   });
 });
+
+describe('trang quản trị và đăng nhập không hiện logo', () => {
+  it('không trang admin nào còn ảnh logo hoặc lớp brand-logo', async () => {
+    const { readdirSync } = await import('node:fs');
+    const pages = readdirSync(new URL('Frontend/admin/', root)).filter(f => /\.(html|css)$/.test(f));
+    for (const f of pages) assert.doesNotMatch(read(`Frontend/admin/${f}`), /brand-logo|assets\/logo\.svg"\s+width/, f);
+  });
+});
