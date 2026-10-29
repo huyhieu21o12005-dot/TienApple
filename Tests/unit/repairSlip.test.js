@@ -107,3 +107,14 @@ describe('trang sản phẩm: khung chờ và Facebook', () => {
     assert.match(read('Frontend/js/product.js'), /removeAttribute\('aria-busy'\)/);
   });
 });
+
+describe('đầu phiếu chỉ gồm địa chỉ, hotline và web', () => {
+  it('shopHeadHtml có địa chỉ, hotline, tienapple.store; không khẩu hiệu hay giờ làm việc', async () => {
+    const { shopHeadHtml } = await import('../../Frontend/js/shopInfo.js');
+    const html = shopHeadHtml();
+    assert.match(html, /54A8 Ngô Chí Quốc/);
+    assert.match(html, /0986 455 457/);
+    assert.match(html, /tienapple\.store/);
+    assert.doesNotMatch(html, /chính hãng|Sửa chữa lấy ngay|7h/);
+  });
+});

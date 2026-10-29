@@ -158,7 +158,7 @@ export function buildInvoice(type, r, extra = {}) {
           ['Đến ngày', formatDate(end)]
         ]
       }],
-      notes: [r.note ? `Ghi chú: ${r.note}` : '', 'Tra cứu bảo hành bằng số điện thoại tại tienappletd.com.'].filter(Boolean)
+      notes: [r.note ? `Ghi chú: ${r.note}` : '', 'Tra cứu bảo hành bằng số điện thoại tại tienapple.store.'].filter(Boolean)
     };
   }
 
