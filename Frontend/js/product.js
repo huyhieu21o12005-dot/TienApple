@@ -122,6 +122,7 @@ async function init() {
   updateBadge();
   const id = new URLSearchParams(location.search).get('id');
   const product = id ? await loadProduct(id) : null;
+  $('state').removeAttribute('aria-busy');
   if (!product) {
     $('state').innerHTML = 'Không tìm thấy sản phẩm này (có thể đã ngừng bán).<br><a href="index.html#dienthoai" class="inline-block mt-4 px-5 py-2 rounded-full bg-[#1D1D1F] text-white no-underline text-[13px]">Về danh sách sản phẩm</a>';
     return;

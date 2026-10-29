@@ -4,44 +4,27 @@
  */
 
 import { escapeHtml } from '../js/utils.js';
+import { SHOP_INFO, brandMarkHtml, shopHeadHtml as shopHeadHtmlFor } from '../js/shopInfo.js';
+import { buildRepairSlip, slipMachineRows } from '../js/repairSlip.js';
+import { statusLabel } from './ordersHelpers.js';
 import { formatDate, addMonths } from '../js/warranty.js';
 import { formatCurrency } from './adminHelpers.js';
 import { formatDateTime } from './ordersHelpers.js';
 import { installmentStatusLabel, nextDueDate, parseMoney, parseRate } from '../js/installment.js';
 
-/** Logo cửa hàng (giống thanh đầu web) vẽ bằng SVG để in luôn có hình, không phụ thuộc tải ảnh. */
-export function brandMarkHtml() {
-  return `<div class="brand-mark"><svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true"><rect x="18" y="6" width="28" height="52" rx="8" fill="none" stroke="#1D1D1F" stroke-width="5"/></svg><span class="brand-mark-t"><b>Tien Mobile</b><i>Thu Duc</i></span></div>`;
-}
+export { brandMarkHtml };
+export const shopHeadHtml = () => shopHeadHtmlFor(SHOP);
 
-/** Đầu giấy tờ: logo như trên web ở bên trái, tên quán/điện thoại/liên hệ ở bên phải như hóa đơn cửa hàng. */
-export function shopHeadHtml() {
-  return `<div class="shop-head">
-    ${brandMarkHtml()}
-    <div class="shop-contact">
-      <div>${escapeHtml(SHOP.tagline)}</div>
-      ${SHOP.address ? `<div>${escapeHtml(SHOP.address)}</div>` : ''}
-      <div>Hotline: ${escapeHtml(SHOP.hotline)}</div>
-      <div>${escapeHtml(SHOP.website)} · ${escapeHtml(SHOP.hours)}</div>
-    </div>
-  </div>`;
-}
+/** Bản sao có thể sửa lúc in (tên, địa chỉ, hotline); thông tin gốc nằm ở js/shopInfo.js. */
+export const SHOP = { ...SHOP_INFO };
 
-export const SHOP = {
-  name: 'TIEN MOBILE THU DUC',
-  tagline: 'Điện thoại chính hãng & Sửa chữa lấy ngay',
-  hotline: '0986 455 457 - 0933 266 179',
-  website: 'tienappletd.com',
-  hours: '7h - 21h (T2 - CN)',
-  address: ''
-};
-
-export const INVOICE_TYPES = ['order', 'booking', 'warranty', 'installment'];
+export const INVOICE_TYPES = ['order', 'booking', 'pickup', 'warranty', 'installment'];
 
 /** Bảng và tên bảng Supabase của từng loại hóa đơn. */
 export const INVOICE_TABLES = {
   order: 'orders',
   booking: 'repair_bookings',
+  pickup: 'repair_bookings',
   warranty: 'warranties',
   installment: 'installments'
 };
@@ -49,6 +32,7 @@ export const INVOICE_TABLES = {
 const SIGNATURES = {
   order: ['Khách hàng', 'Người bán'],
   booking: ['Khách hàng', 'Kỹ thuật viên'],
+  pickup: ['Khách hàng', 'Kỹ thuật viên'],
   warranty: ['Khách hàng', 'Cửa hàng'],
   installment: ['Khách hàng ký, ghi rõ họ tên', 'Cửa hàng']
 };
@@ -91,7 +75,7 @@ function customerRows(r) {
 }
 
 /**
- * @param {'order'|'booking'|'warranty'|'installment'} type
+ * @param {'order'|'booking'|'pickup'|'warranty'|'installment'} type
  * @param {object} r bản ghi lấy từ Supabase
  * @param {{ imei?: string, discount?: string, vat?: string, price?: string }} [extra] thông tin nhập thêm lúc in (seri/IMEI, giảm giá thêm, VAT %, giá dịch vụ)
  * @returns {{ title: string, code: string, dateText: string, customer: string[][], items: object[], sections: Array<{ heading: string, rows: string[][] }>, totals: Array<[string, string, boolean?]>, notes: string[], signatures: string[] } | null}
@@ -138,6 +122,22 @@ export function buildInvoice(type, r, extra = {}) {
         ? totalsWithExtras({ subtotalLabel: 'Chi phí dịch vụ', subtotal: parseMoney(extra.price), discount: 0, discountLabel: 'Giảm giá', shipping: 0, recordTotal: parseMoney(extra.price), totalLabel: 'TỔNG CỘNG' }, extra)
         : [['Chi phí', '.............................', true]],
       notes: [r.note ? `Khách ghi chú: ${r.note}` : '', 'Vui lòng mang phiếu này khi đến nhận máy.'].filter(Boolean)
+    };
+  }
+
+  if (type === 'pickup') {
+    const slip = buildRepairSlip('pickup', r);
+    return {
+      ...base,
+      title: slip.title,
+      sections: [{
+        heading: 'Thông tin máy',
+        rows: [...slipMachineRows(r), ...imeiRows(extra), ['Tình trạng', statusLabel('bookings', r.status)], ['Ngày nhận máy', base.dateText]]
+      }],
+      totals: parseMoney(extra.price) > 0
+        ? totalsWithExtras({ subtotalLabel: 'Chi phí dịch vụ', subtotal: parseMoney(extra.price), discount: 0, discountLabel: 'Giảm giá', shipping: 0, recordTotal: parseMoney(extra.price), totalLabel: 'TỔNG CỘNG' }, extra)
+        : [['Chi phí', '.............................', true]],
+      notes: slip.notes
     };
   }
 

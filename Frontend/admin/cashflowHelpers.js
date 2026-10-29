@@ -86,5 +86,5 @@ export function summarize(entries) {
 
 /** Danh mục gợi ý khi ghi thu từ hóa đơn theo loại phiếu. */
 export function categoryForInvoice(type) {
-  return { order: 'Bán máy', booking: 'Sửa chữa', warranty: 'Sửa chữa', installment: 'Trả góp' }[type] || 'Khác';
+  return { order: 'Bán máy', booking: 'Sửa chữa', pickup: 'Sửa chữa', warranty: 'Sửa chữa', installment: 'Trả góp' }[type] || 'Khác';
 }

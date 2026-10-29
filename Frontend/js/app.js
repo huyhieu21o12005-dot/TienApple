@@ -5,6 +5,7 @@
 
 import { CartManager, ProductFilter, BookingValidator } from './store.js';
 import { alertDialog } from './dialog.js';
+import { buildRepairSlip, repairSlipHtml } from './repairSlip.js';
 import { Phone3DStudio } from './hero3d.js';
 import { WaterRipplesEngine } from './waterRipples.js';
 import { fetchProducts } from './productsApi.js';
@@ -818,6 +819,13 @@ class App {
       });
     }
 
+    document.getElementById('repairSlipClose')?.addEventListener('click', () => this.closeRepairSlip());
+    document.getElementById('repairSlipPrint')?.addEventListener('click', () => window.print());
+    document.getElementById('repairSlipCopy')?.addEventListener('click', async (e) => {
+      const ok = await this.copyText(document.getElementById('repairSlipModal')?.dataset.code || '');
+      e.currentTarget.textContent = ok ? 'Đã sao chép' : 'Không sao chép được';
+    });
+
     const repairForm = document.getElementById('repair-modal-form');
     if (repairForm) {
       repairForm.addEventListener('submit', (e) => this.handleRepairSubmit(e));
@@ -1428,6 +1436,26 @@ class App {
     }
   }
 
+  // Phiếu hẹn sửa chữa: cùng dữ liệu với phiếu lấy máy bên quản trị (mã SC, khách, máy, dịch vụ)
+  showRepairSlip(slip) {
+    const modal = document.getElementById('repairSlipModal');
+    const body = document.getElementById('repairSlipBody');
+    if (!modal || !body || !slip) return;
+    body.innerHTML = repairSlipHtml(slip);
+    modal.dataset.code = slip.code;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeRepairSlip() {
+    const modal = document.getElementById('repairSlipModal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.style.overflow = '';
+  }
+
   closeBookingModal() {
     const modal = document.getElementById('repairModal');
     if (modal) {
@@ -1459,7 +1487,10 @@ class App {
         return;
       }
       this.closeBookingModal();
-      await alertDialog(`ĐÃ ĐẶT LỊCH HẸN!\n\nMã lịch: ${result.code}\n- Khách hàng: ${name} (${phone})\n- Máy: ${device}\n- Dịch vụ: ${service}\n\nKỹ thuật viên sẽ gọi xác nhận trong thời gian sớm nhất.`);
+      this.showRepairSlip(buildRepairSlip('appointment', {
+        code: result.code, customer_name: name, phone: validation.normalizedPhone || phone,
+        device, service, created_at: new Date().toISOString()
+      }));
     } finally {
       this._submitting = false;
     }

@@ -25,9 +25,9 @@
 
   <!-- Custom Design System Stylesheet -->
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
-  <link rel="stylesheet" href="css/style.css?v=579b494e" />
+  <link rel="stylesheet" href="css/style.css?v=9bdb3b7e" />
   <!-- Tailwind biên dịch sẵn (npm run build:css), đặt sau style.css như bản CDN trước đây -->
-  <link rel="stylesheet" href="css/tailwind.css?v=579b494e" />
+  <link rel="stylesheet" href="css/tailwind.css?v=9bdb3b7e" />
 </head>
 
 <body class="min-h-screen bg-white text-[#1D1D1F] flex flex-col font-sans antialiased">
@@ -1033,6 +1033,18 @@
     </div>
   </aside>
 
+  <!-- Phiếu hẹn sửa chữa: hiện sau khi đặt lịch thành công, in hoặc lưu PDF được -->
+  <div id="repairSlipModal" class="fixed inset-0 modal-overlay z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-[20px] max-w-[460px] w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl border border-[#D2D2D7]">
+      <div id="repairSlipBody"></div>
+      <div class="slip-actions flex gap-2 mt-5">
+        <button id="repairSlipPrint" type="button" class="flex-1 h-10 rounded-full bg-[#1D1D1F] text-white text-[13px] font-medium border-0 cursor-pointer">In / Lưu PDF</button>
+        <button id="repairSlipCopy" type="button" class="h-10 px-4 rounded-full bg-[#F5F5F7] text-[#1D1D1F] text-[13px] font-medium border-0 cursor-pointer">Sao chép mã</button>
+        <button id="repairSlipClose" type="button" class="h-10 px-4 rounded-full bg-[#F5F5F7] text-[#1D1D1F] text-[13px] font-medium border-0 cursor-pointer">Đóng</button>
+      </div>
+    </div>
+  </div>
+
   <!-- POPUP 2: Modal "Đặt Lịch Sửa Chữa Nhanh" (#repairModal) -->
   <div id="repairModal" class="fixed inset-0 modal-overlay z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-[20px] max-w-[500px] w-full p-6 sm:p-8 shadow-2xl relative border border-[#D2D2D7]">
@@ -1118,29 +1130,32 @@
   <!-- Main JavaScript App -->
   <script type="importmap">{
     "imports": {
-      "./admin/adminHelpers.js": "./admin/adminHelpers.js?v=579b494e",
-      "./admin/modelImages.js": "./admin/modelImages.js?v=579b494e",
-      "./js/config.js": "./js/config.js?v=579b494e",
-      "./js/customSelect.js": "./js/customSelect.js?v=579b494e",
-      "./js/dialog.js": "./js/dialog.js?v=579b494e",
-      "./js/hero3d.js": "./js/hero3d.js?v=579b494e",
-      "./js/installment.js": "./js/installment.js?v=579b494e",
-      "./js/installmentApi.js": "./js/installmentApi.js?v=579b494e",
-      "./js/lazyScripts.js": "./js/lazyScripts.js?v=579b494e",
-      "./js/ordersApi.js": "./js/ordersApi.js?v=579b494e",
-      "./js/productsApi.js": "./js/productsApi.js?v=579b494e",
-      "./js/searchMatch.js": "./js/searchMatch.js?v=579b494e",
-      "./js/store.js": "./js/store.js?v=579b494e",
-      "./js/templates.js": "./js/templates.js?v=579b494e",
-      "./js/tradeIn.js": "./js/tradeIn.js?v=579b494e",
-      "./js/utils.js": "./js/utils.js?v=579b494e",
-      "./js/warranty.js": "./js/warranty.js?v=579b494e",
-      "./js/warrantyApi.js": "./js/warrantyApi.js?v=579b494e",
-      "./js/waterRipples.js": "./js/waterRipples.js?v=579b494e",
-      "./js/zalo.js": "./js/zalo.js?v=579b494e"
+      "./admin/adminHelpers.js": "./admin/adminHelpers.js?v=9bdb3b7e",
+      "./admin/modelImages.js": "./admin/modelImages.js?v=9bdb3b7e",
+      "./admin/ordersHelpers.js": "./admin/ordersHelpers.js?v=9bdb3b7e",
+      "./js/config.js": "./js/config.js?v=9bdb3b7e",
+      "./js/customSelect.js": "./js/customSelect.js?v=9bdb3b7e",
+      "./js/dialog.js": "./js/dialog.js?v=9bdb3b7e",
+      "./js/hero3d.js": "./js/hero3d.js?v=9bdb3b7e",
+      "./js/installment.js": "./js/installment.js?v=9bdb3b7e",
+      "./js/installmentApi.js": "./js/installmentApi.js?v=9bdb3b7e",
+      "./js/lazyScripts.js": "./js/lazyScripts.js?v=9bdb3b7e",
+      "./js/ordersApi.js": "./js/ordersApi.js?v=9bdb3b7e",
+      "./js/productsApi.js": "./js/productsApi.js?v=9bdb3b7e",
+      "./js/repairSlip.js": "./js/repairSlip.js?v=9bdb3b7e",
+      "./js/searchMatch.js": "./js/searchMatch.js?v=9bdb3b7e",
+      "./js/shopInfo.js": "./js/shopInfo.js?v=9bdb3b7e",
+      "./js/store.js": "./js/store.js?v=9bdb3b7e",
+      "./js/templates.js": "./js/templates.js?v=9bdb3b7e",
+      "./js/tradeIn.js": "./js/tradeIn.js?v=9bdb3b7e",
+      "./js/utils.js": "./js/utils.js?v=9bdb3b7e",
+      "./js/warranty.js": "./js/warranty.js?v=9bdb3b7e",
+      "./js/warrantyApi.js": "./js/warrantyApi.js?v=9bdb3b7e",
+      "./js/waterRipples.js": "./js/waterRipples.js?v=9bdb3b7e",
+      "./js/zalo.js": "./js/zalo.js?v=9bdb3b7e"
     }
   }</script>
-  <script type="module" src="js/app.js?v=579b494e"></script>
+  <script type="module" src="js/app.js?v=9bdb3b7e"></script>
 
 </body>
 </html>

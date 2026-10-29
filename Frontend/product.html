@@ -20,8 +20,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&icon_names=arrow_back,arrow_forward,battery_charging_full,bolt,check_circle,close,currency_exchange,delete,devices_off,layers,local_shipping,manage_search,memory,menu,open_in_new,photo_camera,published_with_changes,qr_code,schedule,screenshot,search,security,shopping_bag,shopping_cart,smartphone,support_agent,thumb_up,tune,verified,verified_user,visibility,volume_up&display=block" rel="stylesheet" />
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
-  <link rel="stylesheet" href="css/style.css?v=77e5b3e0" />
-  <link rel="stylesheet" href="css/tailwind.css?v=77e5b3e0" />
+  <link rel="stylesheet" href="css/style.css?v=bf8b6e6b" />
+  <link rel="stylesheet" href="css/tailwind.css?v=bf8b6e6b" />
 </head>
 <body class="min-h-screen bg-white text-[#1D1D1F] font-sans antialiased" style="font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
 
@@ -38,24 +38,29 @@
 
   <main class="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
     <nav id="crumbs" class="text-[12px] text-[#6E6E73] mb-5" aria-label="Đường dẫn"></nav>
-    <div id="state" class="py-20 text-center text-[#6E6E73]">Đang tải sản phẩm...</div>
+    <div id="state" class="py-8 text-center text-[#6E6E73]" role="status" aria-busy="true">
+      <div class="sk-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-line sk-w60"></div><div class="sk-line sk-w90"></div><div class="sk-line sk-w40"></div></div>
+      <span class="sr-only">Đang tải sản phẩm...</span>
+    </div>
     <article id="detail" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12"></article>
   </main>
+
+  <a href="https://www.facebook.com/van.tien.201660" target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-4 z-40 w-12 h-12 rounded-full shadow-xl overflow-hidden" aria-label="Facebook cửa hàng" title="Facebook cửa hàng"><img src="./assets/icons/facebook.svg" alt="" width="48" height="48" class="w-full h-full"></a>
 
   <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden px-5 py-3 rounded-full bg-[#1D1D1F] text-white text-[13px] shadow-lg"></div>
 
   <script type="importmap">{
     "imports": {
-      "./admin/adminHelpers.js": "./admin/adminHelpers.js?v=77e5b3e0",
-      "./admin/modelImages.js": "./admin/modelImages.js?v=77e5b3e0",
-      "./js/config.js": "./js/config.js?v=77e5b3e0",
-      "./js/dialog.js": "./js/dialog.js?v=77e5b3e0",
-      "./js/productsApi.js": "./js/productsApi.js?v=77e5b3e0",
-      "./js/store.js": "./js/store.js?v=77e5b3e0",
-      "./js/utils.js": "./js/utils.js?v=77e5b3e0"
+      "./admin/adminHelpers.js": "./admin/adminHelpers.js?v=bf8b6e6b",
+      "./admin/modelImages.js": "./admin/modelImages.js?v=bf8b6e6b",
+      "./js/config.js": "./js/config.js?v=bf8b6e6b",
+      "./js/dialog.js": "./js/dialog.js?v=bf8b6e6b",
+      "./js/productsApi.js": "./js/productsApi.js?v=bf8b6e6b",
+      "./js/store.js": "./js/store.js?v=bf8b6e6b",
+      "./js/utils.js": "./js/utils.js?v=bf8b6e6b"
     }
   }</script>
 
-  <script type="module" src="js/product.js?v=77e5b3e0"></script>
+  <script type="module" src="js/product.js?v=bf8b6e6b"></script>
 </body>
 </html>

@@ -146,6 +146,10 @@ function contractLink(type, record) {
   return `<a class="btn btn-secondary btn-sm" href="./print.html?type=${type}&doc=contract&id=${encodeURIComponent(record.id)}" target="_blank" rel="noopener">In hợp đồng</a>`;
 }
 
+function pickupLink(record) {
+  return `<a class="btn btn-secondary btn-sm" href="./print.html?type=pickup&id=${encodeURIComponent(record.id)}" target="_blank" rel="noopener">In phiếu lấy máy</a>`;
+}
+
 function printLink(type, record) {
   return `<a class="btn btn-secondary btn-sm" href="./print.html?type=${type}&id=${encodeURIComponent(record.id)}" target="_blank" rel="noopener">In hóa đơn</a>`;
 }
@@ -244,7 +248,7 @@ function bookingCard(b) {
       ${state.editingId === b.id ? editForm(b, 'bookings') : `${phoneLine(b)}
       <p class="ord-line">${escapeHtml(b.device)} · ${escapeHtml(b.service)}</p>`}
       ${b.note && state.editingId !== b.id ? `<p class="ord-line ord-muted">Khách ghi chú: ${escapeHtml(b.note)}</p>` : ''}
-      <div class="ord-actions">${statusSelect(b)}${editButton(b)}${printLink('booking', b)}${deleteButton(b)}</div>
+      <div class="ord-actions">${statusSelect(b)}${editButton(b)}${printLink('booking', b)}${pickupLink(b)}${deleteButton(b)}</div>
       ${noteBlock(b)}
     </article>`;
 }

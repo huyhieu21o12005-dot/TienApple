@@ -1,5 +1,5 @@
 /**
- * Tien Mobile - Trang in hóa đơn: /admin/print.html?type=order|booking|warranty|installment&id=<uuid>
+ * Tien Mobile - Trang in hóa đơn: /admin/print.html?type=order|booking|pickup|warranty|installment&id=<uuid>
  * Thêm &doc=contract (order|installment) để in hợp đồng mua bán khổ A4.
  * Cần đăng nhập quản trị (dùng phiên Supabase đã lưu). Khổ giấy 80mm cho máy in hóa đơn, hoặc A5.
  */
@@ -96,7 +96,7 @@ function buildInfoForm() {
   }
   fields.push(['Số seri / IMEI máy', () => extra.imei || '', v => { extra.imei = v; }]);
   if (!isContractDoc && docType !== 'installment' && docType !== 'warranty') {
-    if (docType === 'booking') fields.push(['Chi phí dịch vụ (đ)', () => extra.price || '', v => { extra.price = v; }]);
+    if (docType === 'booking' || docType === 'pickup') fields.push(['Chi phí dịch vụ (đ)', () => extra.price || '', v => { extra.price = v; }]);
     fields.push(
       ['Giảm giá thêm (đ)', () => extra.discount || '', v => { extra.discount = v; }],
       ['VAT (%)', () => extra.vat || '', v => { extra.vat = v; }]
